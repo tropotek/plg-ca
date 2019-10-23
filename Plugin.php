@@ -1,7 +1,5 @@
 <?php
-namespace Cat;
-
-
+namespace Ca;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -19,7 +17,7 @@ class Plugin extends \App\Plugin\Iface
      */
     static function getInstance()
     {
-        return \Uni\Config::getInstance()->getPluginFactory()->getPlugin('plg-cat');
+        return \Uni\Config::getInstance()->getPluginFactory()->getPlugin('plg-ca');
     }
 
     /**
@@ -59,9 +57,9 @@ class Plugin extends \App\Plugin\Iface
 
         $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description)
 VALUES
-  ('status.cat.entry.pending', 'Cat Entry - Pending', ''),
-  ('status.cat.entry.approved', 'Cat Entry - Approved', ''),
-  ('status.cat.entry.not approved', 'Cat Entry - Not Approved', '')
+  ('status.ca.entry.pending', 'CA Entry - Pending', ''),
+  ('status.ca.entry.approved', 'CA Entry - Approved', ''),
+  ('status.ca.entry.not approved', 'CA Entry - Not Approved', '')
 ");
         $stm->execute();
 
@@ -79,7 +77,7 @@ VALUES
         $db = $this->getConfig()->getDb();
 
         // Remove status types
-        $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.cat.entry.%' ");
+        $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.ca.entry.%' ");
         $stm->execute();
 
 

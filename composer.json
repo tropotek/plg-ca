@@ -1,5 +1,5 @@
 {
-    "name": "ttek-plg/plg-ct",
+    "name": "ttek-plg/plg-ca",
     "type": "ttek-plugin",
     "description": "The University Of Melbourne - FVAS EMS Placement Compentency Assessment plugin.",
     "keywords":  [
@@ -21,7 +21,7 @@
     ],
     "autoload":  {
         "psr-0":  {
-            "Skill\\": ""
+            "Ca\\": ""
         }
     },
     "extra":  {

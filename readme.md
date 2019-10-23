@@ -15,11 +15,11 @@ Compentency Assessment Tool plugin. Send requests to clients to complete a form 
 
 ## Installation
 
-Available on Packagist ([ttek-plg/plg-cat](http://packagist.org/packages/ttek-plg/plg-ca))
+Available on Packagist ([ttek-plg/plg-ca](http://packagist.org/packages/ttek-plg/plg-ca))
 and as such installable via [Composer](http://getcomposer.org/).
 
 ```bash
-# composer require ttek-plg/plg-cat
+# composer require ttek-plg/plg-ca
 ```
 
 Or add the following to your composer.json file:
@@ -31,7 +31,7 @@ Or add the following to your composer.json file:
 ```
 
 If you do not use Composer, you can grab the code from GitHub, and use any
-PSR-0 compatible autoloader (e.g. the [plg-cat](https://github.com/tropotek/plg-ca))
+PSR-0 compatible autoloader (e.g. the [plg-ca](https://github.com/tropotek/plg-ca))
 to load the classes.
 
 ## Introduction

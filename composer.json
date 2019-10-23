@@ -1,0 +1,34 @@
+{
+    "name": "ttek-plg/plg-ct",
+    "type": "ttek-plugin",
+    "description": "The University Of Melbourne - FVAS EMS Placement Compentency Assessment plugin.",
+    "keywords":  [
+        "tropotek",
+        "plugin",
+        "compentency",
+        "assessment",
+        "EMS"
+    ],
+    "time": "2019-10-15",
+    "license": "MIT",
+    "version": "master",
+    "access": "admin, subject",
+    "authors":  [
+         {
+            "name": "Michael Mifsud",
+            "homepage": "http://www.tropotek.com/"
+        }
+    ],
+    "autoload":  {
+        "psr-0":  {
+            "Skill\\": ""
+        }
+    },
+    "extra":  {
+        "branch-alias":  {
+            "dev-master": "3.0.x-dev"
+        }
+    },
+    "require":  {
+    }
+}

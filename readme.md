@@ -1,6 +1,6 @@
 # CA Plugin
 
-__Project:__ [ttek-plg/plg-ca](http://packagist.org/packages/ttek-plg/plg-ca)
+__Project:__ [ttek-plg/plg-ca](http://packagist.org/packages/ttek-plg/plg-ca)  
 __Web:__ <http://www.tropotek.com/>  
 __Authors:__ Michael Mifsud <http://www.tropotek.com/>  
   

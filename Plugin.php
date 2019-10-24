@@ -36,7 +36,7 @@ class Plugin extends \App\Plugin\Iface
         $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_SUBJECT_PROFILE);
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_SUBJECT);
         
-        \App\Config::getInstance()->getEventDispatcher()->addSubscriber(new \Cat\Listener\SetupHandler());
+        \App\Config::getInstance()->getEventDispatcher()->addSubscriber(new \Ca\Listener\SetupHandler());
     }
 
     /**

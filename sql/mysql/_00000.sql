@@ -5,13 +5,13 @@
 -- ----------------------------
 --
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS ct_data (
+CREATE TABLE IF NOT EXISTS ca_data (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     fid INT(10) NOT NULL DEFAULT 0,
     fkey VARCHAR(64) NOT NULL DEFAULT '',
     `key` VARCHAR(128) NOT NULL DEFAULT '',
     value TEXT,
-    UNIQUE ct_data_foreign_fields(fid, fkey, `key`),
+    UNIQUE ca_data_foreign_fields(fid, fkey, `key`),
     KEY fid(fkey),
     KEY fid(fid)
 ) ENGINE = InnoDB;
@@ -19,15 +19,19 @@ CREATE TABLE IF NOT EXISTS ct_data (
 -- ----------------------------
 --
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS ct_assessment (
+CREATE TABLE IF NOT EXISTS ca_assessment (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     uid VARCHAR(128) NOT NULL DEFAULT '',            -- Reserved to be used via an external API identifier or for historic reporting, this could just = id for now.
     institution_id INT UNSIGNED DEFAULT 0 NOT NULL,
 
     -- Typically this value would need to come from the APP, maybe we could have a listener/interface that supports this plugin and this value
-    -- Use a select box for the interface in EMS this should have \App\Db\PlacementType:class => 'Placement'
+    -- Use a select box for the interface in EMS this should have \App\Db\Placement:class => 'Placement'
     fkey VARCHAR(128) DEFAULT '' NOT NULL,           -- If this is gradable then we need the assessment object
-    -- any extra options related to the fkey object (EG: for placement we would need placementType, availabbility status, etc) probably shoud go into the ct_data table
+    fkey_group VARCHAR(128) DEFAULT '' NOT NULL,     -- (optional) this value could be placementType class name or just a text field (this could be used to link to placementType)
+    -- groupId VARCHAR(16) DEFAULT '' NOT NULL,        -- (optional) This could be the ID of the group object (EG: placementTypeID)
+
+    -- any extra options related to the fkey object (EG: for placement we would need availability status, etc)
+    -- probably shoud go into the ca_data table
 
     type VARCHAR(20) DEFAULT 'student' NOT NULL,     -- student = self assessment, Learner = staff student assessment, supervisor/External = company/mentor student assessment
     multi BOOL NOT NULL DEFAULT 0,                   -- Can multiple entries by unique users be submited (ignored for self-assessment)
@@ -36,13 +40,13 @@ CREATE TABLE IF NOT EXISTS ct_assessment (
     -- `Supervisor/External` Enables a public form that will be sent to the placement supervisor [$fkey->getSupervisor()] (will need an interface for this object too)
     --  NOTE: to support the rotation requirements, a coordinator needs to be able to compile multiple results into one final somehow?
     -- If there are any more behaviours required then they should go here as an assessment can only have one type of behaviour.
-    -- Here is a though, based on the fkey we should see what behaviours are available and let the App interface inform us of them
+    -- Here is a though, based on the fkey we should see what behaviours are available and let the App interface inform us of them.
 
     name VARCHAR(128) DEFAULT '' NOT NULL,
     icon VARCHAR(32) DEFAULT 'fa fa-rebel' NOT NULL, -- a bootstrap CSS icon for the collection EG: 'fa fa-pen'
-    include_zero BOOL DEFAULT 0 NOT NULL,            -- Should zero values be included in average calculations (Default: false)
+    include_zero BOOL DEFAULT 0 NOT NULL,            -- Should zero values be included in overall average calculations (Default: false)
 
-    view_grade DATETIME,                             -- Can the student view their average results for this collection: Past Date is enabled, Future date would enable it then, NULL dissabled
+    view_grade DATETIME,                             -- Can the student view their average results for this collection: Past Date is enabled, Future date would enable it then, NULL dissabled.
     description TEXT,
     notes TEXT,
 
@@ -51,24 +55,25 @@ CREATE TABLE IF NOT EXISTS ct_assessment (
     created DATETIME NOT NULL,
     KEY (uid),
     KEY (institution_id),
-    KEY (fkey),
+    KEY (type),
+    KEY (fkey, fkey_group),
     KEY del(del)
 ) ENGINE = InnoDB;
 
 -- --------------------------------------------
 -- Associate assessments with subjects
 -- --------------------------------------------
-CREATE TABLE IF NOT EXISTS ct_assessment_subject (
+CREATE TABLE IF NOT EXISTS ca_assessment_subject (
     assessment_id INT UNSIGNED NOT NULL DEFAULT 0,
-    subject_id INT UNSIGNED NOT NULL DEFAULT 0,
+    subjeca_id INT UNSIGNED NOT NULL DEFAULT 0,
 --  active BOOL NOT NULL DEFAULT 1,                   -- enable/disable user submission/editing for this subject
-    PRIMARY KEY (assessment_id, subject_id)
+    PRIMARY KEY (assessment_id, subjeca_id)
 ) ENGINE = InnoDB;
 
 -- --------------------------------------------
 --
 -- --------------------------------------------
-CREATE TABLE IF NOT EXISTS ct_item (
+CREATE TABLE IF NOT EXISTS ca_item (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     uid VARCHAR(128) NOT NULL DEFAULT '',
     assessment_id INT UNSIGNED NOT NULL DEFAULT 0,
@@ -93,7 +98,7 @@ CREATE TABLE IF NOT EXISTS ct_item (
 -- --------------------------------------------
 --
 -- --------------------------------------------
-CREATE TABLE IF NOT EXISTS ct_item_competancy (
+CREATE TABLE IF NOT EXISTS ca_item_competancy (
     item_id INT UNSIGNED NOT NULL DEFAULT 0,
     competancy_id INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (item_id, competancy_id)
@@ -102,17 +107,17 @@ CREATE TABLE IF NOT EXISTS ct_item_competancy (
 -- --------------------------------------------
 --
 -- --------------------------------------------
-CREATE TABLE IF NOT EXISTS ct_scale (
+CREATE TABLE IF NOT EXISTS ca_scale (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     uid VARCHAR(128) NOT NULL DEFAULT '',
     institution_id INT UNSIGNED NOT NULL DEFAULT 0,
     name VARCHAR(255) NOT NULL DEFAULT '',
     description TEXT,
-    type VARCHAR(255) NOT NULL DEFAULT 'text',  -- `text`, `points`, `percentage` OR a list using items in the the ct_score table ???
-    multiple BOOL NOT NULL DEFAULT 0,           -- if using a list: when true then use checkboxes whn false use radio boxes
+    type VARCHAR(255) NOT NULL DEFAULT 'text',      -- `text`, `points`, `percentage` OR a list using items in the the ca_score table ???
+    multiple BOOL NOT NULL DEFAULT 0,               -- if using a list: when true then use checkboxes whn false use radio boxes
     -- NOTE: This also means there will be many values per item when true....
-    calc VARCHAR(16) NOT NULL DEFAULT 'avg',    -- avg, add .... ?? (this would be the calculation method for one item
-    max_score DECIMAL(6, 2) NOT NULL DEFAULT 0, -- Used for when entering a grade `points` or `percentage`
+    calc_type VARCHAR(16) NOT NULL DEFAULT 'avg',   -- avg, add .... ?? (this would be the calculation method for one item when using multiple values)
+    max_score DECIMAL(6, 2) NOT NULL DEFAULT 0,     -- Used for when entering a grade `points` or `percentage`
 
     del BOOL NOT NULL DEFAULT 0,
     modified DATETIME NOT NULL,
@@ -124,12 +129,12 @@ CREATE TABLE IF NOT EXISTS ct_scale (
 -- --------------------------------------------
 --
 -- --------------------------------------------
-CREATE TABLE IF NOT EXISTS ct_score (
+CREATE TABLE IF NOT EXISTS ca_score (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     scale_id INT UNSIGNED NOT NULL DEFAULT 0,
     name VARCHAR(255) NOT NULL DEFAULT '',
     description TEXT,
-    value DECIMAL(6, 2) NOT NULL DEFAULT 0, -- Typical values (0, 1, 2, 3, 4) ???
+    value DECIMAL(6, 2) NOT NULL DEFAULT 0,         -- Typical values (0, 1, 2, 3, 4) ???
     del BOOL NOT NULL DEFAULT 0,
     modified DATETIME NOT NULL,
     created DATETIME NOT NULL,
@@ -142,11 +147,11 @@ CREATE TABLE IF NOT EXISTS ct_score (
 -- --------------------------------------------
 -- Learning domains for the competancies
 -- --------------------------------------------
-CREATE TABLE IF NOT EXISTS ct_domain (
+CREATE TABLE IF NOT EXISTS ca_domain (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     uid VARCHAR(128) NOT NULL DEFAULT '',
     institution_id INT UNSIGNED NOT NULL DEFAULT 0,
---  parent_id INT UNSIGNED NOT NULL DEFAULT 0,                  -- TODO: this may be required in the future but for now we will leave it.
+--  parent_id INT UNSIGNED NOT NULL DEFAULT 0,      -- TODO: this may be required in the future but for now we will leave it.
     name VARCHAR(255) NOT NULL DEFAULT '',
     description TEXT,
     label VARCHAR(16) NOT NULL, -- abbreviated label
@@ -162,9 +167,9 @@ CREATE TABLE IF NOT EXISTS ct_domain (
 -- ---------------------------------------
 -- competency question setup tables
 -- ---------------------------------------
-CREATE TABLE IF NOT EXISTS ct_competency (
+CREATE TABLE IF NOT EXISTS ca_competency (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    uid VARCHAR(128) NOT NULL DEFAULT '',               -- TODO: Use to create unique/updateable data
+    uid VARCHAR(128) NOT NULL DEFAULT '',           -- TODO: Use to create unique/updateable data
     institution_id INT UNSIGNED NOT NULL DEFAULT 0,
     name VARCHAR(255) NOT NULL DEFAULT '',
     description TEXT,
@@ -192,7 +197,7 @@ CREATE TABLE IF NOT EXISTS ct_competency (
 CREATE TABLE IF NOT EXISTS skill_entry (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     collection_id INT UNSIGNED NOT NULL DEFAULT 0,
-    subject_id INT UNSIGNED NOT NULL DEFAULT 0,
+    subjeca_id INT UNSIGNED NOT NULL DEFAULT 0,
     user_id INT UNSIGNED NOT NULL DEFAULT 0,             -- The student user id the entry belongs to
     placement_id INT UNSIGNED NOT NULL DEFAULT 0,        -- (optional) The placement this entry is linked to if 0 then assume self-assessment
     title VARCHAR(255) NOT NULL DEFAULT '',              -- A title for the assessment instance
@@ -207,7 +212,7 @@ CREATE TABLE IF NOT EXISTS skill_entry (
     modified DATETIME NOT NULL,
     created DATETIME NOT NULL,
     KEY (collection_id),
-    KEY (subject_id),
+    KEY (subjeca_id),
     KEY (user_id),
     KEY (placement_id),
     KEY (del)

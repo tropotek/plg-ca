@@ -11,46 +11,44 @@ if ($composer)
 $routes = $config->getRouteAssessment();
 if (!$routes) return;
 
-$params = array();
 
 // Staff Only
-$routes->add('ca-staff-assessment-manager', Route::create('/staff/{subjectCode}/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault', $params));
-$routes->add('ca-staff-assessment-edit', Route::create('/staff/{subjectCode}/ca/assessmentEdit.html', 'Ca\Controller\Assessment\Edit::doDefault', $params));
+$routes->add('ca-staff-assessment-manager', Route::create('/staff/{subjectCode}/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault'));
+$routes->add('ca-staff-assessment-edit', Route::create('/staff/{subjectCode}/ca/assessmentEdit.html', 'Ca\Controller\Assessment\Edit::doDefault'));
 
 // TODO: These 2 need to be refactored down to one category table and use a parent or competantcy ????? not sure yet
-$routes->add('ca-staff-domain-manager', Route::create('/staff/{subjectCode}/ca/domainManager.html', 'Ca\Controller\Domain\Manager::doDefault', $params));
-$routes->add('ca-staff-domain-edit', Route::create('/staff/{subjectCode}/ca/domainEdit.html', 'Ca\Controller\Domain\Edit::doDefault', $params));
+$routes->add('ca-staff-domain-manager', Route::create('/staff/{subjectCode}/ca/domainManager.html', 'Ca\Controller\Domain\Manager::doDefault'));
+$routes->add('ca-staff-domain-edit', Route::create('/staff/{subjectCode}/ca/domainEdit.html', 'Ca\Controller\Domain\Edit::doDefault'));
 
-$routes->add('ca-staff-category-manager', Route::create('/staff/{subjectCode}/ca/categoryManager.html', 'Ca\Controller\Category\Manager::doDefault', $params));
-$routes->add('ca-staff-category-edit', Route::create('/staff/{subjectCode}/ca/categoryEdit.html', 'Ca\Controller\Category\Edit::doDefault', $params));
+$routes->add('ca-staff-category-manager', Route::create('/staff/{subjectCode}/ca/categoryManager.html', 'Ca\Controller\Category\Manager::doDefault'));
+$routes->add('ca-staff-category-edit', Route::create('/staff/{subjectCode}/ca/categoryEdit.html', 'Ca\Controller\Category\Edit::doDefault'));
 // TODO: -----------------------------------------------------------------------------------------------------------
 
 // there should be a number of scale types that an item selects as its type...
-$routes->add('ca-staff-scale-manager', Route::create('/staff/{subjectCode}/ca/scaleManager.html', 'Ca\Controller\Scale\Manager::doDefault', $params));
-$routes->add('ca-staff-scale-edit', Route::create('/staff/{subjectCode}/ca/scaleEdit.html', 'Ca\Controller\Scale\Edit::doDefault', $params));
+$routes->add('ca-staff-scale-manager', Route::create('/staff/{subjectCode}/ca/scaleManager.html', 'Ca\Controller\Scale\Manager::doDefault'));
+$routes->add('ca-staff-scale-edit', Route::create('/staff/{subjectCode}/ca/scaleEdit.html', 'Ca\Controller\Scale\Edit::doDefault'));
 
 // Competancy
-$routes->add('ca-staff-item-manager', Route::create('/staff/{subjectCode}/ca/itemManager.html', 'Ca\Controller\Item\Manager::doDefault', $params));
-$routes->add('ca-staff-item-edit', Route::create('/staff/{subjectCode}/ca/itemEdit.html', 'Ca\Controller\Item\Edit::doDefault', $params));
+$routes->add('ca-staff-item-manager', Route::create('/staff/{subjectCode}/ca/itemManager.html', 'Ca\Controller\Item\Manager::doDefault'));
+$routes->add('ca-staff-item-edit', Route::create('/staff/{subjectCode}/ca/itemEdit.html', 'Ca\Controller\Item\Edit::doDefault'));
 
-$routes->add('ca-staff-entry-manager', Route::create('/staff/{subjectCode}/ca/entryManager.html', 'Ca\Controller\Entry\Manager::doDefault', $params));
-$routes->add('ca-staff-entry-edit', Route::create('/staff/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault', $params));
-$routes->add('ca-staff-entry-view', Route::create('/staff/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault', $params));
+$routes->add('ca-staff-entry-manager', Route::create('/staff/{subjectCode}/ca/entryManager.html', 'Ca\Controller\Entry\Manager::doDefault'));
+$routes->add('ca-staff-entry-edit', Route::create('/staff/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
+$routes->add('ca-staff-entry-view', Route::create('/staff/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
 
 // TODO: All these need to be reviewed
-//$routes->add('ca-staff-report-staff-entry-results', Route::create('/staff/{subjectCode}/ca/entryResults.html', 'Ca\Controller\Report\StudentResults::doDefault', $params));
-//$routes->add('ca-staff-report-entry', Route::create('/staff/{subjectCode}/ca/assessmentReport.html', 'Ca\Controller\Report\AssessmentReport::doDefault', $params));
-//$routes->add('ca-staff-report-historic-all', Route::create('/staff/{subjectCode}/ca/historicReportAll.html', 'Ca\Controller\Report\HistoricReportAll::doDefault', $params));
-//$routes->add('ca-staff-report-historic', Route::create('/staff/{subjectCode}/ca/historicReport.html', 'Ca\Controller\Report\HistoricReport::doDefault', $params));
-//$routes->add('ca-staff-report-date-average', Route::create('/staff/{subjectCode}/ca/dateAverageReport.html', 'Ca\Controller\Report\DateAverageReport::doDefault', $params));
-//$routes->add('ca-staff-report-item-average', Route::create('/staff/{subjectCode}/ca/itemAverageReport.html', 'Ca\Controller\Report\ItemAverageReport::doDefault', $params));
-//$routes->add('ca-staff-report-company-average', Route::create('/staff/{subjectCode}/ca/companyAverageReport.html', 'Ca\Controller\Report\CompanyAverageReport::doDefault', $params));
+//$routes->add('ca-staff-report-staff-entry-results', Route::create('/staff/{subjectCode}/ca/entryResults.html', 'Ca\Controller\Report\StudentResults::doDefault'));
+//$routes->add('ca-staff-report-entry', Route::create('/staff/{subjectCode}/ca/assessmentReport.html', 'Ca\Controller\Report\AssessmentReport::doDefault'));
+//$routes->add('ca-staff-report-historic-all', Route::create('/staff/{subjectCode}/ca/historicReportAll.html', 'Ca\Controller\Report\HistoricReportAll::doDefault'));
+//$routes->add('ca-staff-report-historic', Route::create('/staff/{subjectCode}/ca/historicReport.html', 'Ca\Controller\Report\HistoricReport::doDefault'));
+//$routes->add('ca-staff-report-date-average', Route::create('/staff/{subjectCode}/ca/dateAverageReport.html', 'Ca\Controller\Report\DateAverageReport::doDefault'));
+//$routes->add('ca-staff-report-item-average', Route::create('/staff/{subjectCode}/ca/itemAverageReport.html', 'Ca\Controller\Report\ItemAverageReport::doDefault'));
+//$routes->add('ca-staff-report-company-average', Route::create('/staff/{subjectCode}/ca/companyAverageReport.html', 'Ca\Controller\Report\CompanyAverageReport::doDefault'));
 
 // Student Only
-//$params = array('role' => array('student'));
-$routes->add('ca-student-entry-edit', Route::create('/student/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault', $params));
-$routes->add('ca-student-entry-view', Route::create('/student/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault', $params));
-$routes->add('ca-student-entry-results', Route::create('/student/{subjectCode}/ca/entryResults.html', 'Ca\Controller\Report\StudentResults::doDefault', $params));
+$routes->add('ca-student-entry-edit', Route::create('/student/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
+$routes->add('ca-student-entry-view', Route::create('/student/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
+$routes->add('ca-student-entry-results', Route::create('/student/{subjectCode}/ca/entryResults.html', 'Ca\Controller\Report\StudentResults::doDefault'));
 
 // Guest Pages
 // TODO: We also need to review this, would be good to make it secure somehow to stop students from seeing it.

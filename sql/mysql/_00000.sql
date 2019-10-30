@@ -22,7 +22,15 @@ CREATE TABLE IF NOT EXISTS ca_data (
 CREATE TABLE IF NOT EXISTS ca_assessment (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     uid VARCHAR(128) NOT NULL DEFAULT '',            -- Reserved to be used via an external API identifier or for historic reporting, this could just = id for now.
-    institution_id INT UNSIGNED DEFAULT 0 NOT NULL,
+
+--    institution_id INT UNSIGNED DEFAULT 0 NOT NULL,
+    profile_id INT UNSIGNED DEFAULT 0 NOT NULL,
+    placement_type_id INT UNSIGNED DEFAULT 0 NOT NULL, -- 0 = no placement_type (usually for self-assessments)
+
+    -- Here I am a little confused, trying to cater for to many situations (Follow the curent skill plugin a little closely for this)
+    --  1. I will assume that the assessment will always relate to a student
+    --  2. I would like the assessor
+
 
     -- Typically this value would need to come from the APP, maybe we could have a listener/interface that supports this plugin and this value
     -- Use a select box for the interface in EMS this should have \App\Db\Placement:class => 'Placement'
@@ -33,11 +41,12 @@ CREATE TABLE IF NOT EXISTS ca_assessment (
     -- any extra options related to the fkey object (EG: for placement we would need availability status, etc)
     -- probably shoud go into the ca_data table
 
-    type VARCHAR(20) DEFAULT 'student' NOT NULL,     -- student = self assessment, Learner = staff student assessment, supervisor/External = company/mentor student assessment
-    multi BOOL NOT NULL DEFAULT 0,                   -- Can multiple entries by unique users be submited (ignored for self-assessment)
-    -- `Student` Only gets one entry for sel-assessment [Single Entry] (Default if no fkey exists, other options should be hidden)
-    -- `Learner` Each learner/staff will have an icon to add/edit an assessment entry (coordinators would be able to view/edit those assessments) [Multiple Entry]
-    -- `Supervisor/External` Enables a public form that will be sent to the placement supervisor [$fkey->getSupervisor()] (will need an interface for this object too)
+    assessor VARCHAR(20) DEFAULT 'student' NOT NULL,     -- student = self assessment, Learner = staff student assessment, supervisor/External = company/mentor student assessment
+    multi BOOL NOT NULL DEFAULT 0,                   -- Can have multiple assessments by unique users (ignored for self-assessment)
+    -- Assessors:
+    --   `Student` Only gets one entry for sel-assessment [Single Entry] (Default if no fkey exists, other options should be hidden)
+    --   `Learner` Each learner/staff will have an icon to add/edit an assessment entry (coordinators would be able to view/edit those assessments) [Multiple Entry]
+    --   `Supervisor/External` Enables a public form that will be sent to the placement supervisor [$fkey->getSupervisor()] (will need an interface for this object too)
     --  NOTE: to support the rotation requirements, a coordinator needs to be able to compile multiple results into one final somehow?
     -- If there are any more behaviours required then they should go here as an assessment can only have one type of behaviour.
     -- Here is a though, based on the fkey we should see what behaviours are available and let the App interface inform us of them.
@@ -45,14 +54,15 @@ CREATE TABLE IF NOT EXISTS ca_assessment (
     name VARCHAR(128) DEFAULT '' NOT NULL,
     icon VARCHAR(32) DEFAULT 'fa fa-rebel' NOT NULL, -- a bootstrap CSS icon for the collection EG: 'fa fa-pen'
     include_zero BOOL DEFAULT 0 NOT NULL,            -- Should zero values be included in overall average calculations (Default: false)
+    publish_result DATETIME,                             -- Can the student view their average results for this assessment: Past Date is enabled, Future date would enable it then, NULL dissabled.
 
-    view_grade DATETIME,                             -- Can the student view their average results for this collection: Past Date is enabled, Future date would enable it then, NULL dissabled.
     description TEXT,
     notes TEXT,
 
     del BOOL NOT NULL DEFAULT 0,
     modified DATETIME NOT NULL,
     created DATETIME NOT NULL,
+
     KEY (uid),
     KEY (institution_id),
     KEY (type),

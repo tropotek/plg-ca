@@ -15,7 +15,16 @@ if (!$routes) return;
 $routes->add('ca-staff-assessment-manager', Route::create('/staff/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault'));
 $routes->add('ca-staff-assessment-edit', Route::create('/staff/ca/assessmentEdit.html', 'Ca\Controller\Assessment\Edit::doDefault'));
 
+$routes->add('ca-staff-domain-manager', Route::create('/staff/ca/domainManager.html', 'Ca\Controller\Domain\Manager::doDefault'));
+$routes->add('ca-staff-domain-edit', Route::create('/staff/ca/domainEdit.html', 'Ca\Controller\Domain\Edit::doDefault'));
 
+$routes->add('ca-staff-competency-manager', Route::create('/staff/ca/competencyManager.html', 'Ca\Controller\Competency\Manager::doDefault'));
+$routes->add('ca-staff-competency-edit', Route::create('/staff/ca/competencyEdit.html', 'Ca\Controller\Competency\Edit::doDefault'));
+
+$routes->add('ca-staff-scale-manager', Route::create('/staff/ca/scaleManager.html', 'Ca\Controller\Scale\Manager::doDefault'));
+$routes->add('ca-staff-scale-edit', Route::create('/staff/ca/scaleEdit.html', 'Ca\Controller\Scale\Edit::doDefault'));
+$routes->add('ca-staff-score-manager', Route::create('/staff/ca/scoreManager.html', 'Ca\Controller\Score\Manager::doDefault'));
+$routes->add('ca-staff-score-edit', Route::create('/staff/ca/scoreEdit.html', 'Ca\Controller\Score\Edit::doDefault'));
 
 
 //// TODO: These 2 need to be refactored down to one category table and use a parent or competantcy ????? not sure yet

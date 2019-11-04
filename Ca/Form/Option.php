@@ -27,10 +27,9 @@ class Option extends \Bs\FormIface
      */
     public function init()
     {
-        
-        $this->appendField(new Field\Select('scaleId', array()))->prependOption('-- Select --', '');
+
         $this->appendField(new Field\Input('name'));
-        $this->appendField(new Field\Textarea('description'));
+        $this->appendField(new Field\Input('description'));
         $this->appendField(new Field\Input('value'));
 
         $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
@@ -70,12 +69,11 @@ class Option extends \Bs\FormIface
         $this->getOption()->save();
 
         // Do Custom data saving
-
         \Tk\Alert::addSuccess('Record saved!');
         $event->setRedirect($this->getBackUrl());
-        if ($form->getTriggeredEvent()->getName() == 'save') {
-            $event->setRedirect(\Tk\Uri::create()->set('optionId', $this->getOption()->getId()));
-        }
+        //if ($form->getTriggeredEvent()->getName() == 'save') {
+        //    $event->setRedirect(\Tk\Uri::create()->set('scaleId', $this->getOption()->getScaleId()));
+        //}
     }
 
     /**

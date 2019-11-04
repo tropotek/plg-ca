@@ -31,13 +31,24 @@ class Scale extends \Bs\TableIface
     {
     
         $this->appendCell(new Cell\Checkbox('id'));
-        $this->appendCell(new Cell\Text('uid'));
-        $this->appendCell(new Cell\Text('institutionId'));
-        $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
+//        $this->appendCell(new Cell\Text('uid'));
+//        $this->appendCell(new Cell\Text('institutionId'));
+        $url = $this->getEditUrl();
+        $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($url)
+            ->setOnPropertyValue(function ($cell, $obj, $value) use ($url) {
+                /** @var $cell Cell\Text */
+                /** @var $obj \Ca\Db\Scale */
+                if ($obj->getType() != \Ca\Db\Scale::TYPE_CHOICE)
+                    $cell->setUrl(null);
+                else
+                    $cell->setUrl($url);
+
+                return $value;
+            });
         $this->appendCell(new Cell\Text('type'));
         $this->appendCell(new Cell\Boolean('multiple'));
         $this->appendCell(new Cell\Text('calcType'));
-        $this->appendCell(new Cell\Text('maxScore'));
+        $this->appendCell(new Cell\Text('maxValue'));
         $this->appendCell(new Cell\Date('modified'));
         $this->appendCell(new Cell\Date('created'));
 
@@ -45,9 +56,9 @@ class Scale extends \Bs\TableIface
         $this->appendFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Search');
 
         // Actions
-        //$this->appendAction(\Tk\Table\Action\Link::create('New Scale', 'fa fa-plus', \Bs\Uri::createHomeUrl('/ca/scaleEdit.html')));
+        //$this->appendAction(\Tk\Table\Action\Link::create('New Scale', 'fa fa-plus', \Uni\Uri::createHomeUrl('/ca/scaleEdit.html')));
         //$this->appendAction(\Tk\Table\Action\ColumnSelect::create()->setUnselected(array('modified', 'created')));
-        $this->appendAction(\Tk\Table\Action\Delete::create());
+//        $this->appendAction(\Tk\Table\Action\Delete::create());
         $this->appendAction(\Tk\Table\Action\Csv::create());
 
         // load table

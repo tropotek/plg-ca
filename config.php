@@ -23,6 +23,10 @@ $routes->add('ca-staff-competency-edit', Route::create('/staff/ca/competencyEdit
 
 $routes->add('ca-staff-scale-manager', Route::create('/staff/ca/scaleManager.html', 'Ca\Controller\Scale\Manager::doDefault'));
 $routes->add('ca-staff-scale-edit', Route::create('/staff/ca/scaleEdit.html', 'Ca\Controller\Scale\Edit::doDefault'));
+$routes->add('ca-staff-option-manager', Route::create('/staff/ca/optionManager.html', 'Ca\Controller\Option\Manager::doDefault'));
+$routes->add('ca-staff-option-edit', Route::create('/staff/ca/optionEdit.html', 'Ca\Controller\Option\Edit::doDefault'));
+
+
 $routes->add('ca-staff-score-manager', Route::create('/staff/ca/scoreManager.html', 'Ca\Controller\Score\Manager::doDefault'));
 $routes->add('ca-staff-score-edit', Route::create('/staff/ca/scoreEdit.html', 'Ca\Controller\Score\Edit::doDefault'));
 

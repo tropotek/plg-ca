@@ -22,6 +22,19 @@ use Tk\Table\Cell;
  */
 class Option extends \Bs\TableIface
 {
+    /**
+     * @var null
+     */
+    protected $optionDialog = null;
+
+
+    /**
+     * @param string $tableId
+     */
+    public function __construct($tableId = '')
+    {
+        parent::__construct($tableId);
+    }
     
     /**
      * @return $this
@@ -29,22 +42,35 @@ class Option extends \Bs\TableIface
      */
     public function init()
     {
-    
+        $form = \Ca\Form\Option::create();
+        $option = new \Ca\Db\Option();
+        $option->setScaleId($this->getRequest()->get('scaleId'));
+        $form->setOption($option);
+        $this->optionDialog = \Tk\Ui\Dialog\Form::createFormDialog($form, 'Create Option');
+        $this->optionDialog->execute($this->getRequest());
+        $this->getRenderer()->getTemplate()->appendBodyTemplate($this->optionDialog->show());
+
+
         $this->appendCell(new Cell\Checkbox('id'));
-        $this->appendCell(new Cell\Text('scaleId'));
-        $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
+//        $this->appendCell(new Cell\Text('scaleId'));
+        $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl('#');
         $this->appendCell(new Cell\Text('value'));
-        $this->appendCell(new Cell\Date('modified'));
         $this->appendCell(new Cell\Date('created'));
 
         // Filters
         $this->appendFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Search');
 
         // Actions
-        //$this->appendAction(\Tk\Table\Action\Link::create('New Option', 'fa fa-plus', \Bs\Uri::createHomeUrl('/ca/optionEdit.html')));
+
+        // TODO: Add/Edit functions to the options later
+        //$this->appendAction(\Tk\Table\Action\Link::createLink('New Option', null, 'fa fa-plus'))
+        //    ->setAttr('data-toggle', 'modal')->setAttr('data-target', '#'.$this->optionDialog->getId());
+
+
         //$this->appendAction(\Tk\Table\Action\ColumnSelect::create()->setUnselected(array('modified', 'created')));
-        $this->appendAction(\Tk\Table\Action\Delete::create());
+        //$this->appendAction(\Tk\Table\Action\Delete::create());
         $this->appendAction(\Tk\Table\Action\Csv::create());
+
 
         // load table
         //$this->setList($this->findList());

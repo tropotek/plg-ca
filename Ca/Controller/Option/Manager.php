@@ -32,10 +32,13 @@ class Manager extends AdminManagerIface
     public function doDefault(Request $request)
     {
         $this->setTable(\Ca\Table\Option::create());
-        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/optionEdit.html'));
+        $this->getTable();
+            //->setEditUrl(\Bs\Uri::createHomeUrl('/ca/optionEdit.html'));
         $this->getTable()->init();
 
-        $filter = array();
+        $filter = array(
+            'scaleId' => $this->getRequest()->get('scaleId')
+        );
         $this->getTable()->setList($this->getTable()->findList($filter));
     }
 
@@ -44,8 +47,8 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Option',
-            $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
+//        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Option',
+//            $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
     }
 
     /**

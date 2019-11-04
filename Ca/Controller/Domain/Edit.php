@@ -39,7 +39,7 @@ class Edit extends AdminEditIface
     {
         $this->domain = new \Ca\Db\Domain();
         if ($request->get('domainId')) {
-            $this->assessment = \Ca\Db\DomainMap::create()->find($request->get('domainId'));
+            $this->domain = \Ca\Db\DomainMap::create()->find($request->get('domainId'));
         }
 
         $this->setForm(\Ca\Form\Domain::create()->setModel($this->domain));

@@ -32,7 +32,8 @@ class Manager extends AdminManagerIface
     public function doDefault(Request $request)
     {
         $this->setTable(\Ca\Table\Scale::create());
-        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/scaleEdit.html')->set('profileId', $this->getProfileId()));
+        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/optionManager.html')->set('profileId', $this->getProfileId()));
+            //->setEditUrl(\Bs\Uri::createHomeUrl('/ca/scaleEdit.html')->set('profileId', $this->getProfileId()));
         $this->getTable()->init();
 
         $filter = array();
@@ -44,8 +45,8 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Scale',
-            $this->getTable()->getEditUrl(), 'fa fa-balance-scale fa-add-action'));
+//        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Scale',
+//            $this->getTable()->getEditUrl(), 'fa fa-balance-scale fa-add-action'));
     }
 
     /**

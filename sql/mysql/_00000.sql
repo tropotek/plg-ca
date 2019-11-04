@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS ca_competency (
 CREATE TABLE IF NOT EXISTS ca_scale (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     uid VARCHAR(128) NOT NULL DEFAULT '',
-    institution_id INT UNSIGNED NOT NULL DEFAULT 0,
+    institution_id INT UNSIGNED NOT NULL DEFAULT 1,     -- TODO: I think we will keep this option globalfor now....
     name VARCHAR(255) NOT NULL DEFAULT '',
     description TEXT,
     type VARCHAR(255) NOT NULL DEFAULT 'text',          -- `text`, `points`, `percentage` OR a `choice` using options in the the ca_option table ???
@@ -132,8 +132,34 @@ CREATE TABLE IF NOT EXISTS ca_option (
 ) ENGINE = InnoDB;
 
 
+TRUNCATE ca_scale;
+INSERT INTO ca_scale (name, description, type, multiple, calc_type, max_value, modified, created) VALUES
+('Text', 'Prompt the user for an answer as a text value', 'text', 0, 'avg', 0, NOW(), NOW()),
+('Points', 'Allow the user to enter a value. [0-1000]', 'value', 0, 'avg', 1000, NOW(), NOW()),
+('Percent', 'Allow the user to add a percentage value. [0-100]', 'value', 0, 'avg', 100, NOW(), NOW()),
+('EMS Assessment', 'The EMS evaluation criteria as of 2020 as radio selections. [0-3]', 'choice', 0, 'avg', 3, NOW(), NOW()),
+('Yes/No', 'Prompt the user for a yes or no question. [0-1]', 'choice', 0, 'avg', 0, NOW(), NOW()),
+('Rotation Assessment', 'The rotation evaluation criteria as of 2020 as radio selections. [0-4]', 'choice', 0, 'avg', 4, NOW(), NOW())
+;
 
-
+TRUNCATE ca_option;
+INSERT INTO ca_option (scale_id, name, description, value, modified, created) VALUES
+(4, 'Not Observed', '', 0, NOW(), NOW()),
+(4, 'Needs Further Development', '', 1, NOW(), NOW()),
+(4, 'Meets Expectations', '', 2, NOW(), NOW()),
+(4, 'Exceeds Expectations', '', 3, NOW(), NOW())
+;
+INSERT INTO ca_option (scale_id, name, description, value, modified, created) VALUES
+(5, 'No', '', 0, NOW(), NOW()),
+(5, 'Yes', '', 1, NOW(), NOW())
+;
+INSERT INTO ca_option (scale_id, name, description, value, modified, created) VALUES
+(6, 'Unable', '', 0, NOW(), NOW()),
+(6, 'Almost There', '', 1, NOW(), NOW()),
+(6, 'Competent', '', 2, NOW(), NOW()),
+(6, 'Very Good', '', 3, NOW(), NOW()),
+(6, 'Excels', '', 4, NOW(), NOW())
+;
 
 
 

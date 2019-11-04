@@ -39,7 +39,7 @@ class Edit extends AdminEditIface
     {
         $this->competency = new \Ca\Db\Competency();
         if ($request->get('competencyId')) {
-            $this->assessment = \Ca\Db\CompetencyMap::create()->find($request->get('competencyId'));
+            $this->competency = \Ca\Db\CompetencyMap::create()->find($request->get('competencyId'));
         }
 
         $this->setForm(\Ca\Form\Competency::create()->setModel($this->competency));

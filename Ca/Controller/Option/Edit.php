@@ -39,7 +39,7 @@ class Edit extends AdminEditIface
     {
         $this->option = new \Ca\Db\Option();
         if ($request->get('optionId')) {
-            $this->assessment = \Ca\Db\OptionMap::create()->find($request->get('optionId'));
+            $this->option = \Ca\Db\OptionMap::create()->find($request->get('optionId'));
         }
 
         $this->setForm(\Ca\Form\Option::create()->setModel($this->option));

@@ -179,9 +179,9 @@ class Option extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             $errors['name'] = 'Invalid value: name';
         }
 
-        if (!$this->value) {
-            $errors['value'] = 'Invalid value: value';
-        }
+//        if (!$this->value) {      // check it is a number [0-1000]
+//            $errors['value'] = 'Invalid value: value';
+//        }
 
         return $errors;
     }

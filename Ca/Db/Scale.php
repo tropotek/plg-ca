@@ -9,6 +9,9 @@ namespace Ca\Db;
  */
 class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    const TYPE_TEXT = 'text';
+    const TYPE_VALUE = 'value';
+    const TYPE_CHOICE = 'choice';
 
     /**
      * @var int
@@ -53,7 +56,7 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var float
      */
-    public $maxScore = 0;
+    public $maxValue = 0;
 
     /**
      * @var \DateTime
@@ -71,6 +74,7 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function __construct()
     {
+        $this->institutionId = $this->getConfig()->getInstitutionId();
         $this->modified = new \DateTime();
         $this->created = new \DateTime();
 
@@ -203,21 +207,21 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param float $maxScore
+     * @param float $maxValue
      * @return Scale
      */
-    public function setMaxScore($maxScore) : Scale
+    public function setMaxValue($maxValue) : Scale
     {
-        $this->maxScore = $maxScore;
+        $this->maxValue = $maxValue;
         return $this;
     }
 
     /**
      * return float
      */
-    public function getMaxScore() : float
+    public function getMaxValue() : float
     {
-        return $this->maxScore;
+        return $this->maxValue;
     }
 
     /**
@@ -263,9 +267,9 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     {
         $errors = array();
 
-        if (!$this->uid) {
-            $errors['uid'] = 'Invalid value: uid';
-        }
+//        if (!$this->uid) {
+//            $errors['uid'] = 'Invalid value: uid';
+//        }
 
         if (!$this->institutionId) {
             $errors['institutionId'] = 'Invalid value: institutionId';
@@ -279,12 +283,12 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             $errors['type'] = 'Invalid value: type';
         }
 
-        if (!$this->calcType) {
+        if ($this->type == self::TYPE_CHOICE && $this->getMultiple() && !$this->calcType) {
             $errors['calcType'] = 'Invalid value: calcType';
         }
 
-        if (!$this->maxScore) {
-            $errors['maxScore'] = 'Invalid value: maxScore';
+        if ($this->type == self::TYPE_VALUE && !$this->maxValue) {
+            $errors['maxValue'] = 'Invalid value: maxValue';
         }
 
         return $errors;

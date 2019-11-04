@@ -53,8 +53,8 @@ class Manager extends AdminManagerIface
         $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Competencies',
             \Uni\Uri::createHomeUrl('/ca/competencyManager.html')->set('profileId', $this->getProfileId()), 'fa fa-leaf'));
 
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Scales',
-            \Uni\Uri::createHomeUrl('/ca/scaleManager.html')->set('profileId', $this->getProfileId()), 'fa fa-balance-scale'));
+//        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Scales',
+//            \Uni\Uri::createHomeUrl('/ca/scaleManager.html')->set('profileId', $this->getProfileId()), 'fa fa-balance-scale'));
     }
 
     /**

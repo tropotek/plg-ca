@@ -30,12 +30,17 @@ class Scale extends \Bs\FormIface
         $this->addCss('tk-scale-form');
 
         $this->appendField(new Field\Input('name'));
-        $list = array('Text' => 'text', 'Value' => 'value', 'Choice' => 'choice');
-        $this->appendField(new Field\Select('type', $list))->prependOption('-- Select --', '');
-        $this->appendField(new Field\Input('maxScore'));
+        if (!$this->getScale()->getId()) {
+            $list = array('Text' => 'text', 'Value' => 'value', 'Choice' => 'choice');
+            $this->appendField(new Field\Select('type', $list))->prependOption('-- Select --', '')->setAttr('data-value', $this->getScale()->getType());
+        } else {
+            $this->appendField(new Field\Html('type'))->setAttr('data-value', $this->getScale()->getType());
+        }
+        $this->appendField(new Field\Input('maxValue'));
         $this->appendField(new Field\Checkbox('multiple'));
         $list = array('Average' => 'avg', 'Addition' => 'add');
         $this->appendField(new Field\Select('calcType', $list))->prependOption('-- Select --', '');
+
         $this->appendField(new Field\Textarea('description'));
 
         if ($this->getScale()->getId()) {
@@ -72,20 +77,19 @@ jQuery(function($) {
   $('.tk-scale-form').each(function () {
     var form = $(this);
     
-    form.find('.tk-type select').on('change', function () {
+    form.find('.tk-type [data-value]').on('change', function () {
       form.find('.form-group').show();
-      console.log($(this).val());
-      switch($(this).val()) {
+      switch($(this).data('value')) {
         case 'value':
           form.find('.tk-multiple, .tk-calctype').hide();
           break;
         case 'choice':
-          //form.find('').hide();
+          form.find('.tk-maxvalue').hide();
           form.find('.tk-multiple input').trigger('change');
           break;
         default:
         case 'text':
-          form.find('.tk-multiple, .tk-calctype, .tk-maxscore').hide();
+          form.find('.tk-multiple, .tk-calctype, .tk-maxvalue').hide();
           break; 
       }
     }).trigger('change');

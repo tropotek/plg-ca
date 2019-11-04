@@ -34,7 +34,7 @@ class ScaleMap extends Mapper
             $this->dbMap->addPropertyMap(new Db\Text('type'));
             $this->dbMap->addPropertyMap(new Db\Boolean('multiple'));
             $this->dbMap->addPropertyMap(new Db\Text('calcType', 'calc_type'));
-            $this->dbMap->addPropertyMap(new Db\Decimal('maxScore', 'max_score'));
+            $this->dbMap->addPropertyMap(new Db\Decimal('maxValue', 'max_value'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
             $this->dbMap->addPropertyMap(new Db\Date('created'));
 
@@ -57,7 +57,7 @@ class ScaleMap extends Mapper
             $this->formMap->addPropertyMap(new Form\Text('type'));
             $this->formMap->addPropertyMap(new Form\Boolean('multiple'));
             $this->formMap->addPropertyMap(new Form\Text('calcType'));
-            $this->formMap->addPropertyMap(new Form\Decimal('maxScore'));
+            $this->formMap->addPropertyMap(new Form\Decimal('maxValue'));
             $this->formMap->addPropertyMap(new Form\Date('modified'));
             $this->formMap->addPropertyMap(new Form\Date('created'));
 
@@ -101,9 +101,10 @@ class ScaleMap extends Mapper
         if (!empty($filter['uid'])) {
             $filter->appendWhere('a.uid = %s AND ', $this->quote($filter['uid']));
         }
-        if (!empty($filter['institutionId'])) {
-            $filter->appendWhere('a.institution_id = %s AND ', (int)$filter['institutionId']);
-        }
+        // TODO: Keep this global untill we decide if the staff will edit these options
+//        if (!empty($filter['institutionId'])) {
+//            $filter->appendWhere('a.institution_id = %s AND ', (int)$filter['institutionId']);
+//        }
         if (!empty($filter['name'])) {
             $filter->appendWhere('a.name = %s AND ', $this->quote($filter['name']));
         }
@@ -116,8 +117,8 @@ class ScaleMap extends Mapper
         if (!empty($filter['calcType'])) {
             $filter->appendWhere('a.calc_type = %s AND ', $this->quote($filter['calcType']));
         }
-        if (!empty($filter['maxScore'])) {
-            $filter->appendWhere('a.max_score = %s AND ', (float)$filter['maxScore']);
+        if (!empty($filter['maxValue'])) {
+            $filter->appendWhere('a.max_value = %s AND ', (float)$filter['maxValue']);
         }
 
 

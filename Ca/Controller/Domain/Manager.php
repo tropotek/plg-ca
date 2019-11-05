@@ -32,10 +32,12 @@ class Manager extends AdminManagerIface
     public function doDefault(Request $request)
     {
         $this->setTable(\Ca\Table\Domain::create());
-        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/domainEdit.html')->set('profileId', $this->getProfileId()));
+        $this->getTable(); //->setEditUrl(\Bs\Uri::createHomeUrl('/ca/domainEdit.html')->set('profileId', $this->getProfileId()));
         $this->getTable()->init();
 
-        $filter = array();
+        $filter = array(
+            'institutionId' => $this->getConfig()->getInstitutionId()
+        );
         $this->getTable()->setList($this->getTable()->findList($filter));
     }
 
@@ -44,8 +46,8 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Domain',
-            $this->getTable()->getEditUrl(), 'fa fa-black-tie fa-add-action'));
+//        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Domain',
+//            $this->getTable()->getEditUrl(), 'fa fa-black-tie fa-add-action'));
     }
 
     /**
@@ -67,7 +69,12 @@ class Manager extends AdminManagerIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="tk-panel" data-panel-title="Domains" data-panel-icon="fa fa-black-tie" var="panel"></div>
+<div class="tk-panel" data-panel-title="Domains" data-panel-icon="fa fa-black-tie" var="panel">
+  <p>
+    <b>NOTICE:</b> At this time the domains are not editable, please contact the site administrator if you with to
+    have your own domain added to the list. 
+  </p>
+</div>
 HTML;
         return \Dom\Loader::load($xhtml);
     }

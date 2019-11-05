@@ -36,7 +36,7 @@ class AssessmentMap extends Mapper
             $this->dbMap->addPropertyMap(new Db\Text('assessorGroup', 'assessor_group'));
             $this->dbMap->addPropertyMap(new Db\Boolean('multi'));
             $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
-            $this->dbMap->addPropertyMap(new Db\Date('publishResult', 'publish_result'));
+            //$this->dbMap->addPropertyMap(new Db\Date('publishResult', 'publish_result'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
@@ -62,7 +62,7 @@ class AssessmentMap extends Mapper
             $this->formMap->addPropertyMap(new Form\Text('assessorGroup'));
             $this->formMap->addPropertyMap(new Form\Boolean('multi'));
             $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
-            $this->formMap->addPropertyMap(new Form\Date('publishResult'));
+            //$this->formMap->addPropertyMap(new Form\Date('publishResult'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Text('notes'));
             $this->formMap->addPropertyMap(new Form\Date('modified'));

@@ -3,11 +3,11 @@ namespace Ca\Db;
 
 /**
  * @author Mick Mifsud
- * @created 2019-10-31
+ * @created 2019-11-05
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
-class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
+class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
 
     /**
@@ -23,12 +23,17 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var int
      */
-    public $institutionId = 0;
+    public $assessmentId = 0;
 
     /**
      * @var int
      */
-    public $courseId = 0;
+    public $scaleId = 0;
+
+    /**
+     * @var int
+     */
+    public $domainId = 0;
 
     /**
      * @var string
@@ -41,9 +46,9 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public $description = '';
 
     /**
-     * @var string
+     * @var bool
      */
-    public $label = '';
+    public $gradable = false;
 
     /**
      * @var int
@@ -62,7 +67,7 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
 
     /**
-     * Domain
+     * Item
      */
     public function __construct()
     {
@@ -73,9 +78,9 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     
     /**
      * @param string $uid
-     * @return Domain
+     * @return Item
      */
-    public function setUid($uid) : Domain
+    public function setUid($uid) : Item
     {
         $this->uid = $uid;
         return $this;
@@ -90,46 +95,64 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @return int
+     * @param int $assessmentId
+     * @return Item
      */
-    public function getInstitutionId(): int
+    public function setAssessmentId($assessmentId) : Item
     {
-        return $this->institutionId;
-    }
-
-    /**
-     * @param int $institutionId
-     * @return Domain
-     */
-    public function setInstitutionId(int $institutionId): Domain
-    {
-        $this->institutionId = $institutionId;
-        return $this;
-    }
-
-    /**
-     * @param int $courseId
-     * @return Domain
-     */
-    public function setCourseId($courseId) : Domain
-    {
-        $this->courseId = $courseId;
+        $this->assessmentId = $assessmentId;
         return $this;
     }
 
     /**
      * return int
      */
-    public function getCourseId() : int
+    public function getAssessmentId() : int
     {
-        return $this->courseId;
+        return $this->assessmentId;
+    }
+
+    /**
+     * @param int $scaleId
+     * @return Item
+     */
+    public function setScaleId($scaleId) : Item
+    {
+        $this->scaleId = $scaleId;
+        return $this;
+    }
+
+    /**
+     * return int
+     */
+    public function getScaleId() : int
+    {
+        return $this->scaleId;
+    }
+
+    /**
+     * @param int $domainId
+     * @return Item
+     */
+    public function setDomainId($domainId) : Item
+    {
+        $this->domainId = $domainId;
+        return $this;
+    }
+
+    /**
+     * return int
+     */
+    public function getDomainId() : int
+    {
+        return $this->domainId;
     }
 
     /**
      * @param string $name
-     * @return Domain
+     * @return Item
      */
-    public function setName($name) : Domain
+    public function setName($name) : Item
     {
         $this->name = $name;
         return $this;
@@ -145,9 +168,9 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @param string $description
-     * @return Domain
+     * @return Item
      */
-    public function setDescription($description) : Domain
+    public function setDescription($description) : Item
     {
         $this->description = $description;
         return $this;
@@ -162,28 +185,28 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param string $label
-     * @return Domain
+     * @param bool $gradable
+     * @return Item
      */
-    public function setLabel($label) : Domain
+    public function setGradable($gradable) : Item
     {
-        $this->label = $label;
+        $this->gradable = $gradable;
         return $this;
     }
 
     /**
-     * return string
+     * return bool
      */
-    public function getLabel() : string
+    public function getGradable() : bool
     {
-        return $this->label;
+        return $this->gradable;
     }
 
     /**
      * @param int $orderBy
-     * @return Domain
+     * @return Item
      */
-    public function setOrderBy($orderBy) : Domain
+    public function setOrderBy($orderBy) : Item
     {
         $this->orderBy = $orderBy;
         return $this;
@@ -199,9 +222,9 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @param \DateTime $modified
-     * @return Domain
+     * @return Item
      */
-    public function setModified($modified) : Domain
+    public function setModified($modified) : Item
     {
         $this->modified = $modified;
         return $this;
@@ -217,9 +240,9 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @param \DateTime $created
-     * @return Domain
+     * @return Item
      */
-    public function setCreated($created) : Domain
+    public function setCreated($created) : Item
     {
         $this->created = $created;
         return $this;
@@ -244,16 +267,20 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             $errors['uid'] = 'Invalid value: uid';
         }
 
-        if (!$this->courseId) {
-            $errors['courseId'] = 'Invalid value: courseId';
+        if (!$this->assessmentId) {
+            $errors['assessmentId'] = 'Invalid value: assessmentId';
+        }
+
+        if (!$this->scaleId) {
+            $errors['scaleId'] = 'Invalid value: scaleId';
+        }
+
+        if (!$this->domainId) {
+            $errors['domainId'] = 'Invalid value: domainId';
         }
 
         if (!$this->name) {
             $errors['name'] = 'Invalid value: name';
-        }
-
-        if (!$this->label) {
-            $errors['label'] = 'Invalid value: label';
         }
 
         if (!$this->orderBy) {

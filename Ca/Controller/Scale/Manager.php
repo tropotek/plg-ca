@@ -68,7 +68,12 @@ class Manager extends AdminManagerIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="tk-panel" data-panel-title="Scales" data-panel-icon="fa fa-balance-scale" var="panel"></div>
+<div class="tk-panel" data-panel-title="Scales" data-panel-icon="fa fa-balance-scale" var="panel">
+  <p>
+    <b>NOTICE:</b> At this time the scales are not editable, please contact the site administrator if you with to
+    have your own scale added to the list. 
+  </p>
+</div>
 HTML;
         return \Dom\Loader::load($xhtml);
     }

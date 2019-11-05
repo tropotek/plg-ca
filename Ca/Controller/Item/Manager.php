@@ -1,5 +1,5 @@
 <?php 
-namespace Ca\Controller\Assessment;
+namespace Ca\Controller\Item;
 
 use App\Controller\AdminManagerIface;
 use Dom\Template;
@@ -7,10 +7,10 @@ use Tk\Request;
 
 /**
  * TODO: Add Route to routes.php:
- *      $routes->add('ca-assessment-manager', Route::create('/staff/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault'));
+ *      $routes->add('ca-item-manager', Route::create('/staff/ca/itemManager.html', 'Ca\Controller\Item\Manager::doDefault'));
  *
  * @author Mick Mifsud
- * @created 2019-10-31
+ * @created 2019-11-05
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
@@ -22,7 +22,7 @@ class Manager extends AdminManagerIface
      */
     public function __construct()
     {
-        $this->setPageTitle('Assessment Manager');
+        $this->setPageTitle('Item Manager');
     }
 
     /**
@@ -31,8 +31,8 @@ class Manager extends AdminManagerIface
      */
     public function doDefault(Request $request)
     {
-        $this->setTable(\Ca\Table\Assessment::create());
-        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/assessmentEdit.html'));
+        $this->setTable(\Ca\Table\Item::create());
+        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/itemEdit.html'));
         $this->getTable()->init();
 
         $filter = array();
@@ -44,17 +44,8 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Assessment',
+        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Item',
             $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
-
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Domains',
-            \Uni\Uri::createHomeUrl('/ca/domainManager.html')->set('profileId', $this->getProfileId()), 'fa fa-black-tie'));
-
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Competencies',
-            \Uni\Uri::createHomeUrl('/ca/competencyManager.html')->set('profileId', $this->getProfileId()), 'fa fa-leaf'));
-
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Scales',
-            \Uni\Uri::createHomeUrl('/ca/scaleManager.html')->set('profileId', $this->getProfileId()), 'fa fa-balance-scale'));
     }
 
     /**
@@ -76,7 +67,7 @@ class Manager extends AdminManagerIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="tk-panel" data-panel-title="Assessments" data-panel-icon="fa fa-book" var="panel"></div>
+<div class="tk-panel" data-panel-title="Items" data-panel-icon="fa fa-book" var="panel"></div>
 HTML;
         return \Dom\Loader::load($xhtml);
     }

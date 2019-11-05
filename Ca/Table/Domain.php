@@ -31,12 +31,10 @@ class Domain extends \Bs\TableIface
     {
     
         $this->appendCell(new Cell\Checkbox('id'));
-        $this->appendCell(new Cell\Text('uid'));
-        $this->appendCell(new Cell\Text('courseId'));
+        //$this->appendCell(new Cell\Text('uid'));
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
         $this->appendCell(new Cell\Text('label'));
-        $this->appendCell(new Cell\Text('orderBy'));
-        $this->appendCell(new Cell\Date('modified'));
+        //$this->appendCell(new Cell\Date('modified'));
         $this->appendCell(new Cell\Date('created'));
 
         // Filters
@@ -45,7 +43,7 @@ class Domain extends \Bs\TableIface
         // Actions
         //$this->appendAction(\Tk\Table\Action\Link::create('New Domain', 'fa fa-plus', \Bs\Uri::createHomeUrl('/ca/domainEdit.html')));
         //$this->appendAction(\Tk\Table\Action\ColumnSelect::create()->setUnselected(array('modified', 'created')));
-        $this->appendAction(\Tk\Table\Action\Delete::create());
+        //$this->appendAction(\Tk\Table\Action\Delete::create());
         $this->appendAction(\Tk\Table\Action\Csv::create());
 
         // load table

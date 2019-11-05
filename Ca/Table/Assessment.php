@@ -33,13 +33,18 @@ class Assessment extends \Bs\TableIface
         $this->appendCell(new Cell\Checkbox('id'));
         //$this->appendCell(new Cell\Text('uid'));
         //$this->appendCell(new Cell\Text('courseId'));
+        $this->appendCell(new Cell\Text('icon'))->setOnCellHtml(function ($cell, $obj, $html) {
+            $ico = 'fa fa-file-o';
+            if ($obj->getIcon())
+                $ico = $obj->getIcon();
+            return sprintf('<i class="%s"></i>', $ico);
+        });
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
-        $this->appendCell(new Cell\Text('icon'));
-        $this->appendCell(new Cell\Text('statusAvailable'));
+        $this->appendCell(new Cell\ArrayObject('statusAvailable'));
         $this->appendCell(new Cell\Text('assessorGroup'));
         $this->appendCell(new Cell\Boolean('multi'));
         $this->appendCell(new Cell\Boolean('includeZero'));
-        $this->appendCell(new Cell\Date('publishResult'));
+        //$this->appendCell(new Cell\Date('publishResult'));
 
         $this->appendCell(new Cell\Date('modified'));
         $this->appendCell(new Cell\Date('created'));

@@ -28,7 +28,8 @@ class CompetencyMap extends Mapper
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
             $this->dbMap->addPropertyMap(new Db\Text('uid'));
-            $this->dbMap->addPropertyMap(new Db\Integer('courseId', 'course_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('institutionId', 'institution_id'));
+            //$this->dbMap->addPropertyMap(new Db\Integer('courseId', 'course_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
@@ -47,7 +48,8 @@ class CompetencyMap extends Mapper
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
             $this->formMap->addPropertyMap(new Form\Text('uid'));
-            $this->formMap->addPropertyMap(new Form\Integer('courseId'));
+            $this->formMap->addPropertyMap(new Form\Integer('institutionId'));
+            //$this->formMap->addPropertyMap(new Form\Integer('courseId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Date('modified'));
@@ -93,9 +95,12 @@ class CompetencyMap extends Mapper
         if (!empty($filter['uid'])) {
             $filter->appendWhere('a.uid = %s AND ', $this->quote($filter['uid']));
         }
-        if (!empty($filter['courseId'])) {
-            $filter->appendWhere('a.course_id = %s AND ', (int)$filter['courseId']);
+        if (!empty($filter['institutionId'])) {
+            $filter->appendWhere('a.institution_id = %s AND ', (int)$filter['institutionId']);
         }
+//        if (!empty($filter['courseId'])) {
+//            $filter->appendWhere('a.course_id = %s AND ', (int)$filter['courseId']);
+//        }
         if (!empty($filter['name'])) {
             $filter->appendWhere('a.name = %s AND ', $this->quote($filter['name']));
         }

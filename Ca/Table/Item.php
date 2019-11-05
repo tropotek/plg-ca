@@ -7,7 +7,7 @@ use Tk\Table\Cell;
 /**
  * Example:
  * <code>
- *   $table = new Competency::create();
+ *   $table = new Item::create();
  *   $table->init();
  *   $list = ObjectMap::getObjectListing();
  *   $table->setList($list);
@@ -16,11 +16,11 @@ use Tk\Table\Cell;
  * </code>
  * 
  * @author Mick Mifsud
- * @created 2019-10-31
+ * @created 2019-11-05
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
-class Competency extends \Bs\TableIface
+class Item extends \Bs\TableIface
 {
     
     /**
@@ -31,19 +31,23 @@ class Competency extends \Bs\TableIface
     {
     
         $this->appendCell(new Cell\Checkbox('id'));
-        //$this->appendCell(new Cell\Text('uid'));
-        //$this->appendCell(new Cell\Text('institutionId'));
+        $this->appendCell(new Cell\Text('uid'));
+        $this->appendCell(new Cell\Text('assessmentId'));
+        $this->appendCell(new Cell\Text('scaleId'));
+        $this->appendCell(new Cell\Text('domainId'));
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
-        //$this->appendCell(new Cell\Date('modified'));
+        $this->appendCell(new Cell\Boolean('gradable'));
+        $this->appendCell(new Cell\Text('orderBy'));
+        $this->appendCell(new Cell\Date('modified'));
         $this->appendCell(new Cell\Date('created'));
 
         // Filters
         $this->appendFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Search');
 
         // Actions
-        //$this->appendAction(\Tk\Table\Action\Link::create('New Competency', 'fa fa-plus', \Bs\Uri::createHomeUrl('/ca/competencyEdit.html')));
+        //$this->appendAction(\Tk\Table\Action\Link::createLink('New Item', \Bs\Uri::createHomeUrl('/ca/itemEdit.html'), 'fa fa-plus'));
         //$this->appendAction(\Tk\Table\Action\ColumnSelect::create()->setUnselected(array('modified', 'created')));
-        //$this->appendAction(\Tk\Table\Action\Delete::create());
+        $this->appendAction(\Tk\Table\Action\Delete::create());
         $this->appendAction(\Tk\Table\Action\Csv::create());
 
         // load table
@@ -55,14 +59,14 @@ class Competency extends \Bs\TableIface
     /**
      * @param array $filter
      * @param null|\Tk\Db\Tool $tool
-     * @return \Tk\Db\Map\ArrayObject|\Ca\Db\Competency[]
+     * @return \Tk\Db\Map\ArrayObject|\Ca\Db\Item[]
      * @throws \Exception
      */
     public function findList($filter = array(), $tool = null)
     {
         if (!$tool) $tool = $this->getTool();
         $filter = array_merge($this->getFilterValues(), $filter);
-        $list = \Ca\Db\CompetencyMap::create()->findFiltered($filter, $tool);
+        $list = \Ca\Db\ItemMap::create()->findFiltered($filter, $tool);
         return $list;
     }
 

@@ -23,6 +23,11 @@ class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var int
      */
+    public $institutionId = 0;
+
+    /**
+     * @var int
+     */
     public $courseId = 0;
 
     /**
@@ -72,6 +77,24 @@ class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function getUid() : string
     {
         return $this->uid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getInstitutionId(): int
+    {
+        return $this->institutionId;
+    }
+
+    /**
+     * @param int $institutionId
+     * @return Domain
+     */
+    public function setInstitutionId(int $institutionId): Domain
+    {
+        $this->institutionId = $institutionId;
+        return $this;
     }
 
     /**

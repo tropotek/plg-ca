@@ -58,7 +58,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var \DateTime
      */
-    public $publishResult = null;
+    //public $publishResult = null;
 
     /**
      * @var string
@@ -236,21 +236,29 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @param $subjectId
      * @param \DateTime $publishResult
      * @return Assessment
      */
-    public function setPublishResult($publishResult) : Assessment
+    public function setPublishResult($subjectId, $publishResult) : Assessment
     {
-        $this->publishResult = $publishResult;
+        //$this->publishResult = $publishResult;
+        // TODO: set the publish result date for this assessment within a specific course
         return $this;
     }
 
     /**
-     * return \DateTime
+     * return null|\DateTime
+     * @param $subjectId
+     * @return \DateTime
      */
-    public function getPublishResult() : \DateTime
+    public function getPublishResult($subjectId) : \DateTime
     {
-        return $this->publishResult;
+        //return $this->publishResult;
+        // TODO: get the publish date for this subject
+
+
+        return null;
     }
 
     /**

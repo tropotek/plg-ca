@@ -116,9 +116,6 @@ class ItemMap extends Mapper
         if (!empty($filter['gradable'])) {
             $filter->appendWhere('a.gradable = %s AND ', (int)$filter['gradable']);
         }
-        if (!empty($filter['orderBy'])) {
-            $filter->appendWhere('a.order_by = %s AND ', (int)$filter['orderBy']);
-        }
 
 
         if (!empty($filter['exclude'])) {
@@ -129,4 +126,56 @@ class ItemMap extends Mapper
         return $filter;
     }
 
+
+    // Link to competencies
+
+    /**
+     * @param int $competencyId
+     * @param int $itemId
+     * @return boolean
+     */
+    public function hasCompetency($competencyId, $itemId)
+    {
+        try {
+            $stm = $this->getDb()->prepare('SELECT * FROM ca_item_competency WHERE competency_id = ? AND item_id = ?');
+            $stm->bindParam(1, $competencyId);
+            $stm->bindParam(2, $itemId);
+            $stm->execute();
+            return ($stm->rowCount() > 0);
+        } catch (Exception $e) {}
+        return false;
+    }
+
+    /**
+     * @param int $competencyId
+     * @param int $itemId (optional) If null all are to be removed
+     */
+    public function removeCompetency($competencyId, $itemId = null)
+    {
+        try {
+            $stm = $this->getDb()->prepare('DELETE FROM ca_item_competency WHERE competency_id = ?');
+            $stm->bindParam(1, $competencyId);
+            if ($itemId) {
+                $stm = $this->getDb()->prepare('DELETE FROM ca_item_competency WHERE competency_id = ? AND item_id = ?');
+                $stm->bindParam(1, $competencyId);
+                $stm->bindParam(2, $itemId);
+            }
+            $stm->execute();
+        } catch (Exception $e) {}
+    }
+
+    /**
+     * @param int $competencyId
+     * @param int $itemId
+     */
+    public function addCompetency($competencyId, $itemId)
+    {
+        try {
+            if ($this->hasCompetency($competencyId, $itemId)) return;
+            $stm = $this->getDb()->prepare('INSERT INTO ca_item_competency (competency_id, item_id)  VALUES (?, ?)');
+            $stm->bindParam(1, $competencyId);
+            $stm->bindParam(2, $itemId);
+            $stm->execute();
+        } catch (Exception $e) {}
+    }
 }

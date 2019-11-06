@@ -27,18 +27,33 @@ class Assessment extends \Bs\FormIface
      */
     public function init()
     {
+        $layout = $this->getRenderer()->getLayout();
+        $layout->removeRow('name', 'col-md-6');
+        $layout->removeRow('assessorGroup', 'col-md-6');
+        $layout->removeRow('multi', 'col-md-4');
+        $layout->removeRow('includeZero', 'col-md-4');
+        $layout->removeRow('icon', 'col-md-4');
         
         //$this->appendField(new Field\Input('uid'));
         //$this->appendField(new Field\Select('courseId', array()))->prependOption('-- Select --', '');
         $this->appendField(new Field\Input('name'));
-        $this->appendField(new Field\Input('icon'));
-        $this->appendField(new Field\Input('statusAvailable'));
-        $this->appendField(new Field\Input('assessorGroup'));
-        $this->appendField(new Field\Checkbox('multi'));
-        $this->appendField(new Field\Checkbox('includeZero'));
-        //$this->appendField(new Field\Input('publishResult'));
-        $this->appendField(new Field\Textarea('description'));
-        //$this->appendField(new Field\Textarea('notes'));
+        $this->appendField(new Field\Select('assessorGroup', \Ca\Db\Assessment::getAssessorGroupList($this->getAssessment()->getAssessorGroup())))
+            ->setNotes('Who is the user group to submit the assessment evaluations.');
+
+        $list = array('tk tk-clear', 'tk tk-goals', 'fa fa-eye', 'fa fa-user-circle-o', 'fa fa-bell', 'fa fa-certificate', 'fa fa-tv', 'fa fa-drivers-license',
+            'fa fa-leaf', 'fa fa-trophy', 'fa fa-ambulance', 'fa fa-rebel', 'fa fa-empire', 'fa fa-font-awesome', 'fa fa-heartbeat',
+            'fa fa-medkit', 'fa fa-user-md', 'fa fa-user-secret', 'fa fa-heart');
+        $this->appendField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))
+            ->addCss('iconpicker')->setNotes('Select an icon for this assessment');
+
+        $this->appendField(new Field\Checkbox('multi'))->setCheckboxLabel('Can more than one assessor submit an assessment.');
+        $this->appendField(new Field\Checkbox('includeZero'))->setCheckboxLabel('When calculating the score should 0 value results be included.');
+
+        // TODO: Hide this when assessor group is 'student'
+        $this->appendField(new Field\Select('statusAvailable[]', \App\Db\Placement::getStatusList()))->addCss('tk-dual-select')
+            ->setNotes('Select the placement status values when assessments become available and can be submitted.');
+
+        $this->appendField(new Field\Textarea('description'))->setLabel('Instructions');
 
         $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
         $this->appendField(new Event\Submit('save', array($this, 'doSubmit')));

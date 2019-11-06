@@ -263,10 +263,6 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     {
         $errors = array();
 
-        if (!$this->uid) {
-            $errors['uid'] = 'Invalid value: uid';
-        }
-
         if (!$this->assessmentId) {
             $errors['assessmentId'] = 'Invalid value: assessmentId';
         }
@@ -275,17 +271,10 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             $errors['scaleId'] = 'Invalid value: scaleId';
         }
 
-        if (!$this->domainId) {
-            $errors['domainId'] = 'Invalid value: domainId';
-        }
+//        if (!$this->name) {
+//            $errors['name'] = 'Invalid value: name';
+//        }
 
-        if (!$this->name) {
-            $errors['name'] = 'Invalid value: name';
-        }
-
-        if (!$this->orderBy) {
-            $errors['orderBy'] = 'Invalid value: orderBy';
-        }
 
         return $errors;
     }

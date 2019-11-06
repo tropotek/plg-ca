@@ -9,6 +9,11 @@ namespace Ca\Db;
  */
 class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    const ASSESSOR_GROUP_STUDENT = 'student';
+    const ASSESSOR_GROUP_COMPANY = 'company';
+    const ASSESSOR_GROUP_STAFF = 'staff';
+
+
 
     /**
      * @var int
@@ -332,7 +337,29 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     {
         return $this->created;
     }
-    
+
+    /**
+     * return the status list for a select field
+     * @param null|string $current
+     * @return array
+     */
+    public static function getAssessorGroupList($current = null)
+    {
+        $arr = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants(__CLASS__, 'ASSESSOR_GROUP'));
+        if (is_string($current)) {
+            $arr2 = array();
+            foreach ($arr as $k => $v) {
+                if ($v == $current) {
+                    $arr2[$k.' (Current)'] = $v;
+                } else {
+                    $arr2[$k] = $v;
+                }
+            }
+            $arr = $arr2;
+        }
+        return $arr;
+    }
+
     /**
      * @return array
      */

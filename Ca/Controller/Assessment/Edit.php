@@ -48,10 +48,29 @@ class Edit extends AdminEditIface
     }
 
     /**
+     * Add actions here
+     */
+    public function initActionPanel()
+    {
+        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Items',
+            \Uni\Uri::createHomeUrl('/ca/itemManager.html')
+                ->set('profileId', $this->assessment->getCourseId())
+                ->set('assessmentId', $this->assessment->getId()),
+            'fa fa-question'));
+        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Form Preview',
+        \Uni\Uri::createHomeUrl('/ca/assessmentPreview.html')
+            ->set('profileId', $this->assessment->getCourseId())
+            ->set('assessmentId', $this->assessment->getId()),
+        'fa fa-eye'));
+    }
+
+
+    /**
      * @return \Dom\Template
      */
     public function show()
     {
+        $this->initActionPanel();
         $template = parent::show();
 
         // Render the form

@@ -57,7 +57,6 @@ CREATE TABLE IF NOT EXISTS ca_assessment_placement_type (
   PRIMARY KEY (assessment_id, placement_type_id)
 ) ENGINE=InnoDB;
 
-
 -- --------------------------------------------
 -- Learning domains for the competancies
 -- --------------------------------------------
@@ -95,7 +94,6 @@ CREATE TABLE IF NOT EXISTS ca_competency (
     KEY (institution_id),
     KEY (del)
 ) ENGINE = InnoDB;
-
 
 -- --------------------------------------------
 -- Scale
@@ -135,7 +133,6 @@ CREATE TABLE IF NOT EXISTS ca_option (
     KEY del(del)
 ) ENGINE = InnoDB;
 
-
 -- --------------------------------------------
 -- Item
 -- --------------------------------------------
@@ -164,12 +161,52 @@ CREATE TABLE IF NOT EXISTS ca_item (
 -- --------------------------------------------
 --
 -- --------------------------------------------
-CREATE TABLE IF NOT EXISTS ca_item_competancy (
+CREATE TABLE IF NOT EXISTS ca_item_competency (
     item_id INT UNSIGNED NOT NULL DEFAULT 0,
-    competancy_id INT UNSIGNED NOT NULL DEFAULT 0,
-    PRIMARY KEY (item_id, competancy_id)
+    competency_id INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (item_id, competency_id)
 ) ENGINE = InnoDB;
 
+
+-- ------------------------------------------------------
+--
+--
+-- ------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ca_entry (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    assessment_id INT UNSIGNED NOT NULL DEFAULT 0,
+    subject_id INT UNSIGNED NOT NULL DEFAULT 0,
+    student_id INT UNSIGNED NOT NULL DEFAULT 0,          -- The student user id the entry belongs to
+    assessor_id INT UNSIGNED NOT NULL DEFAULT 0,         -- (optional) The assessor user id the entry belongs to if a local user
+    placement_id INT UNSIGNED NOT NULL DEFAULT 0,        -- (optional) The placement this entry is linked to if 0 then assume self-assessment
+
+    title VARCHAR(255) NOT NULL DEFAULT '',              -- A title for the assessment instance
+    assessor_name VARCHAR(128) DEFAULT '' NOT NULL,      -- Name of person assessing the student if not supervisor.
+    assessor_email VARCHAR(128) DEFAULT '' NOT NULL,     -- Email of assesor
+    absent INT(4) DEFAULT '0' NOT NULL,                  -- Number of days absent from placement.
+    average DECIMAL(6, 2) NOT NULL DEFAULT 0.0,          -- Average calculated from all item values
+    status VARCHAR(64) NOT NULL DEFAULT '',              -- pending, approved, not-approved
+    notes TEXT,                                          -- Staff only notes
+    del BOOL NOT NULL DEFAULT 0,
+    modified DATETIME NOT NULL,
+    created DATETIME NOT NULL,
+    KEY (assessment_id),
+    KEY (subject_id),
+    KEY (student_id),
+    KEY (assessor_id),
+    KEY (placement_id),
+    KEY (del)
+) ENGINE = InnoDB;
+
+-- ------------------------------------------------------
+--
+-- ------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ca_value (
+    entry_id INT UNSIGNED NOT NULL DEFAULT 0,
+    item_id INT UNSIGNED NOT NULL DEFAULT 0,
+    value TEXT,
+    PRIMARY KEY (entry_id, item_id)
+) ENGINE = InnoDB;
 
 
 
@@ -239,10 +276,9 @@ INSERT INTO ca_competency (institution_id, name, description, modified, created)
     (1, 'Discusses a pre and post-operative management plan for common surgical procedures ', '', NOW(), NOW()),
     (1, 'Demonstrates understanding of health, safety and biosecurity in a veterinary setting', '', NOW(), NOW()),
     (1, 'Demonstrates ability to calculate an appropriate drug dose and knowledge of withholding periods where appropriate', '', NOW(), NOW()),
-    (1, 'Demonstrates an understanding  of anatomy, physiology and pathophysiology', '', NOW(), NOW()),
+    (1, 'Demonstrates an understanding of anatomy, physiology and pathophysiology', '', NOW(), NOW()),
     (1, 'Demonstrates ability to find information in the literature', '', NOW(), NOW()),
     (1, 'Applies principles of anatomy, physiology and pathophysiology to the diagnosis, prevention, and treatment of clinical cases', '', NOW(), NOW()),
-    (1, 'Demonstrates ability to find information in the literature', '', NOW(), NOW()),
     (1, 'Creates a prioritised differential diagnosis list assimilating information from the history, clinical examination and diagnostic tests', '', NOW(), NOW()),
     (1, 'Develops an adaptive management plan that respects client wishes and finances and available resources (including personal skills and equipment)', '', NOW(), NOW()),
     (1, 'Demonstrates understanding of appropriate preventative health care programs', '', NOW(), NOW()),
@@ -263,66 +299,168 @@ INSERT INTO ca_domain (institution_id, name, description, label, modified, creat
 ;
 
 
+TRUNCATE ca_item;
+TRUNCATE ca_item_competency;
+
+-- GOALS (Weeks 5-21)
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 1);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 2);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 3);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 4);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 5);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 6);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 7);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 9);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 10);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 1, 'Please provide specific feedback to the student regarding areas of professionalism and ethics that require further development?', '', 0, NOW(), NOW());
+
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 11);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 13);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 17);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 18);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 19);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 20);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 21);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 23);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 2, 'Please provide specific feedback to the student regarding areas of clinical and technical skills that require further development?', '', 0, NOW(), NOW());
+
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 27);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 26);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 28);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 29);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 30);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 31);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 32);
+
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 0, 'What did the student do well on this placement?', '', 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 0, 'What areas do you think the student should focus on improving to be day-one ready by the end of DVM4, provide any comment if you have any specific concerns?', '', 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 5, 0, 'Do you believe this student is on track to being day one practice ready by the end of DVM4?', '', 0, NOW(), NOW());
 
 
+-- Self Assessment
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 1);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 2);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 3);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 4);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 5);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 6);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 7);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 9);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 10);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 1, 'What areas of professionalism and ethics do you feel you need to further develop?', '', 1, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 1, 'How do you plan to further develop your competency in these areas of professionalism and ethics?', '', 1, NOW(), NOW());
 
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 11);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 13);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 17);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 18);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 19);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 20);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 21);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 23);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 2, 'What areas of clinical and technical skills do you feel you need to further develop?', '', 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 2, 'How do you plan to further develop your competency in these areas of clinical and technical skills?', '', 0, NOW(), NOW());
 
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 27);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 26);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 28);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 29);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 30);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 31);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 32);
 
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 0, 'Briefly describe a case you dealt with during a placement where you were actively involved in working up, managing and treating the case (300 words or less).', '', 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 0, 'Do you have any reasons to believe you will not being day one practice ready by November?', '', 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 5, 0, 'Do you feel you are on track to being day one practice ready in November?', '', 0, NOW(), NOW());
 
+-- Supervisor Feedback (Weeks 1-4)
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 1);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 2);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 4);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 5);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 8);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 1, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 10);
 
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 11);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 12);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 14);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 15);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 16);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 22);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 24);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 23);
 
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 4, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 25);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 4, 2, '', '', 1, NOW(), NOW());
+INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 26);
 
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 1, 0, 'What did the student do well on this placement?', '', 0, NOW(), NOW());
 
+UPDATE ca_item SET order_by = id WHERE 1;
 
-
-
-
-
-
-
-
-
-
--- These are the instance tables.
--- TODO: OOHH!! lets create a conversation/discussion per entry instance, then the staff and student can converse on it....
--- TODO:
---
-CREATE TABLE IF NOT EXISTS skill_entry (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    collection_id INT UNSIGNED NOT NULL DEFAULT 0,
-    subjeca_id INT UNSIGNED NOT NULL DEFAULT 0,
-    user_id INT UNSIGNED NOT NULL DEFAULT 0,             -- The student user id the entry belongs to
-    placement_id INT UNSIGNED NOT NULL DEFAULT 0,        -- (optional) The placement this entry is linked to if 0 then assume self-assessment
-    title VARCHAR(255) NOT NULL DEFAULT '',              -- A title for the assessment instance
-    assessor VARCHAR(128) DEFAULT '' NOT NULL,           -- Name of person assessing the student if not supervisor.
-    absent INT(4) DEFAULT '0' NOT NULL,                  -- Number of days absent from placement.
-    average DECIMAL(6, 2) NOT NULL DEFAULT 0.0,          -- Average calculated from all item values
-    weighted_average DECIMAL(6, 2) NOT NULL DEFAULT 0.0, -- Average calculated from all item values with their domain weight, including/not zero values
-    confirm BOOL DEFAULT NULL,                           -- The value of the confirmation question true/false/null
-    status VARCHAR(64) NOT NULL DEFAULT '',              -- pending, approved, not-approved
-    notes TEXT,                                          -- Staff only notes
-    del BOOL NOT NULL DEFAULT 0,
-    modified DATETIME NOT NULL,
-    created DATETIME NOT NULL,
-    KEY (collection_id),
-    KEY (subjeca_id),
-    KEY (user_id),
-    KEY (placement_id),
-    KEY (del)
-) ENGINE = InnoDB;
-
-
--- ------------------------------------------------------
--- TODO: Lets change the value table to have no entry for a zero values
--- TODO:  this will save around 1/4 of required disc space .....
--- TODO:
--- ------------------------------------------------------
-CREATE TABLE IF NOT EXISTS skill_value (
-    entry_id INT UNSIGNED NOT NULL DEFAULT 0,
-    item_id INT UNSIGNED NOT NULL DEFAULT 0,
-    value TEXT,
-    PRIMARY KEY (entry_id, item_id)
-) ENGINE = InnoDB;
 
 
 

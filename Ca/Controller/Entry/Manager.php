@@ -1,5 +1,5 @@
 <?php 
-namespace Ca\Controller\Item;
+namespace Ca\Controller\Entry;
 
 use App\Controller\AdminManagerIface;
 use Dom\Template;
@@ -7,10 +7,10 @@ use Tk\Request;
 
 /**
  * TODO: Add Route to routes.php:
- *      $routes->add('ca-item-manager', Route::create('/staff/ca/itemManager.html', 'Ca\Controller\Item\Manager::doDefault'));
+ *      $routes->add('ca-entry-manager', Route::create('/staff/ca/entryManager.html', 'Ca\Controller\Entry\Manager::doDefault'));
  *
  * @author Mick Mifsud
- * @created 2019-11-05
+ * @created 2019-11-06
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
@@ -22,7 +22,7 @@ class Manager extends AdminManagerIface
      */
     public function __construct()
     {
-        $this->setPageTitle('Item Manager');
+        $this->setPageTitle('Entry Manager');
     }
 
     /**
@@ -31,13 +31,11 @@ class Manager extends AdminManagerIface
      */
     public function doDefault(Request $request)
     {
-        $this->setTable(\Ca\Table\Item::create());
-        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/itemEdit.html'));
+        $this->setTable(\Ca\Table\Entry::create());
+        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/entryEdit.html'));
         $this->getTable()->init();
 
-        $filter = array(
-            'assessmentId' => $this->getRequest()->get('assessmentId')
-        );
+        $filter = array();
         $this->getTable()->setList($this->getTable()->findList($filter));
     }
 
@@ -46,7 +44,7 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Item',
+        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Entry',
             $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
     }
 
@@ -69,7 +67,7 @@ class Manager extends AdminManagerIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="tk-panel" data-panel-title="Items" data-panel-icon="fa fa-book" var="panel"></div>
+<div class="tk-panel" data-panel-title="Entrys" data-panel-icon="fa fa-book" var="panel"></div>
 HTML;
         return \Dom\Loader::load($xhtml);
     }

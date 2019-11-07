@@ -133,10 +133,6 @@ JS;
      */
     public function doSubmit($form, $event)
     {
-        if ($this->getEntry()->getId() < 0) {
-            $event->setRedirect(\Tk\Uri::create());
-            return;
-        }
 
         // Load the object with form data
         \Ca\Db\EntryMap::create()->mapForm($form->getValues(), $this->getEntry());
@@ -146,7 +142,13 @@ JS;
         if ($form->hasErrors()) {
             return;
         }
-        
+
+        if ($this->getEntry()->getId() < 0) {
+            \Tk\Alert::addInfo('This form was successfully submitted and validated.<br/>However no data was saved as this is only a preview form. ;-)');
+            //$event->setRedirect(\Tk\Uri::create());
+            return;
+        }
+
         $isNew = (bool)$this->getEntry()->getId();
         $this->getEntry()->save();
 

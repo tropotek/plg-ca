@@ -50,6 +50,8 @@ class Preview extends AdminEditIface
 
         // Setup dummy Entry object
         $this->entry = new \Ca\Db\Entry();
+        $this->entry->setSubjectId(1);
+        $this->entry->setStudentId($this->getUser()->getId());
         $this->entry->setAssessmentId($this->assessment->getId());
         $this->entry->setTitle('Student Name @ Some Company [Dates] Assessment');
         $this->entry->setAssessorName($this->getUser()->getName());

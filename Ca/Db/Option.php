@@ -9,6 +9,7 @@ namespace Ca\Db;
  */
 class Option extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    use Traits\ScaleTrait;
 
     /**
      * @var int
@@ -54,24 +55,6 @@ class Option extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $this->modified = new \DateTime();
         $this->created = new \DateTime();
 
-    }
-    
-    /**
-     * @param int $scaleId
-     * @return Option
-     */
-    public function setScaleId($scaleId) : Option
-    {
-        $this->scaleId = $scaleId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getScaleId() : int
-    {
-        return $this->scaleId;
     }
 
     /**
@@ -170,19 +153,11 @@ class Option extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function validate()
     {
         $errors = array();
-
-        if (!$this->scaleId) {
-            $errors['scaleId'] = 'Invalid value: scaleId';
-        }
+        $errors = $this->validateScaleId($errors);
 
         if (!$this->name) {
             $errors['name'] = 'Invalid value: name';
         }
-
-//        if (!$this->value) {      // check it is a number [0-1000]
-//            $errors['value'] = 'Invalid value: value';
-//        }
-
         return $errors;
     }
 

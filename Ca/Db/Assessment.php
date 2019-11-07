@@ -9,11 +9,11 @@ namespace Ca\Db;
  */
 class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    use \App\Db\Traits\CourseTrait;
+
     const ASSESSOR_GROUP_STUDENT = 'student';
     const ASSESSOR_GROUP_COMPANY = 'company';
     const ASSESSOR_GROUP_STAFF = 'staff';
-
-
 
     /**
      * @var int
@@ -115,24 +115,6 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param int $courseId
-     * @return Assessment
-     */
-    public function setCourseId($courseId) : Assessment
-    {
-        $this->courseId = $courseId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getCourseId() : int
-    {
-        return $this->courseId;
-    }
-
-    /**
      * @param string $name
      * @return Assessment
      */
@@ -217,7 +199,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * return bool
      */
-    public function getMulti() : bool
+    public function isMulti() : bool
     {
         return $this->multi;
     }
@@ -235,7 +217,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * return bool
      */
-    public function getIncludeZero() : bool
+    public function isIncludeZero() : bool
     {
         return $this->includeZero;
     }
@@ -366,14 +348,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function validate()
     {
         $errors = array();
-
-        if (!$this->uid) {
-            $errors['uid'] = 'Invalid value: uid';
-        }
-
-        if (!$this->courseId) {
-            $errors['courseId'] = 'Invalid value: courseId';
-        }
+        $errors = $this->validateCourseId($errors);
 
         if (!$this->name) {
             $errors['name'] = 'Invalid value: name';

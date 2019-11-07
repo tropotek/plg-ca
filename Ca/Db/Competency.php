@@ -9,6 +9,7 @@ namespace Ca\Db;
  */
 class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    use \Uni\Db\Traits\InstitutionTrait;
 
     /**
      * @var int
@@ -24,11 +25,6 @@ class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      * @var int
      */
     public $institutionId = 0;
-
-    /**
-     * @var int
-     */
-    public $courseId = 0;
 
     /**
      * @var string
@@ -77,42 +73,6 @@ class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function getUid() : string
     {
         return $this->uid;
-    }
-
-    /**
-     * @return int
-     */
-    public function getInstitutionId(): int
-    {
-        return $this->institutionId;
-    }
-
-    /**
-     * @param int $institutionId
-     * @return Domain
-     */
-    public function setInstitutionId(int $institutionId): Domain
-    {
-        $this->institutionId = $institutionId;
-        return $this;
-    }
-
-    /**
-     * @param int $courseId
-     * @return Competency
-     */
-    public function setCourseId($courseId) : Competency
-    {
-        $this->courseId = $courseId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getCourseId() : int
-    {
-        return $this->courseId;
     }
 
     /**
@@ -193,14 +153,7 @@ class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function validate()
     {
         $errors = array();
-
-        if (!$this->uid) {
-            $errors['uid'] = 'Invalid value: uid';
-        }
-
-        if (!$this->courseId) {
-            $errors['courseId'] = 'Invalid value: courseId';
-        }
+        $errors = $this->validateInstitutionId($errors);
 
         if (!$this->name) {
             $errors['name'] = 'Invalid value: name';

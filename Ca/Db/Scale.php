@@ -9,6 +9,8 @@ namespace Ca\Db;
  */
 class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    use \Uni\Db\Traits\InstitutionTrait;
+
     const TYPE_TEXT = 'text';
     const TYPE_VALUE = 'value';
     const TYPE_CHOICE = 'choice';
@@ -99,24 +101,6 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param int $institutionId
-     * @return Scale
-     */
-    public function setInstitutionId($institutionId) : Scale
-    {
-        $this->institutionId = $institutionId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getInstitutionId() : int
-    {
-        return $this->institutionId;
-    }
-
-    /**
      * @param string $name
      * @return Scale
      */
@@ -183,7 +167,7 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * return bool
      */
-    public function getMultiple() : bool
+    public function isMultiple() : bool
     {
         return $this->multiple;
     }
@@ -266,14 +250,7 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function validate()
     {
         $errors = array();
-
-//        if (!$this->uid) {
-//            $errors['uid'] = 'Invalid value: uid';
-//        }
-
-        if (!$this->institutionId) {
-            $errors['institutionId'] = 'Invalid value: institutionId';
-        }
+        $errors = $this->validateInstitutionId($errors);
 
         if (!$this->name) {
             $errors['name'] = 'Invalid value: name';

@@ -3,6 +3,7 @@ namespace Ca\Db;
 
 use Tk\Form\Field\Select;
 use Tk\ObjectUtil;
+use Uni\Config;
 
 /**
  * @author Mick Mifsud
@@ -12,6 +13,10 @@ use Tk\ObjectUtil;
  */
 class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    use Traits\AssessmentTrait;
+    use \Uni\Db\Traits\SubjectTrait;
+    use \App\Db\Traits\PlacementTrait;
+
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_NOT_APPROVED = 'not approved';
@@ -91,6 +96,16 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public $created = null;
 
+    /**
+     * @var null|\Uni\Db\UserIface
+     */
+    private $_student = null;
+
+    /**
+     * @var null|\Uni\Db\UserIface
+     */
+    private $_assessor = null;
+
 
     /**
      * Entry
@@ -100,42 +115,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $this->modified = new \DateTime();
         $this->created = new \DateTime();
 
-    }
-    
-    /**
-     * @param int $assessmentId
-     * @return Entry
-     */
-    public function setAssessmentId($assessmentId) : Entry
-    {
-        $this->assessmentId = $assessmentId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getAssessmentId() : int
-    {
-        return $this->assessmentId;
-    }
-
-    /**
-     * @param int $subjectId
-     * @return Entry
-     */
-    public function setSubjectId($subjectId) : Entry
-    {
-        $this->subjectId = $subjectId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getSubjectId() : int
-    {
-        return $this->subjectId;
     }
 
     /**
@@ -157,6 +136,19 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @return \Tk\Db\Map\Model|\Tk\Db\ModelInterface|null|\Uni\Db\UserIface
+     */
+    public function getStudent()
+    {
+        if (!$this->_student) {
+            try {
+                $this->_student = Config::getInstance()->getUserMapper()->find($this->getStudentId());
+            } catch (\Exception $e) {}
+        }
+        return $this->_student;
+    }
+
+    /**
      * @param int $assessorId
      * @return Entry
      */
@@ -175,21 +167,16 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param int $placementId
-     * @return Entry
+     * @return \Tk\Db\Map\Model|\Tk\Db\ModelInterface|null|\Uni\Db\UserIface
      */
-    public function setPlacementId($placementId) : Entry
+    public function getAssessor()
     {
-        $this->placementId = $placementId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getPlacementId() : int
-    {
-        return $this->placementId;
+        if (!$this->_assessor) {
+            try {
+                $this->_assessor = Config::getInstance()->getUserMapper()->find($this->getAssessorId());
+            } catch (\Exception $e) {}
+        }
+        return $this->_assessor;
     }
 
     /**
@@ -279,6 +266,8 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function getAverage() : float
     {
+        if ($this->average == 0)
+            $this->calculateAverage();
         return $this->average;
     }
 
@@ -355,6 +344,17 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * Get the entry average score.
+     *
+     * @return float
+     * @todo We need to complete this function
+     */
+    public function calculateAverage()
+    {
+        return 0.0;
+    }
+
+    /**
      * return the status list for a select field
      * @param null|string $status
      * @return array
@@ -382,26 +382,12 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function validate()
     {
         $errors = array();
-
-        if (!$this->assessmentId) {
-            $errors['assessmentId'] = 'Invalid value: assessmentId';
-        }
-
-        if (!$this->subjectId) {
-            $errors['subjectId'] = 'Invalid value: subjectId';
-        }
+        $errors = $this->validateAssessmentId($errors);
+        $errors = $this->validateSubjectId($errors);
 
         if (!$this->studentId) {
             $errors['studentId'] = 'Invalid value: studentId';
         }
-
-//        if (!$this->assessorId) {
-//            $errors['assessorId'] = 'Invalid value: assessorId';
-//        }
-
-//        if (!$this->placementId) {
-//            $errors['placementId'] = 'Invalid value: placementId';
-//        }
 
         if (!$this->title) {
             $errors['title'] = 'Invalid value: title';
@@ -414,14 +400,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         if (!$this->assessorEmail) {
             $errors['assessorEmail'] = 'Invalid value: assessorEmail';
         }
-
-//        if (!$this->absent) {
-//            $errors['absent'] = 'Invalid value: absent';
-//        }
-
-//        if (!$this->average) {
-//            $errors['average'] = 'Invalid value: average';
-//        }
 
         if (!$this->status) {
             $errors['status'] = 'Invalid value: status';

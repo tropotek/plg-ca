@@ -321,7 +321,7 @@ INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, grad
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 9);
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 1, '', '', 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 10);
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 1, 'Please provide specific feedback to the student regarding areas of professionalism and ethics that require further development?', '', 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 1, 'Please provide specific feedback to the student regarding areas of professionalism and ethics that require further development.', '', 0, NOW(), NOW());
 
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 11);
@@ -339,7 +339,7 @@ INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, grad
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 21);
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 2, '', '', 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 23);
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 2, 'Please provide specific feedback to the student regarding areas of clinical and technical skills that require further development?', '', 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 2, 'Please provide specific feedback to the student regarding areas of clinical and technical skills that require further development.', '', 0, NOW(), NOW());
 
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 27);
@@ -355,6 +355,8 @@ INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, grad
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 31);
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 4, 4, '', '', 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 32);
+
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 4, ' Please provide specific feedback to the student regarding areas of knowledge and problem solving that require further development.', '', 0, NOW(), NOW());
 
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 0, 'What did the student do well on this placement?', '', 0, NOW(), NOW());
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (1, 1, 0, 'What areas do you think the student should focus on improving to be day-one ready by the end of DVM4, provide any comment if you have any specific concerns?', '', 0, NOW(), NOW());
@@ -416,6 +418,8 @@ INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, grad
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 31);
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 4, 4, '', '', 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 32);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 4, 'What areas of knowledge and problem solving do you feel you need to further develop?', '', 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 4, 'How do you plan to further develop your competency in these areas of knowledge and problem solving?', '', 0, NOW(), NOW());
 
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 0, 'Briefly describe a case you dealt with during a placement where you were actively involved in working up, managing and treating the case (300 words or less).', '', 0, NOW(), NOW());
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (2, 1, 0, 'Do you have any reasons to believe you will not being day one practice ready by November?', '', 0, NOW(), NOW());

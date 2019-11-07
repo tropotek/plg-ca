@@ -19,7 +19,7 @@ use Tk\Form;
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
-class Competency extends \Bs\FormIface
+class Competency extends \Uni\FormIface
 {
 
     /**

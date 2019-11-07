@@ -20,8 +20,9 @@ use Tk\Table\Cell;
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
-class Entry extends \Bs\TableIface
+class Entry extends \Uni\TableIface
 {
+
     
     /**
      * @return $this

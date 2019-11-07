@@ -20,7 +20,7 @@ use Tk\Table\Cell;
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
-class Domain extends \Bs\TableIface
+class Domain extends \Uni\TableIface
 {
     
     /**

@@ -9,6 +9,9 @@ namespace Ca\Db;
  */
 class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    use Traits\AssessmentTrait;
+    use Traits\ScaleTrait;
+    use Traits\DomainTrait;
 
     /**
      * @var int
@@ -65,6 +68,11 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public $created = null;
 
+    /**
+     * @var null|\Tk\Db\Map\ArrayObject|Competency[]
+     */
+    private $competencyList = null;
+
 
     /**
      * Item
@@ -92,60 +100,6 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function getUid() : string
     {
         return $this->uid;
-    }
-
-    /**
-     * @param int $assessmentId
-     * @return Item
-     */
-    public function setAssessmentId($assessmentId) : Item
-    {
-        $this->assessmentId = $assessmentId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getAssessmentId() : int
-    {
-        return $this->assessmentId;
-    }
-
-    /**
-     * @param int $scaleId
-     * @return Item
-     */
-    public function setScaleId($scaleId) : Item
-    {
-        $this->scaleId = $scaleId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getScaleId() : int
-    {
-        return $this->scaleId;
-    }
-
-    /**
-     * @param int $domainId
-     * @return Item
-     */
-    public function setDomainId($domainId) : Item
-    {
-        $this->domainId = $domainId;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getDomainId() : int
-    {
-        return $this->domainId;
     }
 
     /**
@@ -197,7 +151,7 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * return bool
      */
-    public function getGradable() : bool
+    public function isGradable() : bool
     {
         return $this->gradable;
     }
@@ -255,6 +209,18 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     {
         return $this->created;
     }
+
+    /**
+     * @return Competency[]|\Tk\Db\Map\ArrayObject|null
+     * @throws \Exception
+     */
+    public function getCompetencyList()
+    {
+        if (!$this->competencyList) {
+            $this->competencyList = CompetencyMap::create()->findFiltered(array('itemId' => $this->getId()));
+        }
+        return $this->competencyList;
+    }
     
     /**
      * @return array
@@ -263,18 +229,14 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     {
         $errors = array();
 
-        if (!$this->assessmentId) {
-            $errors['assessmentId'] = 'Invalid value: assessmentId';
-        }
+        $errors = $this->validateAssessmentId($errors);
+        $errors = $this->validateScaleId($errors);
+        //$errors = $this->validateDomainId($errors);
 
-        if (!$this->scaleId) {
-            $errors['scaleId'] = 'Invalid value: scaleId';
-        }
-
+        // TODO: Check that there is > 1 competency for this to be null
 //        if (!$this->name) {
 //            $errors['name'] = 'Invalid value: name';
 //        }
-
 
         return $errors;
     }

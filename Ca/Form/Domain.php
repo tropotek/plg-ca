@@ -19,7 +19,7 @@ use Tk\Form;
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
-class Domain extends \Bs\FormIface
+class Domain extends \Uni\FormIface
 {
 
     /**

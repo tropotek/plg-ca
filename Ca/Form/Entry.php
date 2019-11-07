@@ -133,6 +133,11 @@ JS;
      */
     public function doSubmit($form, $event)
     {
+        if ($this->getEntry()->getId() < 0) {
+            $event->setRedirect(\Tk\Uri::create());
+            return;
+        }
+
         // Load the object with form data
         \Ca\Db\EntryMap::create()->mapForm($form->getValues(), $this->getEntry());
 

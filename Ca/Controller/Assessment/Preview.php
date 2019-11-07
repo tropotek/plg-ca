@@ -55,6 +55,7 @@ class Preview extends AdminEditIface
         $this->entry->setAssessorName($this->getUser()->getName());
         $this->entry->setAssessorEmail($this->getUser()->getEmail());
         $this->entry->setAbsent(0);
+        $this->entry->id = -1;
 
         $this->setForm(\Ca\Form\Entry::create()->setModel($this->entry));
         $this->initForm($request);

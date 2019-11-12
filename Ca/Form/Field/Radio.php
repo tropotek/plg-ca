@@ -35,7 +35,7 @@ class Radio extends Field\Radio
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="">
+<div class="ca-control ca-radio">
   <div class="col-md-8" var="left-col"></div>
   <div class="col-md-4">
       <div class="radio" repeat="option" var="option">

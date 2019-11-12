@@ -85,7 +85,6 @@ class Item extends \Uni\TableIface
             return $value;
         });
 
-        $this->appendCell(new Cell\Boolean('gradable'));
         $this->appendCell(new Cell\Text('scaleId'))->setOnPropertyValue(function ($cell, $obj, $value) {
             /* @var $cell Cell\Text */
             /* @var $obj \Ca\Db\Item */
@@ -93,6 +92,8 @@ class Item extends \Uni\TableIface
             if ($scale) $value = $scale->getName();
             return $value;
         });
+        $this->appendCell(new Cell\Boolean('gradable'));
+        $this->appendCell(new Cell\Boolean('required'));
         $this->appendCell(new Cell\Date('modified'));
         $this->appendCell(new Cell\Date('created'));
 

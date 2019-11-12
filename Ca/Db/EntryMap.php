@@ -149,4 +149,89 @@ class EntryMap extends Mapper
         return $filter;
     }
 
+
+    /**
+     * @param int $entryId
+     * @param int $itemId
+     * @return array|\stdClass
+     * @throws \Exception
+     */
+    public function findValue($entryId, $itemId = 0)
+    {
+        $st = null;
+        if ($itemId) {
+            $st = $this->getDb()->prepare('SELECT * FROM ca_value a WHERE a.entry_id = ? AND a.item_id = ?');
+            $st->bindParam(1, $entryId);
+            $st->bindParam(2, $itemId);
+        } else {
+            $st = $this->getDb()->prepare('SELECT * FROM ca_value a WHERE a.entry_id = ?');
+            $st->bindParam(1, $entryId);
+        }
+        $st->execute();
+        $arr = $st->fetchAll();
+        if($itemId) return current($arr);
+        return $arr;
+    }
+
+    /**
+     * @param int $entryId
+     * @param int $itemId
+     * @param string $value
+     * @throws \Exception
+     */
+    public function saveValue($entryId, $itemId, $value)
+    {
+        /** @var Item $item */
+        $item = $this->find($itemId);
+        if ($item) {
+            $max = $item->getScale()->getMaxValue();
+            if ($value < 0) $value = 0;
+            if ($value > $max) $value = $max;
+        }
+
+        if ($this->hasValue($entryId, $itemId)) {
+            $st = $this->getDb()->prepare('UPDATE ca_value SET value = ? WHERE entry_id = ? AND item_id = ? ');
+        } else {
+            $st = $this->getDb()->prepare('INSERT INTO ca_value (value, entry_id, item_id) VALUES (?, ?, ?)');
+        }
+        $st->bindParam(1, $value);
+        $st->bindParam(2, $entryId);
+        $st->bindParam(3, $itemId);
+        $st->execute();
+    }
+
+    /**
+     * @param int $entryId
+     * @param int $itemId
+     * @throws \Exception
+     */
+    public function removeValue($entryId, $itemId = null)
+    {
+        $st = $this->getDb()->prepare('DELETE FROM ca_value WHERE entry_id = ?');
+        $st->bindParam(1, $entryId);
+        if ($itemId !== null) {
+            $st = $this->getDb()->prepare('DELETE FROM ca_value WHERE entry_id = ? AND item_id = ?');
+            $st->bindParam(1, $entryId);
+            $st->bindParam(2, $itemId);
+        }
+        $st->execute();
+    }
+
+    /**
+     * Does the value record exist
+     *
+     * @param int $entryId
+     * @param int $itemId
+     * @return bool
+     * @throws \Exception
+     */
+    public function hasValue($entryId, $itemId)
+    {
+        $val = $this->findValue($entryId, $itemId);
+        return $val != null;
+    }
+
+
+
+
 }

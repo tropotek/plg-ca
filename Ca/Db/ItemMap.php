@@ -34,6 +34,7 @@ class ItemMap extends Mapper
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Boolean('gradable'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('required'));
             $this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
             $this->dbMap->addPropertyMap(new Db\Date('created'));
@@ -57,6 +58,7 @@ class ItemMap extends Mapper
             $this->formMap->addPropertyMap(new Form\Text('name'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Boolean('gradable'));
+            $this->formMap->addPropertyMap(new Form\Boolean('required'));
             $this->formMap->addPropertyMap(new Form\Integer('orderBy'));
             $this->formMap->addPropertyMap(new Form\Date('modified'));
             $this->formMap->addPropertyMap(new Form\Date('created'));
@@ -115,6 +117,9 @@ class ItemMap extends Mapper
         }
         if (!empty($filter['gradable'])) {
             $filter->appendWhere('a.gradable = %s AND ', (int)$filter['gradable']);
+        }
+        if (!empty($filter['required'])) {
+            $filter->appendWhere('a.required = %s AND ', (int)$filter['required']);
         }
 
 

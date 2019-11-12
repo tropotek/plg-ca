@@ -5,57 +5,107 @@
  */
 
 .ca-entry-edit {    // Entry Form
-  .ca-row .form-row:nth-child(even) {
-    //background-color: #EFEFEF;
-  }
-  .ca-row .form-row .form-group {
-    //border-bottom: 1px solid #EFEFEF;
-  }
-  // Radio
-  .tk-radio {
-    vertical-align: top;
-    .col-md-8 {
-      padding-bottom: 15px;
+  .ca-row {
+
+    .form-row {
+      margin-bottom: 15px;
+
+      &:nth-child(even) {
+        background-color: #EFEFEF;
+      }
+      .form-group {
+        //border-bottom: 1px solid #EFEFEF;
+        .col-md-12 {
+          .help-block {
+            .make-md-column(12);
+            .row;
+            //margin-left: -15px;
+            //margin-right: -15px;
+            //padding-left: 0;
+            //padding-right: 0;
+          }
+        }
+      }
     }
-    .col-md-4 {
-      padding-bottom: 15px;
-      text-align: right;
-    }
-    .radio {
-      display: inline-block;
-      padding: 0 0 0 0;
-      margin: 0;
-      label {
-        padding: 0;
-        margin: 0 15px 0 0;
+
+
+    // Radio
+    .ca-control {
+      //vertical-align: top;
+      .col-md-8 {
+        padding-bottom: 0;
+      }
+      .col-md-4 {
+        padding-bottom: 0;
+        text-align: right;
+        //display: table-row;
+        display: flex;
+      }
+      .radio {
         text-align: center;
-        input, span {
+        vertical-align: top;
+        display: block;
+        flex-grow: 1;
+        //display: table-cell;
+        width: 100%;
+        padding: 0 0 0 0;
+        margin: 0;
+        label {
           padding: 0;
-          margin: 0;
-        }
+          margin: 0 15px 0 0;
+          text-align: center;
+          input, span {
+            padding: 0;
+            margin: 0;
+          }
 
-        input {
-          position: relative;
-        }
+          input {
+            position: relative;
+          }
 
-        span {
+          span {
+            display: inline-block;
+            width: 100%;
+            font-size: 0.9em;
+            font-size: 1.1rem;
+          }
+        }
+      }  // .radio
+
+      &.ca-input {
+        .form-control {
           display: inline-block;
-          width: 100%;
+          max-width: 120px;
+          margin-left: auto;
+          margin-right: auto;
         }
       }
 
-    }
-  }
+    } // .ca-control
 
-  .ca-competency {
-    li {
-      &:hover {
-        font-weight: 600;
-        cursor: pointer;
+    .help-text {
+      //text-align: right;
+      font-style: italic;
+    }
+
+    .ca-competency {
+      li {
+        &:hover {
+          &::marker {
+            //color: @brand-primary;
+            //color: @gray-light;
+            color: #3498db;
+            //color: #000;
+          }
+          //font-weight: 600;
+          color: #000;
+          cursor: pointer;
+        }
       }
     }
-  }
 
+
+  }
 }
 
 

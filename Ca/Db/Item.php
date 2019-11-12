@@ -54,6 +54,11 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public $gradable = false;
 
     /**
+     * @var bool
+     */
+    public $required = false;
+
+    /**
      * @var int
      */
     public $orderBy = 0;
@@ -154,6 +159,24 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function isGradable() : bool
     {
         return $this->gradable;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequired(): bool
+    {
+        return $this->required;
+    }
+
+    /**
+     * @param bool $required
+     * @return Item
+     */
+    public function setRequired(bool $required): Item
+    {
+        $this->required = $required;
+        return $this;
     }
 
     /**

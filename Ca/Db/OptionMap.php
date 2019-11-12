@@ -100,7 +100,6 @@ class OptionMap extends Mapper
             $filter->appendWhere('a.value = %s AND ', (float)$filter['value']);
         }
 
-
         if (!empty($filter['exclude'])) {
             $w = $this->makeMultiQuery($filter['exclude'], 'a.id', 'AND', '!=');
             if ($w) $filter->appendWhere('(%s) AND ', $w);

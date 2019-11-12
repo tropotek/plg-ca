@@ -29,7 +29,8 @@ class Item extends \Uni\FormIface
     {
         $layout = $this->getRenderer()->getLayout();
         $layout->removeRow('name', 'col-md-8');
-        $layout->removeRow('gradable', 'col-md-4');
+        $layout->removeRow('gradable', 'col-md-2');
+        $layout->removeRow('required', 'col-md-2');
         $layout->removeRow('scaleId', 'col-md-6');
         $layout->removeRow('domainId', 'col-md-6');
         
@@ -48,6 +49,7 @@ class Item extends \Uni\FormIface
             }
         });
         $this->appendField(new Field\Checkbox('gradable'));
+        $this->appendField(new Field\Checkbox('required'));
         $list = \Ca\Db\ScaleMap::create()->findFiltered(array('institutionId' => $this->getConfig()->getInstitutionId()));
         $this->appendField(new Field\Select('scaleId', $list))->prependOption('-- Select --', '');
         $list = \Ca\Db\DomainMap::create()->findFiltered(array('institutionId' => $this->getConfig()->getInstitutionId()));

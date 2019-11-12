@@ -145,7 +145,8 @@ CREATE TABLE IF NOT EXISTS ca_item (
 
     name VARCHAR(255) NOT NULL DEFAULT '',
     description TEXT,
-    gradable BOOL NOT NULL DEFAULT 0,          -- When true whatever the calculated score is, will be used in an average for the overall assessment
+    gradable BOOL NOT NULL DEFAULT 0,           -- When true whatever the calculated score is, will be used in an average for the overall assessment
+    required BOOL NOT NULL DEFAULT 0,           --
     -- NOTE: Enable only one `avg` or `percent` item to allow the user to enter a score/grade manually.
     order_by INT UNSIGNED NOT NULL DEFAULT 0,
     del BOOL NOT NULL DEFAULT 0,
@@ -234,7 +235,8 @@ INSERT INTO ca_scale (name, description, type, multiple, calc_type, max_value, m
 TRUNCATE ca_option;
 INSERT INTO ca_option (scale_id, name, description, value, modified, created) VALUES
 (4, 'Not Observed', '', 0, NOW(), NOW()),
-(4, 'Needs Further Development', '', 1, NOW(), NOW()),
+-- (4, 'Needs Further Development', '', 1, NOW(), NOW()),
+(4, 'Needs Development', '', 1, NOW(), NOW()),
 (4, 'Meets Expectations', '', 2, NOW(), NOW()),
 (4, 'Exceeds Expectations', '', 3, NOW(), NOW())
 ;

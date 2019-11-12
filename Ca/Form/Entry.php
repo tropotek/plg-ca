@@ -74,16 +74,8 @@ class Entry extends \Uni\FormIface
             }
             if (!$fieldset) $fieldset = 'Conclusion';
 
-
             $field = \Ca\Form\Field\ItemHelper::createField($item);
             if (!$field) continue;
-            $name = trim($item->getName());
-            if (!$name) {
-                /** @var Option $option */
-                $option = CompetencyMap::create()->findFiltered(array('itemId' => $item->getId()))->current();
-                if ($option) $name = $option->getName();
-            }
-            $field->setLabel($name);
             $this->appendField($field)->setFieldset($fieldset, 'ca-row')->setAttr('placeholder', $item->getScale()->getType());
 
             // TODO:
@@ -133,9 +125,19 @@ JS;
      */
     public function doSubmit($form, $event)
     {
-
         // Load the object with form data
         \Ca\Db\EntryMap::create()->mapForm($form->getValues(), $this->getEntry());
+
+        vd($form->getValues());
+
+        $items = \Ca\Db\ItemMap::create()->findFiltered(array('assessmentId' => $this->getEntry()->getAssessmentId()),
+            \Tk\Db\Tool::create('order_by'));
+        foreach ($items as $item) {
+            $id = 'item-'.$item->getId();
+            if ($item->isRequired() && ($form->getFieldValue($id) === null || $form->getFieldValue($id) === '')) {
+                $form->addFieldError($id, 'Please enter a valid value for this item.');
+            }
+        }
 
         // Do Custom Validations
         $form->addFieldErrors($this->getEntry()->validate());

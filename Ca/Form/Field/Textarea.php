@@ -12,7 +12,6 @@ class Textarea extends Field\Textarea
 {
     use Traits\CompetencyTrait;
 
-
     /**
      * Get the element HTML
      *

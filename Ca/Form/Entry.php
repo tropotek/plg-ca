@@ -133,9 +133,9 @@ JS;
         $items = \Ca\Db\ItemMap::create()->findFiltered(array('assessmentId' => $this->getEntry()->getAssessmentId()),
             \Tk\Db\Tool::create('order_by'));
         foreach ($items as $item) {
-            $id = 'item-'.$item->getId();
-            if ($item->isRequired() && ($form->getFieldValue($id) === null || $form->getFieldValue($id) === '')) {
-                $form->addFieldError($id, 'Please enter a valid value for this item.');
+            $name = 'item-'.$item->getId();
+            if (!\Ca\Form\Field\ItemHelper::isValid($item, $form->getFieldValue($name))) {
+                $form->addFieldError($name, 'Please enter a valid value for this item.');
             }
         }
 
@@ -151,10 +151,26 @@ JS;
             return;
         }
 
+        // Save Item values
+        \Ca\Db\EntryMap::create()->removeValue($this->getEntry()->getVolatileId());
+        foreach ($form->getValues('/^item\-/') as $name => $val) {
+            $id = (int)substr($name, strrpos($name, '-') + 1);
+            \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, (int)$val);
+        }
+
         $isNew = (bool)$this->getEntry()->getId();
         $this->getEntry()->save();
 
-        // Do Custom data saving
+
+//        // Create status if changed and trigger notifications
+//        if (!$this->isPublic() && $form->getField('status')) {
+//            \App\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
+//                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
+//        } else {
+//            \App\Db\Status::create($this->getEntry(), $this->getEntry()->status, true, '',
+//                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
+//        }
+
 
         \Tk\Alert::addSuccess('Record saved!');
         $event->setRedirect($this->getBackUrl());

@@ -70,4 +70,28 @@ class ItemHelper
         return $field;
     }
 
+    /**
+     *
+     * @param Item $item
+     * @param mixed $value
+     */
+    public static function isValid($item, $value)
+    {
+        if ($item->isRequired() && ($value === null || $value === '')) {
+            return false;
+        }
+        switch ($item->getScale()->getType()) {
+            case Scale::TYPE_TEXT:
+            case Scale::TYPE_VALUE:
+                break;
+            case Scale::TYPE_CHOICE:
+                if ($item->getScale()->isMultiple()) {
+                    if ($item->isRequired() && (!is_array($value) || !count($value)))
+                        return false;
+                } else {
+                }
+                break;
+        }
+        return true;
+    }
 }

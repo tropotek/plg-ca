@@ -30,9 +30,8 @@ class Assessment extends \Uni\FormIface
         $layout = $this->getRenderer()->getLayout();
         $layout->removeRow('name', 'col-md-6');
         $layout->removeRow('assessorGroup', 'col-md-6');
-        $layout->removeRow('multiple', 'col-md-4');
-        $layout->removeRow('includeZero', 'col-md-4');
-        $layout->removeRow('icon', 'col-md-4');
+        $layout->removeRow('includeZero', 'col-md-6');
+        $layout->removeRow('icon', 'col-md-6');
         
         //$this->appendField(new Field\Input('uid'));
         //$this->appendField(new Field\Select('courseId', array()))->prependOption('-- Select --', '');
@@ -44,19 +43,18 @@ class Assessment extends \Uni\FormIface
             'fa fa-leaf', 'fa fa-trophy', 'fa fa-ambulance', 'fa fa-rebel', 'fa fa-empire', 'fa fa-font-awesome', 'fa fa-heartbeat',
             'fa fa-medkit', 'fa fa-user-md', 'fa fa-user-secret', 'fa fa-heart');
         $this->appendField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))
-            ->addCss('iconpicker')->setNotes('Select an icon for this assessment');
+            ->addCss('iconpicker')->setNotes('Select an identifying icon for this assessment');
 
-        $this->appendField(new Field\Checkbox('multiple'))->setCheckboxLabel('Can more than one assessor submit an assessment.');
         $this->appendField(new Field\Checkbox('includeZero'))->setCheckboxLabel('When calculating the score should 0 value results be included.');
 
         // TODO: Hide this when assessor group is 'student'
-        $this->appendField(new Field\Select('statusAvailable[]', \App\Db\Placement::getStatusList()))->addCss('tk-dual-select')
+        $this->appendField(new Field\Select('placementStatus[]', \App\Db\Placement::getStatusList()))->addCss('tk-dual-select')
             ->setNotes('Select the placement status values when assessments become available and can be submitted.');
 
         $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('profileId' => $this->getAssessment()->getCourseId()));
         $ptiField = $this->appendField(new Field\Select('placementTypeId[]', $list))
             ->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')
-            ->setNotes('Enable this collection for the selected placement types.');
+            ->setNotes('Enable this assessment for the selected placement types.');
 
         $list = \Ca\Db\AssessmentMap::create()->findPlacementTypes($this->getAssessment()->getId());
         $ptiField->setValue($list);

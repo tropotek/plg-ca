@@ -32,9 +32,8 @@ class AssessmentMap extends Mapper
             $this->dbMap->addPropertyMap(new Db\Integer('courseId', 'course_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('icon'));
-            $this->dbMap->addPropertyMap(new Db\ArrayObject('statusAvailable', 'status_available'));
+            $this->dbMap->addPropertyMap(new Db\ArrayObject('placementStatus', 'placement_status'));
             $this->dbMap->addPropertyMap(new Db\Text('assessorGroup', 'assessor_group'));
-            $this->dbMap->addPropertyMap(new Db\Boolean('multiple'));
             $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
@@ -57,9 +56,8 @@ class AssessmentMap extends Mapper
             $this->formMap->addPropertyMap(new Form\Integer('courseId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
             $this->formMap->addPropertyMap(new Form\Text('icon'));
-            $this->formMap->addPropertyMap(new Form\ObjectMap('statusAvailable'));
+            $this->formMap->addPropertyMap(new Form\ObjectMap('placementStatus'));
             $this->formMap->addPropertyMap(new Form\Text('assessorGroup'));
-            $this->formMap->addPropertyMap(new Form\Boolean('multiple'));
             $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Text('notes'));
@@ -117,16 +115,13 @@ class AssessmentMap extends Mapper
         if (!empty($filter['icon'])) {
             $filter->appendWhere('a.icon = %s AND ', $this->quote($filter['icon']));
         }
-        if (!empty($filter['statusAvailable'])) {
-            $w = $this->makeMultiQuery($filter['statusAvailable'], 'a.status_available', 'OR', 'LIKE');
+        if (!empty($filter['placementStatus'])) {
+            $w = $this->makeMultiQuery($filter['placementStatus'], 'a.placement_status', 'OR', 'LIKE');
             if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
         if (!empty($filter['assessorGroup'])) {
             $w = $this->makeMultiQuery($filter['assessorGroup'], 'a.assessor_group');
             if ($w) $filter->appendWhere('(%s) AND ', $w);
-        }
-        if (!empty($filter['multiple'])) {
-            $filter->appendWhere('a.multiple = %s AND ', (int)$filter['multiple']);
         }
         if (!empty($filter['includeZero'])) {
             $filter->appendWhere('a.include_zero = %s AND ', (int)$filter['includeZero']);

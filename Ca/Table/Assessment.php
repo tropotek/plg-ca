@@ -40,7 +40,7 @@ class Assessment extends \Uni\TableIface
             return sprintf('<i class="%s"></i>', $ico);
         });
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
-        $this->appendCell(new Cell\ArrayObject('statusAvailable'));
+        $this->appendCell(new Cell\ArrayObject('placementStatus'));
         $this->appendCell(new Cell\Text('assessorGroup'));
         $this->appendCell(new Cell\Boolean('multiple'));
         $this->appendCell(new Cell\Boolean('includeZero'));

@@ -13,7 +13,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     const ASSESSOR_GROUP_STUDENT = 'student';
     const ASSESSOR_GROUP_COMPANY = 'company';
-    const ASSESSOR_GROUP_STAFF = 'staff';
+    //const ASSESSOR_GROUP_STAFF = 'staff';
 
     /**
      * @var int
@@ -43,17 +43,13 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var array
      */
-    public $statusAvailable = array();
+    public $placementStatus = array();
 
     /**
      * @var string
      */
     public $assessorGroup = 'student';
 
-    /**
-     * @var bool
-     */
-    public $multiple = false;
 
     /**
      * @var bool
@@ -146,21 +142,21 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param array $statusAvailable
+     * @param array $placementStatus
      * @return Assessment
      */
-    public function setStatusAvailable(array $statusAvailable) : Assessment
+    public function setPlacementStatus(array $placementStatus) : Assessment
     {
-        $this->statusAvailable = $statusAvailable;
+        $this->placementStatus = $placementStatus;
         return $this;
     }
 
     /**
      * return array|null
      */
-    public function getStatusAvailable() : ?array
+    public function getPlacementStatus() : ?array
     {
-        return $this->statusAvailable;
+        return $this->placementStatus;
     }
 
     /**
@@ -179,24 +175,6 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function getAssessorGroup() : string
     {
         return $this->assessorGroup;
-    }
-
-    /**
-     * @param bool $multiple
-     * @return Assessment
-     */
-    public function setMultiple($multiple) : Assessment
-    {
-        $this->multiple = $multiple;
-        return $this;
-    }
-
-    /**
-     * return bool
-     */
-    public function isMultiple() : bool
-    {
-        return $this->multiple;
     }
 
     /**
@@ -219,28 +197,23 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @param $subjectId
-     * @param \DateTime $publishResult
+     * @param null|\DateTime $publishResult
      * @return Assessment
      */
     public function setPublishResult($subjectId, $publishResult) : Assessment
     {
-        //$this->publishResult = $publishResult;
-        // TODO: set the publish result date for this assessment within a specific course
+        AssessmentMap::create()->setPublishStudent($subjectId, $this->getId(), $publishResult);
         return $this;
     }
 
     /**
      * return null|\DateTime
-     * @param $subjectId
-     * @return \DateTime
+     * @param int $subjectId
+     * @return null|\DateTime
      */
-    public function getPublishResult($subjectId) : \DateTime
+    public function getPublishResult($subjectId) : ?\DateTime
     {
-        //return $this->publishResult;
-        // TODO: get the publish date for this subject
-
-
-        return null;
+        return AssessmentMap::create()->getPublishStudent($subjectId, $this->getId());
     }
 
     /**
@@ -351,7 +324,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         if (!$this->getId() || !$this->isActive($placement->getSubjectId())) return false;
         $b = true;
         if ($placement) {
-            $b &= in_array($placement->getStatus(), $this->getStatusAvailable());
+            $b &= in_array($placement->getStatus(), $this->getPlacementStatus());
             $b &= AssessmentMap::create()->hasPlacementType($this->getId(), $placement->getPlacementTypeId());
         }
         return $b;
@@ -359,9 +332,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * If the assessor group is student then this is a self assessment
-     * and does not require a placement.
-     *
-     * TODO: allow for multiple self assessments so students can self asses multiple times if multi is selected.
+     * Self assessment forms should be shown after the student submit their
      *
      * @return bool
      */
@@ -400,19 +371,19 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $errors = array();
         $errors = $this->validateCourseId($errors);
 
-        if (!$this->name) {
+        if (!$this->getName()) {
             $errors['name'] = 'Invalid value: name';
         }
 
-        if (!$this->icon) {
+        if (!$this->getIcon()) {
             $errors['icon'] = 'Invalid value: icon';
         }
 
-        if (!$this->isSelfAssessment() && (!$this->statusAvailable || !count($this->statusAvailable))) {
+        if (!$this->isSelfAssessment() && (!$this->getPlacementStatus() || !count($this->getPlacementStatus()))) {
             $errors['statusAvailable'] = 'Invalid value: statusAvailable';
         }
 
-        if (!$this->assessorGroup) {
+        if (!$this->getAssessorGroup()) {
             $errors['assessorGroup'] = 'Invalid value: assessorGroup';
         }
 

@@ -33,7 +33,7 @@ class StatusMailHandler implements Subscriber
                         'subjectId' => $message->get('placement::subjectId'),
                         'role' => \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY,
                         'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY,
-                        'requirePlacement' => true,
+                        //'requirePlacement' => true,
                         'placementTypeId' => $placement->placementTypeId
                     );
                     $list = \Ca\Db\AssessmentMap::create()->findFiltered($filter);
@@ -53,13 +53,13 @@ class StatusMailHandler implements Subscriber
                 }
 
                 // legacy template vars
-                $message->set('skill::linkHtml', rtrim($caLinkHtml, ' | '));
-                $message->set('skill::linkText', rtrim($caLinkText, ' | '));
-                $message->set('placement::goalsUrl', rtrim($caLinkHtml, ' | '));
+//                $message->set('skill::linkHtml', rtrim($caLinkHtml, ' | '));
+//                $message->set('skill::linkText', rtrim($caLinkText, ' | '));
+//                $message->set('placement::goalsUrl', rtrim($caLinkHtml, ' | '));
 
                 // Current
-                $message->set('skill::linkHtml', rtrim($caLinkHtml, ' | '));
-                $message->set('skill::linkText', rtrim($caLinkText, ' | '));
+                $message->set('assessment::linkHtml', rtrim($caLinkHtml, ' | '));
+                $message->set('assessment::linkText', rtrim($caLinkText, ' | '));
             }
         }
     }

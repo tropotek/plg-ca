@@ -61,6 +61,13 @@ class Preview extends AdminEditIface
 
         $this->setForm(\Ca\Form\Entry::create()->setModel($this->entry));
         $this->initForm($request);
+        $list = array('title', 'average', 'status', 'assessorName', 'assessorEmail', 'absent', 'notes');
+        foreach ($list as $name) {
+            if($this->getForm()->getField($name)) {
+                $this->getForm()->getField($name)->setAttr('readonly');
+            }
+        }
+
         $this->getForm()->execute();
     }
 

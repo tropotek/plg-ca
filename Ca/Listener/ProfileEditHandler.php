@@ -28,7 +28,6 @@ class ProfileEditHandler implements Subscriber
                     \App\Uri::createHomeUrl('/ca/assessmentManager.html')
                         ->set('profileId', $controller->getProfile()->getId()), 'fa fa-gavel'));
             }
-
         }
     }
 

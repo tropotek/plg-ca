@@ -76,7 +76,7 @@ class Entry extends \Uni\FormIface
 
             $field = \Ca\Form\Field\ItemHelper::createField($item);
             if (!$field) continue;
-            $this->appendField($field)->setFieldset($fieldset, 'ca-row')->setAttr('placeholder', $item->getScale()->getType());
+            $this->appendField($field)->setFieldset($fieldset, 'ca-row');
 
             // TODO:
 //            $val = \Skill\Db\EntryMap::create()->findValue($this->getEntry()->getId(), $item->getId());
@@ -127,8 +127,6 @@ JS;
     {
         // Load the object with form data
         \Ca\Db\EntryMap::create()->mapForm($form->getValues(), $this->getEntry());
-
-        vd($form->getValues());
 
         $items = \Ca\Db\ItemMap::create()->findFiltered(array('assessmentId' => $this->getEntry()->getAssessmentId()),
             \Tk\Db\Tool::create('order_by'));

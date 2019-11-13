@@ -77,8 +77,8 @@ class SetupHandler implements Subscriber
 //            }
         }
 
-//        $dispatcher->addSubscriber(new \Ca\Listener\SubjectEditHandler());
-//        $dispatcher->addSubscriber(new \Ca\Listener\StatusMailHandler());
+        $dispatcher->addSubscriber(new \Ca\Listener\SubjectEditHandler());
+        $dispatcher->addSubscriber(new \Ca\Listener\StatusMailHandler());
 
     }
 

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS ca_assessment (
     name VARCHAR(128) DEFAULT '' NOT NULL,
     icon VARCHAR(32) DEFAULT 'fa fa-rebel' NOT NULL,        -- a bootstrap CSS icon for the collection EG: 'fa fa-pen'
 
-    status_available VARCHAR(128) DEFAULT '' NOT NULL,      -- JSON array of status values when an assessment can be edited
+    status_available TEXT,                                  -- JSON array of status values when an assessment can be edited
     assessor_group VARCHAR(20) DEFAULT 'student' NOT NULL,  -- student = self assessment, Learner = staff student assessment, supervisor/External = company/mentor student assessment
     -- Assessors:
     --   `Student` Only gets one entry for sel-assessment [Single Entry] (Default if no fkey exists, other options should be hidden)
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS ca_assessment (
     --      If there are any more behaviours required then they should go here as an assessment can only have one type of behaviour.
     --      Here is a though, based on the fkey we should see what behaviours are available and let the App interface inform us of them.
 
-    multi BOOL NOT NULL DEFAULT 0,                          -- Can have multiple assessments by unique users (ignored for self-assessment)
+    multiple BOOL NOT NULL DEFAULT 0,                          -- Can have multiple assessments by unique users (ignored for self-assessment)
     include_zero BOOL DEFAULT 0 NOT NULL,                   -- Should zero values be included in overall average calculations (Default: false)
     -- TODO: this cannot be here it belongs to the subject for a cohort of students
     -- publish_result DATETIME,                                -- Can the student view their average results for this assessment: Past Date is enabled, Future date would enable it then, NULL dissabled.
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS ca_assessment (
 CREATE TABLE IF NOT EXISTS ca_assessment_subject (
     assessment_id INT UNSIGNED NOT NULL DEFAULT 0,
     subject_id INT UNSIGNED NOT NULL DEFAULT 0,
-    publish_result DATETIME,                                -- Can the student view their average results for this assessment: Past Date is enabled, Future date would enable it then, NULL dissabled.
+    publish_student DATETIME,                                -- Can the student view the completed entries, or submit self assessment
     PRIMARY KEY (assessment_id, subject_id)
 ) ENGINE=InnoDB;
 
@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS ca_assessment_placement_type (
   placement_type_id INT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (assessment_id, placement_type_id)
 ) ENGINE=InnoDB;
+
 
 -- --------------------------------------------
 -- Learning domains for the competancies
@@ -216,11 +217,14 @@ CREATE TABLE IF NOT EXISTS ca_value (
 
 
 TRUNCATE ca_assessment;
-INSERT INTO ca_assessment (uid, course_id, name, icon, status_available, assessor_group, multi, include_zero, description, modified, created) VALUES
+INSERT INTO ca_assessment (uid, course_id, name, icon, status_available, assessor_group, multiple, include_zero, description, modified, created) VALUES
     (1, 2, 'GOALS', 'tk tk-goals', 'assessing,evaluating,completed,failed', 'company', 0, 0, '', NOW(), NOW()),
     (2, 2, 'Self Assessment', 'fa fa-user-circle-o', '', 'student', 0, 0, '', NOW(), NOW()),
     (3, 2, 'Supervisor Feedback', 'fa fa-user-md', 'approved,assessing,evaluating,completed,failed', 'company', 0, 0, '', NOW(), NOW())
 ;
+
+INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (1, 8);
+INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (3, 9);
 
 TRUNCATE ca_scale;
 INSERT INTO ca_scale (name, description, type, multiple, calc_type, max_value, modified, created) VALUES

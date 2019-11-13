@@ -34,9 +34,8 @@ class AssessmentMap extends Mapper
             $this->dbMap->addPropertyMap(new Db\Text('icon'));
             $this->dbMap->addPropertyMap(new Db\ArrayObject('statusAvailable', 'status_available'));
             $this->dbMap->addPropertyMap(new Db\Text('assessorGroup', 'assessor_group'));
-            $this->dbMap->addPropertyMap(new Db\Boolean('multi'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('multiple'));
             $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
-            //$this->dbMap->addPropertyMap(new Db\Date('publishResult', 'publish_result'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
@@ -60,9 +59,8 @@ class AssessmentMap extends Mapper
             $this->formMap->addPropertyMap(new Form\Text('icon'));
             $this->formMap->addPropertyMap(new Form\ObjectMap('statusAvailable'));
             $this->formMap->addPropertyMap(new Form\Text('assessorGroup'));
-            $this->formMap->addPropertyMap(new Form\Boolean('multi'));
+            $this->formMap->addPropertyMap(new Form\Boolean('multiple'));
             $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
-            //$this->formMap->addPropertyMap(new Form\Date('publishResult'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Text('notes'));
             $this->formMap->addPropertyMap(new Form\Date('modified'));
@@ -127,8 +125,8 @@ class AssessmentMap extends Mapper
             $w = $this->makeMultiQuery($filter['assessorGroup'], 'a.assessor_group');
             if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
-        if (!empty($filter['multi'])) {
-            $filter->appendWhere('a.multi = %s AND ', (int)$filter['multi']);
+        if (!empty($filter['multiple'])) {
+            $filter->appendWhere('a.multiple = %s AND ', (int)$filter['multiple']);
         }
         if (!empty($filter['includeZero'])) {
             $filter->appendWhere('a.include_zero = %s AND ', (int)$filter['includeZero']);
@@ -274,4 +272,42 @@ class AssessmentMap extends Mapper
             $stm->execute();
         } catch (Exception $e) {}
     }
+
+    /**
+     * @param int $subjectId
+     * @param int $assessmentId
+     * @param \DateTime $publishStudent
+     */
+    public function setPublishStudent($subjectId, $assessmentId, ?\DateTime $publishStudent)
+    {
+        try {
+            if (!$this->hasSubject($subjectId, $assessmentId)) $this->addSubject($subjectId, $assessmentId);
+            $stm = $this->getDb()->prepare('UPDATE ca_assessment_subject SET publish_student = ? WHERE assessment_id = ? AND subject_id = ?');
+            $date = $publishStudent;
+            if ($date instanceof \DateTime)
+                $date = $publishStudent->format(\Tk\Date::FORMAT_ISO_DATETIME);
+            $stm->execute(array($date, $assessmentId, $subjectId));
+        } catch (Exception $e) {}
+    }
+
+    /**
+     * @param int $subjectId
+     * @param int $assessmentId
+     * @return \DateTime|null
+     */
+    public function getPublishStudent($subjectId, $assessmentId)
+    {
+        $val = null;
+        try {
+            if (!$this->hasSubject($subjectId, $assessmentId)) $this->addSubject($subjectId, $assessmentId);
+            $stm = $this->getDb()->prepare('SELECT publish_student FROM ca_assessment_subject WHERE assessment_id = ? AND subject_id = ?');
+            $stm->execute(array($assessmentId, $subjectId));
+            $val = $stm->fetchColumn();
+            if ($val)
+                $val = \Tk\Date::create($val);
+        } catch (Exception $e) {}
+        return $val;
+    }
+
+
 }

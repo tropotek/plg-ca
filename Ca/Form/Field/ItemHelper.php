@@ -47,6 +47,7 @@ class ItemHelper
 
         $field->setRequired($item->isRequired());
 
+
         if ($item->getDescription()) {
             $field->setNotes($item->getDescription());
         }
@@ -58,8 +59,10 @@ class ItemHelper
         }
 
         $field->setLabel($name);
-        if (\Tk\Config::getInstance()->isDebug())
-            $field->setLabel($name . ' ['.$item->getScale()->getName().']');
+        if (\Tk\Config::getInstance()->isDebug()) {
+            $field->setLabel($name . ' [' . $item->getScale()->getName() . ']');
+            //$field->setAttr('placeholder', $item->getScale()->getType());
+        }
 
         if ($field) {
             if ($item->getName() || ($item->getCompetencyList()->count() > 1)) {

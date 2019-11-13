@@ -15,6 +15,7 @@ if (!$routes) return;
 $routes->add('ca-staff-assessment-manager', Route::create('/staff/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault'));
 $routes->add('ca-staff-assessment-edit', Route::create('/staff/ca/assessmentEdit.html', 'Ca\Controller\Assessment\Edit::doDefault'));
 $routes->add('ca-staff-assessment-preview', Route::create('/staff/ca/assessmentPreview.html', 'Ca\Controller\Assessment\Preview::doDefault'));
+$routes->add('ca-staff-assessment-active', Route::create('/staff/{subjectCode}/ca/activeAssessments.html', 'Ca\Controller\Assessment\Active::doDefault'));
 
 $routes->add('ca-staff-domain-manager', Route::create('/staff/ca/domainManager.html', 'Ca\Controller\Domain\Manager::doDefault'));
 $routes->add('ca-staff-domain-edit', Route::create('/staff/ca/domainEdit.html', 'Ca\Controller\Domain\Edit::doDefault'));

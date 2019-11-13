@@ -41,9 +41,9 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public $icon = 'fa fa-rebel';
 
     /**
-     * @var string
+     * @var array
      */
-    public $statusAvailable = '';
+    public $statusAvailable = array();
 
     /**
      * @var string
@@ -53,17 +53,12 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var bool
      */
-    public $multi = false;
+    public $multiple = false;
 
     /**
      * @var bool
      */
     public $includeZero = false;
-
-    /**
-     * @var \DateTime
-     */
-    //public $publishResult = null;
 
     /**
      * @var string
@@ -151,19 +146,19 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param string $statusAvailable
+     * @param array $statusAvailable
      * @return Assessment
      */
-    public function setStatusAvailable($statusAvailable) : Assessment
+    public function setStatusAvailable(array $statusAvailable) : Assessment
     {
         $this->statusAvailable = $statusAvailable;
         return $this;
     }
 
     /**
-     * return string
+     * return array|null
      */
-    public function getStatusAvailable() : string
+    public function getStatusAvailable() : ?array
     {
         return $this->statusAvailable;
     }
@@ -187,21 +182,21 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param bool $multi
+     * @param bool $multiple
      * @return Assessment
      */
-    public function setMulti($multi) : Assessment
+    public function setMultiple($multiple) : Assessment
     {
-        $this->multi = $multi;
+        $this->multiple = $multiple;
         return $this;
     }
 
     /**
      * return bool
      */
-    public function isMulti() : bool
+    public function isMultiple() : bool
     {
-        return $this->multi;
+        return $this->multiple;
     }
 
     /**
@@ -321,6 +316,61 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * When an assessment is active for a subject staff and companies can access entries
+     *
+     * @param int $subjectId
+     * @return bool
+     */
+    public function isActive($subjectId)
+    {
+        if ($subjectId instanceof \Uni\Db\SubjectIface) $subjectId = $subjectId->getId();
+        return AssessmentMap::create()->hasSubject($subjectId, $this->getId());
+    }
+
+    /**
+     * When an assessment is published, students can submit self-assessments
+     * and also view any assessment entries that have been completed/approved including self-assessments.
+     *
+     * @param $subjectId
+     * @return bool
+     */
+    public function isPublished($subjectId)
+    {
+        if ($subjectId instanceof \Uni\Db\SubjectIface) $subjectId = $subjectId->getId();
+        return AssessmentMap::create()->hasSubject($subjectId, $this->getId());
+    }
+
+    /**
+     * Use this to test if the public user or student can submit/view an entry
+     *
+     * @param \App\Db\Placement $placement (optional)
+     * @return bool
+     */
+    public function isAvailable($placement = null)
+    {
+        if (!$this->getId() || !$this->isActive($placement->getSubjectId())) return false;
+        $b = true;
+        if ($placement) {
+            $b &= in_array($placement->getStatus(), $this->getStatusAvailable());
+            $b &= AssessmentMap::create()->hasPlacementType($this->getId(), $placement->getPlacementTypeId());
+        }
+        return $b;
+    }
+
+    /**
+     * If the assessor group is student then this is a self assessment
+     * and does not require a placement.
+     *
+     * TODO: allow for multiple self assessments so students can self asses multiple times if multi is selected.
+     *
+     * @return bool
+     */
+    public function isSelfAssessment()
+    {
+        return ($this->getAssessorGroup() == self::ASSESSOR_GROUP_STUDENT);
+    }
+
+    /**
      * return the status list for a select field
      * @param null|string $current
      * @return array
@@ -358,7 +408,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             $errors['icon'] = 'Invalid value: icon';
         }
 
-        if (!$this->statusAvailable) {
+        if (!$this->isSelfAssessment() && (!$this->statusAvailable || !count($this->statusAvailable))) {
             $errors['statusAvailable'] = 'Invalid value: statusAvailable';
         }
 

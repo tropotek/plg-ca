@@ -133,6 +133,16 @@ class AssessmentMap extends Mapper
             $filter->appendWhere('b.placement_type_id = %s AND ', (int)$filter['placementTypeId']);
         }
 
+        if (!empty($filter['subjectId'])) {
+            $filter->appendFrom(',  %s c ',
+                $this->quoteTable('ca_assessment_subject'));
+            $filter->appendWhere('a.id = c.assessment_id AND c.subject_id = %s AND ', (int)$filter['subjectId']);
+
+            if (!empty($filter['publish'])) {
+                // TODO: This should be checking if c.publish_student <= NOW() then the assessment is considdered published
+            }
+        }
+
         if (!empty($filter['exclude'])) {
             $w = $this->makeMultiQuery($filter['exclude'], 'a.id', 'AND', '!=');
             if ($w) $filter->appendWhere('(%s) AND ', $w);

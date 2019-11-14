@@ -218,6 +218,8 @@ INSERT INTO ca_assessment (uid, course_id, name, icon, placement_status, assesso
 ;
 
 INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (1, 8);
+INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (2, 8);
+INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (2, 9);
 INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (3, 9);
 
 TRUNCATE ca_scale;

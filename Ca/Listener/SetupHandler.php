@@ -72,7 +72,7 @@ class SetupHandler implements Subscriber
         if ($profile && $plugin->isZonePluginEnabled(Plugin::ZONE_SUBJECT_PROFILE, $profile->getId())) {
             $subject = \Uni\Config::getInstance()->getSubject();
             if ($subject) {
-                //$dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler($subject));
+                $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler($subject));
                 //$dispatcher->addSubscriber(new \Ca\Listener\PlacementEditHandler($subject));
                 //$dispatcher->addSubscriber(new \Ca\Listener\PlacementViewHandler());
                 //$dispatcher->addSubscriber(new \Ca\Listener\CompanyManagerHandler($subject));

@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Listener;
+namespace Ca\Listener;
 
 use Tk\Event\Subscriber;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -44,10 +44,6 @@ class PlacementManagerHandler implements Subscriber
         if ($controller instanceof \App\Controller\Placement\Manager) {
             $config = \Uni\Config::getInstance();
             $this->controller = $controller;
-
-            if (!$config->getUser()->isStudent()) {
-                \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
-            }
         }
     }
 
@@ -60,40 +56,44 @@ class PlacementManagerHandler implements Subscriber
     public function addActions(\Tk\Event\TableEvent $event)
     {
         if ($this->controller) {
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(),
-                'active' => true, 'requirePlacement' => true));
+            $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
+                'subjectId' => $this->subject->getId()
+            ));
 
-            /** @var \Tk\Table\Cell\Actions $actionsCell */
+            /** @var \Tk\Table\Cell\ButtonCollection $actionsCell */
             $actionsCell = $event->getTable()->findCell('actions');
 
-            /** @var \Skill\Db\Collection $collection */
-            foreach ($collectionList as $collection) {
-                $url = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
+            /** @var \Ca\Db\Assessment $assessment */
+            foreach ($assessmentList as $assessment) {
+                $url = \App\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $assessment->getId());
 
-                $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
-                    ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
+                $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
+                    ->setGroup('ca')->setOnShow(function ($cell, $obj, $btn) use ($assessment) {
                         /* @var $obj \App\Db\Placement */
                         /* @var $btn \Tk\Table\Cell\ActionButton */
+                        $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
+                            array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->uid)
+                        )->current();
+                        if (!$placementAssessment) $placementAssessment = $assessment;
 
-                        $placementCollection = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $obj->getSubjectId(),
-                            'active' => true, 'requirePlacement' => true, 'uid' => $collection->uid))->current();
-                        if (!$placementCollection) $placementCollection = $collection;
-
-                        $btn->setUrl(\App\Uri::createSubjectUrl('/entryEdit.html', $obj->getSubject())->set('collectionId', $placementCollection->getId()));
+                        $btn->setUrl(\App\Uri::createSubjectUrl('/ca/entryEdit.html', $obj->getSubject())->set('assessmentId', $placementAssessment->getId()));
                         $btn->getUrl()->set('placementId', $obj->getId());
-                        if (!$placementCollection->isAvailable($obj)) {
+                        if (!$placementAssessment->isAvailable($obj)) {
                             $btn->setVisible(false);
                             return;
                         }
 
-                        $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $placementCollection->getId(),
-                            'placementId' => $obj->getId()))->current();
+                        $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                            'assessmentId' => $placementAssessment->getId(),
+                            'placementId' => $obj->getId())
+                        )->current();
+
                         if ($entry) {
                             $btn->addCss('btn-default');
-                            $btn->setTitle('Edit ' . $placementCollection->name);
+                            $btn->setText('Edit ' . $placementAssessment->name);
                         } else {
                             $btn->addCss('btn-success');
-                            $btn->setTitle('Create ' . $placementCollection->name);
+                            $btn->setText('Create ' . $placementAssessment->name);
                         }
                     });
             }
@@ -109,41 +109,32 @@ class PlacementManagerHandler implements Subscriber
     public function addEntryCell(\Tk\Event\TableEvent $event)
     {
         if ($this->controller) {
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(),
-                'active' => true, 'requirePlacement' => true));
-
+            $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array('subjectId' => $this->subject->getId()));
             $table = $event->getTable();
-            $table->appendCell(\Tk\Table\Cell\Link::create('feedbackLinks'))->setLabel('Feedback Links')
-                ->setOnPropertyValue(function ($cell, $obj, $value) use ($collectionList) {
+            $table->appendCell(\Tk\Table\Cell\Link::create('assessmentLinks'))->setLabel('Assessment Links')
+                ->setOnPropertyValue(function ($cell, $obj, $value) use ($assessmentList) {
                     /** @var \App\Db\Placement $obj */
                     $value = '';
-                    /** @var \Skill\Db\Collection $collection */
-                    foreach ($collectionList as $collection) {
-                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getSubject()->getInstitution())
-                            ->set('h', $obj->getHash())
-                            ->set('collectionId', $collection->getId());
-                        if ($collection->isAvailable($obj)) {
-                            $value .= $url->toString();
+                    /** @var \Ca\Db\Assessment $assessment */
+                    foreach ($assessmentList as $assessment) {
+                        if ($assessment->isAvailable($obj)) {
+                            $value .= $assessment->getPublicUrl($obj->getHash())->toString();
                         }
                     }
                     return $value;
                 })
-                ->setOnCellHtml(function ($cell, $obj, $html) use ($collectionList) {
+                ->setOnCellHtml(function ($cell, $obj, $html) use ($assessmentList) {
                     /** @var \Tk\Table\Cell\Link $cell */
                     /** @var \App\Db\Placement $obj */
                     $html = '';
-
-                    /** @var \Skill\Db\Collection $collection */
-                    foreach ($collectionList as $collection) {
-                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getSubject()->getInstitution())
-                            ->set('h', $obj->getHash())
-                            ->set('collectionId', $collection->getId());
-                        if ($collection->isAvailable($obj)) {
+                    /** @var \Ca\Db\Assessment $assessment */
+                    foreach ($assessmentList as $assessment) {
+                        if ($assessment->isAvailable($obj)) {
                             $html .= sprintf('<a href="%s" class="btn btn-xs btn-default" title="%s" target="_blank"><i class="%s"></i></a>',
-                                htmlentities($url->toString()), $collection->name, $collection->icon);
+                                htmlentities($assessment->getPublicUrl($obj->getHash())), $assessment->getName(), $assessment->getIcon());
                         }
                     }
-                    return $html;
+                    return '<div class="btn-toolbar" role="toolbar">'.$html.'</div>';
                 });
         }
     }

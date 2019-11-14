@@ -364,6 +364,19 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * create a URL for the public entry submissions
+     *
+     * @param string $placementHash
+     * @return string|\Tk\Uri|\Uni\Uri
+     */
+    public function getPublicUrl($placementHash)
+    {
+        return \Uni\Uri::createInstitutionUrl('/assessment.html', $this->getCourse()->getInstitution())
+            ->set('h', $placementHash)
+            ->set('assessmentId', $this->getId());
+    }
+
+    /**
      * @return array
      */
     public function validate()

@@ -50,10 +50,10 @@ $routes->add('ca-staff-item-edit', Route::create('/staff/ca/itemEdit.html', 'Ca\
 //// Competancy
 //$routes->add('ca-staff-item-manager', Route::create('/staff/{subjectCode}/ca/itemManager.html', 'Ca\Controller\Item\Manager::doDefault'));
 //$routes->add('ca-staff-item-edit', Route::create('/staff/{subjectCode}/ca/itemEdit.html', 'Ca\Controller\Item\Edit::doDefault'));
-//
-//$routes->add('ca-staff-entry-manager', Route::create('/staff/{subjectCode}/ca/entryManager.html', 'Ca\Controller\Entry\Manager::doDefault'));
-//$routes->add('ca-staff-entry-edit', Route::create('/staff/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
-//$routes->add('ca-staff-entry-view', Route::create('/staff/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
+
+$routes->add('ca-staff-entry-manager', Route::create('/staff/{subjectCode}/ca/entryManager.html', 'Ca\Controller\Entry\Manager::doDefault'));
+$routes->add('ca-staff-entry-edit', Route::create('/staff/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
+$routes->add('ca-staff-entry-view', Route::create('/staff/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
 
 // TODO: All these need to be reviewed
 //$routes->add('ca-staff-report-staff-entry-results', Route::create('/staff/{subjectCode}/ca/entryResults.html', 'Ca\Controller\Report\StudentResults::doDefault'));
@@ -68,9 +68,10 @@ $routes->add('ca-staff-item-edit', Route::create('/staff/ca/itemEdit.html', 'Ca\
 //$routes->add('ca-student-entry-edit', Route::create('/student/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
 //$routes->add('ca-student-entry-view', Route::create('/student/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
 //$routes->add('ca-student-entry-results', Route::create('/student/{subjectCode}/ca/entryResults.html', 'Ca\Controller\Report\StudentResults::doDefault'));
-//
-//// Guest Pages
-//// TODO: We also need to review this, would be good to make it secure somehow to stop students from seeing it.
-//$routes->add('ca-public-entry-submit', Route::create('/inst/{institutionHash}/ca/entry.html', 'Ca\Controller\Entry\Edit::doPublicSubmission'));
+
+
+// Guest Pages
+// TODO: We also need to review this, would be good to make it secure somehow to stop students from seeing it.
+$routes->add('ca-public-entry-submit', Route::create('/inst/{institutionHash}/assessment.html', 'Ca\Controller\Entry\Edit::doPublicSubmission'));
 
 

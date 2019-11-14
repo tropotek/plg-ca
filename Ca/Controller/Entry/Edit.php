@@ -85,6 +85,8 @@ class Edit extends AdminEditIface
         $this->entry->setSubjectId((int)$request->get('subjectId'));
         $this->entry->setAssessmentId((int)$request->get('assessmentId'));
         $this->entry->setPlacementId((int)$request->get('placementId'));
+        if ($this->entry->getPlacement())
+            $this->entry->setStudentId($this->entry->getPlacement()->getUserId());
 
         if ($request->get('entryId')) {
             $this->entry = \Ca\Db\EntryMap::create()->find($request->get('entryId'));
@@ -169,9 +171,9 @@ class Edit extends AdminEditIface
             }
         }
 
-        if ($this->entry->isSelfAssessment() && !$this->entry->getId()) {
-            $this->entry->title = $this->entry->getCollection()->name . ' for ' . $this->entry->getUser()->getName();
-            $this->entry->assessor = $this->entry->getUser()->getName();
+        if ($this->entry->getAssessment()->isSelfAssessment() && !$this->entry->getId()) {
+            $this->entry->title = $this->entry->getAssessment()->getName() . ' for ' . $this->entry->getStudent()->getName();
+            $this->entry->assessor = $this->entry->getStudent()->getName();
         }
 
         // ---------------------- End Entry Setup -------------------
@@ -279,7 +281,6 @@ class Edit extends AdminEditIface
       <div class="instructions" choice="instructions" var="instructions"></div>
       <hr choice="instructions"/>
   </div>
-  <div class="tk-panel" data-panel-title="Entry Edit" data-panel-icon="fa fa-book" var="panel"></div>
 </div>
 HTML;
         return \Dom\Loader::load($xhtml);

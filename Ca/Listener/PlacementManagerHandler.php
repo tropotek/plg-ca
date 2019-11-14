@@ -67,16 +67,17 @@ class PlacementManagerHandler implements Subscriber
             foreach ($assessmentList as $assessment) {
                 $url = \App\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $assessment->getId());
 
-                $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
-                    ->setGroup('ca')->setOnShow(function ($cell, $obj, $btn) use ($assessment) {
+                $cell = $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
+                    ->setOnShow(function ($cell, $obj, $btn) use ($assessment) {
                         /* @var $obj \App\Db\Placement */
                         /* @var $btn \Tk\Table\Cell\ActionButton */
                         $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
-                            array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->uid)
+                            array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
                         )->current();
                         if (!$placementAssessment) $placementAssessment = $assessment;
 
-                        $btn->setUrl(\App\Uri::createSubjectUrl('/ca/entryEdit.html', $obj->getSubject())->set('assessmentId', $placementAssessment->getId()));
+                        $btn->setUrl(\App\Uri::createSubjectUrl('/ca/entryEdit.html', $obj->getSubject())
+                            ->set('assessmentId', $placementAssessment->getId()));
                         $btn->getUrl()->set('placementId', $obj->getId());
                         if (!$placementAssessment->isAvailable($obj)) {
                             $btn->setVisible(false);
@@ -90,12 +91,17 @@ class PlacementManagerHandler implements Subscriber
 
                         if ($entry) {
                             $btn->addCss('btn-default');
-                            $btn->setText('Edit ' . $placementAssessment->name);
+                            $btn->setText('Edit ' . $placementAssessment->getName());
                         } else {
                             $btn->addCss('btn-success');
-                            $btn->setText('Create ' . $placementAssessment->name);
+                            $btn->setText('Create ' . $placementAssessment->getName());
                         }
                     });
+                if ($assessment->isSelfAssessment()) {
+                    $cell->setGroup('feedback');
+                } else {
+                    $cell->setGroup('ca');
+                }
             }
         }
     }
@@ -109,9 +115,13 @@ class PlacementManagerHandler implements Subscriber
     public function addEntryCell(\Tk\Event\TableEvent $event)
     {
         if ($this->controller) {
-            $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array('subjectId' => $this->subject->getId()));
+            $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
+                'subjectId' => $this->subject->getId(),
+                'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY
+            ));
             $table = $event->getTable();
-            $table->appendCell(\Tk\Table\Cell\Link::create('assessmentLinks'))->setLabel('Assessment Links')
+            $table->appendCell(\Tk\Table\Cell\Link::create('assessmentLinks'))
+                ->setLabel('Assessment Links')
                 ->setOnPropertyValue(function ($cell, $obj, $value) use ($assessmentList) {
                     /** @var \App\Db\Placement $obj */
                     $value = '';

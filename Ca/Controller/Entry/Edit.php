@@ -85,8 +85,12 @@ class Edit extends AdminEditIface
         $this->entry->setSubjectId((int)$request->get('subjectId'));
         $this->entry->setAssessmentId((int)$request->get('assessmentId'));
         $this->entry->setPlacementId((int)$request->get('placementId'));
-        if ($this->entry->getPlacement())
+        if ($this->entry->getPlacement()) {
             $this->entry->setStudentId($this->entry->getPlacement()->getUserId());
+            if ($this->entry->getAssessment()->isSelfAssessment()) {
+                $this->entry->setAssessorId($this->entry->getPlacement()->getUserId());
+            }
+        }
 
         if ($request->get('entryId')) {
             $this->entry = \Ca\Db\EntryMap::create()->find($request->get('entryId'));
@@ -172,8 +176,9 @@ class Edit extends AdminEditIface
         }
 
         if ($this->entry->getAssessment()->isSelfAssessment() && !$this->entry->getId()) {
-            $this->entry->title = $this->entry->getAssessment()->getName() . ' for ' . $this->entry->getStudent()->getName();
-            $this->entry->assessor = $this->entry->getStudent()->getName();
+            $this->entry->setTitle($this->entry->getAssessment()->getName() . ': ' . $this->entry->getTitle());
+            $this->entry->setAssessorName($this->entry->getStudent()->getName());
+            $this->entry->setAssessorEmail($this->entry->getStudent()->getEmail());
         }
 
         // ---------------------- End Entry Setup -------------------

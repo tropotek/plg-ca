@@ -293,7 +293,7 @@ INSERT INTO ca_domain (institution_id, name, description, label, modified, creat
     (1, 'Personal And Professional Development', '', 'PD', NOW(), NOW()),
     (1, 'Clinical And Technical Skills', '', 'CS', NOW(), NOW()),
     (1, 'Communication Skills', '', 'COM', NOW(), NOW()),
-    (1, 'Knowledge And Problem Solving', '', 'KPS', NOW(), NOW()),                          -- Not a recognised domain????
+--    (1, 'Knowledge And Problem Solving', '', 'KPS', NOW(), NOW()),                          -- Not a recognised domain???? {should be SB domain}
     (1, 'Scientific Basis Of Clinical Practice', '', 'SB', NOW(), NOW()),
     (1, 'Safely Approach, Handle And Restrain Animals (Exotic)', '', 'EX', NOW(), NOW()),
     (1, 'Ethics And Animal Welfare', '', 'AW', NOW(), NOW()),

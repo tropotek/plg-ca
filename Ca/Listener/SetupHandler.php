@@ -73,6 +73,7 @@ class SetupHandler implements Subscriber
             $subject = \Uni\Config::getInstance()->getSubject();
             if ($subject) {
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler($subject));
+                $dispatcher->addSubscriber(new \Ca\Listener\PlacementReportHandler($subject));
                 //$dispatcher->addSubscriber(new \Ca\Listener\PlacementEditHandler($subject));
                 //$dispatcher->addSubscriber(new \Ca\Listener\PlacementViewHandler());
                 //$dispatcher->addSubscriber(new \Ca\Listener\CompanyManagerHandler($subject));

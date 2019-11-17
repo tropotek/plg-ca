@@ -29,6 +29,10 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
                 if (!$prevStatusName || Entry::STATUS_PENDING == $prevStatusName)
                     return true;
                 break;
+            case Entry::STATUS_AMEND:
+                if ($prevStatusName)
+                    return true;
+                break;
             case Entry::STATUS_NOT_APPROVED:
                 if (Entry::STATUS_PENDING == $prevStatusName)
                     return true;
@@ -73,10 +77,10 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         $message->set('assessment::description', $model->getAssessment()->getDescription());
 
         $message->set('entry::id', $model->getId());
-        $message->set('entry::title', $model->title);
-        $message->set('entry::assessor', $model->assessor);
-        $message->set('entry::status', $model->status);
-        $message->set('entry::notes', nl2br($model->notes, true));
+        $message->set('entry::title', $model->getTitle());
+        $message->set('entry::assessor', $model->getAssessorName());
+        $message->set('entry::status', $model->getStatus());
+        $message->set('entry::notes', nl2br($model->getNotes(), true));
 
         switch ($mailTemplate->recipient) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:

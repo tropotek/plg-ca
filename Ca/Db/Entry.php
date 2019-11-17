@@ -17,9 +17,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     use \Uni\Db\Traits\SubjectTrait;
     use \App\Db\Traits\PlacementTrait;
 
-    const STATUS_PENDING = 'pending';
-    const STATUS_APPROVED = 'approved';
-    const STATUS_NOT_APPROVED = 'not approved';
+    const STATUS_PENDING        = 'pending';
+    const STATUS_APPROVED       = 'approved';
+    const STATUS_AMEND          = 'amend';
+    const STATUS_NOT_APPROVED   = 'not approved';
 
     /**
      * @var int

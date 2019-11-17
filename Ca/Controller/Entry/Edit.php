@@ -60,6 +60,15 @@ class Edit extends AdminEditIface
     }
 
     /**
+     *
+     * @return \App\Db\Placement
+     */
+    public function getPlacement()
+    {
+        return $this->placement;
+    }
+
+    /**
      * @param Request $request
      * @throws \Exception
      */

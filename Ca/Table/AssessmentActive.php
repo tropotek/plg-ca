@@ -53,25 +53,25 @@ class AssessmentActive extends \Uni\TableIface
                     $name, $name, $obj->getId(), $name, $checked);
                 return $html;
             });
-        $this->appendCell(new Cell\Text('publishStudent'))->setLabel('Student Publish')
-            ->setOnCellHtml(function ($cell, $obj, $html) {
-                /* @var $cell Cell\Text */
-                /* @var $obj \Ca\Db\Assessment */
-                $name = 'pub-'.$obj->getId();
-                $subject = \Uni\Config::getInstance()->getSubject();
-                $value = \Ca\Db\AssessmentMap::create()->getPublishStudent($subject->getId(), $obj->getId());
-                if ($value instanceof \DateTime)
-                    $value = $value->format(\Tk\Date::$formFormat);
-
-                $html = sprintf('
-<div class="input-group">
-  <input type="text" class="form-control ca-control date" style="min-width: 100px;" name="%s" id="fid-%s" data-assessment-id="%s" value="%s" />
-  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-</div>
-',
-                    $name, $name, $obj->getId(), $value);
-                return $html;
-            });
+//        $this->appendCell(new Cell\Text('publishStudent'))->setLabel('Student Publish')
+//            ->setOnCellHtml(function ($cell, $obj, $html) {
+//                /* @var $cell Cell\Text */
+//                /* @var $obj \Ca\Db\Assessment */
+//                $name = 'pub-'.$obj->getId();
+//                $subject = \Uni\Config::getInstance()->getSubject();
+//                $value = \Ca\Db\AssessmentMap::create()->getPublishStudent($subject->getId(), $obj->getId());
+//                if ($value instanceof \DateTime)
+//                    $value = $value->format(\Tk\Date::$formFormat);
+//
+//                $html = sprintf('
+//<div class="input-group">
+//  <input type="text" class="form-control ca-control date" style="min-width: 100px;" name="%s" id="fid-%s" data-assessment-id="%s" value="%s" />
+//  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+//</div>
+//',
+//                    $name, $name, $obj->getId(), $value);
+//                return $html;
+//            });
 
         $this->appendCell(new Cell\Date('modified'));
         $this->appendCell(new Cell\Date('created'));

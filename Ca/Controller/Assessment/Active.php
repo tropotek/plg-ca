@@ -70,15 +70,15 @@ class Active extends AdminManagerIface
         $xhtml = <<<HTML
 <div class="tk-panel" data-panel-title="Active Assessments" data-panel-icon="fa fa-gavel" var="panel">  
   <div>
-    <h4>Activate And Publish Assessments</h4>
+    <h4>Activate Assessments For This Subject</h4>
     <p>
       <b>Subject Active:</b> Use this checkbox to activate assessments for this subject, Activating an assesment
       enables it for staff and companies. 
     </p>
-    <p>
-      <b>Student Publish</b> To make assessments available to student select a date that they can access their self assessments 
-      and assessment entries from other users.
-    </p>
+<!--    <p>-->
+<!--      <b>Student Publish</b> To make assessments available to student select a date that they can access their self assessments -->
+<!--      and assessment entries from other users.-->
+<!--    </p>-->
   </div>
 </div>
 HTML;

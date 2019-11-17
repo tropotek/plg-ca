@@ -17,10 +17,6 @@ use Tk\Request;
 class Edit extends AdminEditIface
 {
 
-    /**
-     * @var \App\Db\Placement
-     */
-    protected $placement = null;
 
     /**
      * @var \Ca\Db\Entry
@@ -65,7 +61,15 @@ class Edit extends AdminEditIface
      */
     public function getPlacement()
     {
-        return $this->placement;
+        return $this->entry->getPlacement();
+    }
+
+    /**
+     * @return \Ca\Db\Entry
+     */
+    public function getEntry()
+    {
+        return $this->entry;
     }
 
     /**
@@ -89,15 +93,15 @@ class Edit extends AdminEditIface
         // ---------------------- Start Entry Setup -------------------
         $this->entry = new \Ca\Db\Entry();
         if ($this->getUser()) {
-            $this->entry->setAssessorId($this->getUser()->getId());
+            $this->getEntry()->setAssessorId($this->getUser()->getId());
         }
-        $this->entry->setSubjectId((int)$request->get('subjectId'));
-        $this->entry->setAssessmentId((int)$request->get('assessmentId'));
-        $this->entry->setPlacementId((int)$request->get('placementId'));
-        if ($this->entry->getPlacement()) {
-            $this->entry->setStudentId($this->entry->getPlacement()->getUserId());
-            if ($this->entry->getAssessment()->isSelfAssessment()) {
-                $this->entry->setAssessorId($this->entry->getPlacement()->getUserId());
+        $this->getEntry()->setSubjectId((int)$request->get('subjectId'));
+        $this->getEntry()->setAssessmentId((int)$request->get('assessmentId'));
+        $this->getEntry()->setPlacementId((int)$request->get('placementId'));
+        if ($this->getEntry()->getPlacement()) {
+            $this->getEntry()->setStudentId($this->getEntry()->getPlacement()->getUserId());
+            if ($this->getEntry()->getAssessment()->isSelfAssessment()) {
+                $this->getEntry()->setAssessorId($this->getEntry()->getPlacement()->getUserId());
             }
         }
 
@@ -108,30 +112,30 @@ class Edit extends AdminEditIface
         if (preg_match('/[0-9a-f]{32}/i', $request->get('h'))) {
             // EG: h=13644394c4d1473f1547513fc21d7934
             // http://ems.vet.unimelb.edu.au/assessment.html?h=13644394c4d1473f1547513fc21d7934&assessmentId=2
-            $this->placement = \App\Db\PlacementMap::create()->findByHash($request->get('h'));
-            if (!$this->placement) {
+            $placement = \App\Db\PlacementMap::create()->findByHash($request->get('h'));
+            if (!$placement) {
                 \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
                 $this->getConfig()->getUserHomeUrl()->redirect();
             }
             $e = \Ca\Db\EntryMap::create()->findFiltered(array(
                     'assessmentId' => $request->get('assessmentId'),
-                    'placementId' => $this->placement->getId()
+                    'placementId' => $placement->getId()
                 )
             )->current();
 
             if ($e) {
                 $this->entry = $e;
             } else {
-                $this->entry->setPlacementId($this->placement->getId());
-                $this->entry->setStudentId($this->placement->userId);
-                $this->entry->setSubjectId($this->placement->subjectId);
-                if (!$this->entry->getAssessment()) {
+                $this->getEntry()->setPlacementId($placement->getId());
+                $this->getEntry()->setStudentId($this->getEntry()->getPlacement()->userId);
+                $this->getEntry()->setSubjectId($this->getEntry()->getPlacement()->subjectId);
+                if (!$this->getEntry()->getAssessment()) {
                     throw new \Tk\Exception('Invalid Assessment. Please contact the subject coordinator.');
                 }
             }
         }
-        if (!$this->entry->getSubjectId() && $this->getSubject()) {
-            $this->entry->setSubjectId($this->getSubject()->getId());
+        if (!$this->getEntry()->getSubjectId() && $this->getSubject()) {
+            $this->getEntry()->setSubjectId($this->getSubject()->getId());
         }
 
         if ($request->get('assessmentId') && $request->get('placementId')) {
@@ -154,49 +158,51 @@ class Edit extends AdminEditIface
         // Assumed to be student self assessment form
         if (!$request->has('studentId') && !$request->has('subjectId') && $this->getUser() && $this->getUser()->isStudent()) {
             $e = \Ca\Db\EntryMap::create()->findFiltered(array(
-                    'assessmentId' => $this->entry->getAssessmentId(),
-                    'subjectId' => $this->entry->getSubjectId(),
-                    'studentId' => $this->entry->getStudentId())
+                    'assessmentId' => $this->getEntry()->getAssessmentId(),
+                    'subjectId' => $this->getEntry()->getSubjectId(),
+                    'studentId' => $this->getEntry()->getStudentId())
             )->current();
             if ($e) $this->entry = $e;
         }
 
         if ($this->isPublic()) {
-            if ($this->entry->getStatus() == \Ca\Db\Entry::STATUS_APPROVED || $this->entry->getStatus() == \Ca\Db\Entry::STATUS_NOT_APPROVED) {
+            if ($this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_APPROVED || $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_NOT_APPROVED) {
                 $this->errors[] = 'This entry has already been submitted.';
                 return;
             }
-            if ($this->entry->getPlacement() && !$this->entry->getAssessment()->isAvailable($this->entry->getPlacement())) {
+            if ($this->getEntry()->getPlacement() && !$this->getEntry()->getAssessment()->isAvailable($this->getEntry()->getPlacement())) {
                 $this->errors[] = 'This entry is no longer available.';
                 return;
             }
         }
 
-        if (!$this->entry->getId() && $this->entry->getPlacement()) {
-            $this->entry->setTitle($this->entry->getPlacement()->getTitle(true));
-            if ($this->entry->getPlacement()->getCompany()) {
-                $this->entry->setAssessorName($this->entry->getPlacement()->getCompany()->name);
-                $this->entry->setAssessorEmail($this->entry->getPlacement()->getCompany()->email);
+        if (!$this->getEntry()->getId() && $this->getEntry()->getPlacement()) {
+            $this->getEntry()->setTitle($this->getEntry()->getPlacement()->getTitle(true));
+            if ($this->getEntry()->getPlacement()->getCompany()) {
+                $this->getEntry()->setAssessorName($this->getEntry()->getPlacement()->getCompany()->name);
+                $this->getEntry()->setAssessorEmail($this->getEntry()->getPlacement()->getCompany()->email);
             }
-            if ($this->entry->getPlacement()->getSupervisor()) {
-                $this->entry->setAssessorName($this->entry->getPlacement()->getSupervisor()->name);
-                $this->entry->setAssessorEmail($this->entry->getPlacement()->getSupervisor()->email);
+            if ($this->getEntry()->getPlacement()->getSupervisor()) {
+                $this->getEntry()->setAssessorName($this->getEntry()->getPlacement()->getSupervisor()->name);
+                $this->getEntry()->setAssessorEmail($this->getEntry()->getPlacement()->getSupervisor()->email);
             }
         }
 
-        if ($this->entry->getAssessment()->isSelfAssessment() && !$this->entry->getId()) {
-            $this->entry->setTitle($this->entry->getAssessment()->getName() . ': ' . $this->entry->getTitle());
-            $this->entry->setAssessorName($this->entry->getStudent()->getName());
-            $this->entry->setAssessorEmail($this->entry->getStudent()->getEmail());
+        if ($this->getEntry()->getAssessment()->isSelfAssessment() && !$this->getEntry()->getId()) {
+            $this->getEntry()->setTitle($this->getEntry()->getAssessment()->getName() . ': ' . $this->getEntry()->getTitle());
+            $this->getEntry()->setAssessorName($this->getEntry()->getStudent()->getName());
+            $this->getEntry()->setAssessorEmail($this->getEntry()->getStudent()->getEmail());
         }
 
         // ---------------------- End Entry Setup -------------------
 
+        // TODO: The entry is saving but not re-populating its values yet......
+        vd('TODO: The entry is saving but not re-populating its values yet. ' . $this->getEntry()->getId());
 
-        $this->setPageTitle($this->entry->getAssessment()->name);
+        $this->setPageTitle($this->getEntry()->getAssessment()->name);
 
-        $this->setForm(\Ca\Form\Entry::create()->setModel($this->entry));
-        if ($this->entry->getAssessment()->isSelfAssessment()) {
+        $this->setForm(\Ca\Form\Entry::create()->setModel($this->getEntry()));
+        if ($this->getEntry()->getAssessment()->isSelfAssessment()) {
             $this->getForm()->remove('assessorName');
             $this->getForm()->remove('assessorEmail');
             $this->getForm()->remove('average');
@@ -205,11 +211,11 @@ class Edit extends AdminEditIface
         $this->initForm($request);
         $this->getForm()->execute();
 
-        if ($this->getUser() && $this->getUser()->isStaff() && $this->entry->getId()) {
+        if ($this->getUser() && $this->getUser()->isStaff() && $this->getEntry()->getId()) {
             $this->statusTable = \App\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')->init();
             $filter = array(
-                'model' => $this->entry,
-                'subjectId' => $this->entry->subjectId
+                'model' => $this->getEntry(),
+                'subjectId' => $this->getEntry()->subjectId
             );
             $this->statusTable->setList($this->statusTable->findList($filter, $this->statusTable->getTool('created DESC')));
         }
@@ -220,11 +226,11 @@ class Edit extends AdminEditIface
      */
     public function initActionPanel()
     {
-        if ($this->entry->getId() && ($this->getUser() && $this->getUser()->isStaff())) {
+        if ($this->getEntry()->getId() && ($this->getUser() && $this->getUser()->isStaff())) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
-                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
+                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId()), 'fa fa-eye'));
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
-                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->entry->getId())->set('p', 'p'), 'fa fa-file-pdf-o')->setAttr('target', '_blank'));
+                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId())->set('p', 'p'), 'fa fa-file-pdf-o')->setAttr('target', '_blank'));
         }
     }
 
@@ -243,7 +249,7 @@ class Edit extends AdminEditIface
                 }
                 $template->setVisible('not-available');
                 $template->setAttr('contact', 'href', \Tk\Uri::create('/contact.html')
-                    ->set('subjectId', $this->entry->subjectId));
+                    ->set('subjectId', $this->getEntry()->getSubjectId()));
                 return $template;
             } else {
                 $template->setVisible('available');
@@ -251,7 +257,7 @@ class Edit extends AdminEditIface
         } else {
             $template->setVisible('edit');
             if ($this->getUser()->isStaff()) {
-                if ($this->entry->getId()) {
+                if ($this->getEntry()->getId()) {
                     if ($this->statusTable) {
                         $template->appendTemplate('statusLog', $this->statusTable->show());
                         $template->setVisible('statusLog');
@@ -261,20 +267,20 @@ class Edit extends AdminEditIface
         }
 
 
-        $title = $this->entry->getAssessment()->getName();
-        if ($this->entry->getPlacement()) {
-            $title .= ': ' . $this->entry->getPlacement()->getTitle(true);
+        $title = $this->getEntry()->getAssessment()->getName();
+        if ($this->getEntry()->getPlacement()) {
+            $title .= ': ' . $this->getEntry()->getPlacement()->getTitle(true);
         }
-        if ($this->entry->getId()) {
-            $title = sprintf('[ID: %s] ', $this->entry->getId()) . $title;
+        if ($this->getEntry()->getId()) {
+            $title = sprintf('[ID: %s] ', $this->getEntry()->getId()) . $title;
         }
         $template->setAttr('panel', 'data-panel-title', $title);
 
-        if ($this->entry->getAssessment()->icon) {
-            $template->setAttr('panel', 'data-panel-icon', $this->entry->getAssessment()->icon);
+        if ($this->getEntry()->getAssessment()->icon) {
+            $template->setAttr('panel', 'data-panel-icon', $this->getEntry()->getAssessment()->icon);
         }
-        if ($this->entry->getAssessment()->getDescription()) {
-            $template->insertHtml('instructions', $this->entry->getAssessment()->getDescription());
+        if ($this->getEntry()->getAssessment()->getDescription()) {
+            $template->insertHtml('instructions', $this->getEntry()->getAssessment()->getDescription());
             $template->setVisible('instructions');
         }
 

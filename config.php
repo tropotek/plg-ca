@@ -55,6 +55,10 @@ $routes->add('ca-staff-entry-manager', Route::create('/staff/{subjectCode}/ca/en
 $routes->add('ca-staff-entry-edit', Route::create('/staff/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
 $routes->add('ca-staff-entry-view', Route::create('/staff/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
 
+$routes->add('ca-student-entry-edit', Route::create('/student/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
+//$routes->add('ca-student-entry-view', Route::create('/student/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
+
+
 // TODO: All these need to be reviewed
 //$routes->add('ca-staff-report-staff-entry-results', Route::create('/staff/{subjectCode}/ca/entryResults.html', 'Ca\Controller\Report\StudentResults::doDefault'));
 //$routes->add('ca-staff-report-entry', Route::create('/staff/{subjectCode}/ca/assessmentReport.html', 'Ca\Controller\Report\AssessmentReport::doDefault'));

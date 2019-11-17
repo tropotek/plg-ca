@@ -72,29 +72,35 @@ class PlacementReportHandler implements Subscriber
             return;
         }
 
-        // Find first self-assessment that needs to be created and redirect with an alert message
-        // Keep this loop going until there are none left.
-        // TODO: this should give the illusion that we are going next -> next -> submit....
+        if (!$this->getConfig()->getUser()->isStudent()) return;
 
-        // TODO: How to find self-assessment entries that have not been created... (See Icon setup)
         $placement = $this->controller->getPlacement();
         $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
             'subjectId' => $this->subject->getId(),
             'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT
         ));
+
         /** @var \Ca\Db\Assessment $assessment */
         foreach ($assessmentList as $assessment) {
                 if (!$assessment->isAvailable($placement)) {
                     continue;
                 }
+                /** @var \Ca\Db\Entry $entry */
+                $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                    'assessmentId' => $assessment->getId(),
+                    'placementId' => $placement->getId())
+                )->current();
+                if ($entry && $entry->getStatus() != \Ca\Db\Entry::STATUS_PENDING && $entry->getStatus() != \Ca\Db\Entry::STATUS_AMEND) continue;
                 $url = \App\Uri::createSubjectUrl('/ca/entryEdit.html')
                     ->set('placementId', $placement->getId())
                     ->set('assessmentId', $assessment->getId());
                 \Tk\Alert::addInfo('Please submit the following ' . $assessment->getName() . ' Form');
                 $event->setRedirect($url);
+                return;
         }
 
-
+        $url = \Uni\Uri::createSubjectUrl('/index.html');
+        $event->setRedirect($url);
     }
 
     /**
@@ -123,6 +129,14 @@ class PlacementReportHandler implements Subscriber
             KernelEvents::CONTROLLER => array('onControllerInit', 0),
             \Tk\Form\FormEvents::FORM_SUBMIT => array(array('onSubmit', 0))
         );
+    }
+
+    /**
+     * @return \App\Config|\Tk\Config
+     */
+    protected function getConfig()
+    {
+        return \App\Config::getInstance();
     }
 
 }

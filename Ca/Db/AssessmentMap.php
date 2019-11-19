@@ -116,6 +116,13 @@ class AssessmentMap extends Mapper
             $filter->appendWhere('a.icon = %s AND ', $this->quote($filter['icon']));
         }
         if (!empty($filter['placementStatus'])) {
+            if (!is_array($filter['placementStatus'])) $filter->set('placementStatus', array($filter['placementStatus']));
+            $arr = $filter['placementStatus'];
+            foreach ($arr as $k => $v) {
+                $arr[$k] = '%'.$v.'%';
+            }
+            $filter->set('placementStatus', $arr);
+
             $w = $this->makeMultiQuery($filter['placementStatus'], 'a.placement_status', 'OR', 'LIKE');
             if ($w) $filter->appendWhere('(%s) AND ', $w);
         }

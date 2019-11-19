@@ -74,7 +74,7 @@ class SetupHandler implements Subscriber
             if ($subject) {
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementReportHandler($subject));
-                //$dispatcher->addSubscriber(new \Ca\Listener\PlacementEditHandler($subject));
+                $dispatcher->addSubscriber(new \Ca\Listener\PlacementEditHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementViewHandler());
                 //$dispatcher->addSubscriber(new \Ca\Listener\CompanyManagerHandler($subject));
                 //$dispatcher->addSubscriber(new \Ca\Listener\StudentManagerButtonHandler($subject));

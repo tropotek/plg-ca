@@ -13,7 +13,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     const ASSESSOR_GROUP_STUDENT = 'student';
     const ASSESSOR_GROUP_COMPANY = 'company';
-    //const ASSESSOR_GROUP_STAFF = 'staff';
+    //const ASSESSOR_GROUP_STAFF = 'staff';           // TODO: this is not full implemented as yet
 
     /**
      * @var int

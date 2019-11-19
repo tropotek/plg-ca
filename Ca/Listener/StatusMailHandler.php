@@ -38,18 +38,28 @@ class StatusMailHandler implements Subscriber
                     /** @var \Ca\Db\Assessment $assessment */
                     foreach ($list as $assessment) {
                         $key = $assessment->getNameKey();
-                        $url = \Uni\Uri::createInstitutionUrl('/assessment.html', $placement->getSubject()->getInstitution())
-                            ->set('h', $placement->getHash())
-                            ->set('assessmentId', $assessment->getId());
                         $avail = '';
                         if (!$assessment->isAvailable($placement)) {
                             $avail = ' [Currently Unavailable]';
                         }
-
-                        $caLinkHtml = sprintf('<a href="%s" title="%s">%s</a>', htmlentities($url->toString()),
-                                htmlentities($assessment->getName()) . $avail, htmlentities($assessment->getName()) . $avail);
-                        $caLinkText = sprintf('%s: %s', htmlentities($assessment->getName()) . $avail, htmlentities($url->toString()));
-
+                        $url = '';
+                        switch($assessment->getAssessorGroup()) {
+                            case \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT:     // Student URL
+                                $url = \Uni\Uri::createSubjectUrl('/ca/editEntry.html', $placement->getSubject(), '/student')
+                                    ->set('placementId', $placement->getId())
+                                    ->set('assessmentId', $assessment->getId())->toString();
+                                break;
+                            case \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY:     // Public URL
+                                $url = \Uni\Uri::createInstitutionUrl('/assessment.html', $placement->getSubject()->getInstitution())
+                                    ->set('h', $placement->getHash())
+                                    ->set('assessmentId', $assessment->getId())->toString();
+                                break;
+//                            case \Ca\Db\Assessment::ASSESSOR_GROUP_STAFF:
+//                                break;
+                        }
+                        $caLinkHtml = sprintf('<a href="%s" title="%s">%s</a>', htmlentities($url),
+                            htmlentities($assessment->getName()) . $avail, htmlentities($assessment->getName()) . $avail);
+                        $caLinkText = sprintf('%s: %s', htmlentities($assessment->getName()) . $avail, htmlentities($url));
                         $message->set($key.'::linkHtml', $caLinkHtml);
                         $message->set($key.'::linkText', $caLinkText);
 //                        $message->set($key.'::id', $assessment->getId());

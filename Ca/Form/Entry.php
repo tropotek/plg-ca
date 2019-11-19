@@ -26,7 +26,18 @@ class Entry extends \Uni\FormIface
     const MODE_PRIVATE = 'private';         // For logged in users
     const MODE_PUBLIC = 'public';           // For public users
 
-    protected $mode = 'private';
+    protected $public = false;
+
+
+    /**
+     * @param bool $isPublic
+     * @param string $formId
+     */
+    public function __construct($isPublic = false, $formId = '')
+    {
+        parent::__construct($formId);
+        $this->setPublic($isPublic);
+    }
 
     /**
      * @throws \Exception
@@ -45,7 +56,7 @@ class Entry extends \Uni\FormIface
 //            $avg = $this->getEntry()->getAverage();
 //            $this->appendField(new Field\Html('average', sprintf('%.2f', $this->getEntry()->getAverage())))->setFieldset($fieldset);
 //        }
-        if ($this->getUser()->isStaff() && !$this->isPublic()) {
+        if (!$this->isPublic() && $this->getUser()->isStaff()) {
             $this->appendField(new \App\Form\Field\CheckSelect('status', \Ca\Db\Entry::getStatusList($this->getEntry()->getStatus())))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset($fieldset);
         } else {
@@ -56,7 +67,7 @@ class Entry extends \Uni\FormIface
         $this->appendField(new Field\Input('assessorName'))->setFieldset($fieldset)->setRequired();
         $this->appendField(new Field\Input('assessorEmail'))->setFieldset($fieldset);
         if ($this->getEntry()->getAssessorId() != $this->getEntry()->getStudentId()) {
-            $this->appendField(new Field\Input('absent'))->setFieldset($fieldset)->setNotes('Enter the number of days absent if any.');
+            $this->appendField(new Field\Input('absent'))->setFieldset($fieldset)->setNotes('Enter the number of days the student was absent if any.');
         }
         $this->appendField(new Field\Textarea('notes'))->setLabel('Comments')->setFieldset($fieldset);
 
@@ -82,7 +93,6 @@ class Entry extends \Uni\FormIface
             if ($val) {
                 $field->setValue($val->value);
             }
-
         }
 
         if ($this->isPublic()) {
@@ -104,7 +114,8 @@ jQuery(function ($) {
   }
 });
 JS;
-        $template->appendJs($js);
+        if (!$this->isPublic() && $this->getUser()->isStaff())
+            $template->appendJs($js);
     }
 
     /**
@@ -151,10 +162,8 @@ JS;
         $isNew = (bool)$this->getEntry()->getId();
 
         if ($this->getUser()->isStudent() && $this->getEntry()->getAssessment()->isSelfAssessment() && $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_AMEND)
-            $this->getPlacement()->status = \App\Db\Placement::STATUS_PENDING;
-
+            $this->getEntry()->status = \Ca\Db\Entry::STATUS_PENDING;
         $this->getEntry()->save();
-
 
         // Save Item values
         \Ca\Db\EntryMap::create()->removeValue($this->getEntry()->getVolatileId());
@@ -164,7 +173,7 @@ JS;
         }
 
         // Create status if changed and trigger notifications
-        if (!$this->isPublic() && $form->getField('status')) {
+        if (!$this->isPublic() && $form->getField('status') instanceof \App\Form\Field\CheckSelect) {
             \App\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
                 $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
         } else {
@@ -172,29 +181,26 @@ JS;
                 $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
         }
 
-
         \Tk\Alert::addSuccess('Record saved!');
-        $event->setRedirect($this->getBackUrl());
+
+        $event->setRedirect($this->getBackUrl());  // <<<---- For some reasonn this is not working for student pages.
+        if ($this->getEntry()->getAssessment()->isSelfAssessment()) {
+            $event->setRedirect(\Uni\Uri::createSubjectUrl('/placementView.html')
+                ->set('placementId', $this->getEntry()->getPlacement()->getId()));
+        }
         if ($form->getTriggeredEvent()->getName() == 'save') {
             $event->setRedirect(\Tk\Uri::create()->set('entryId', $this->getEntry()->getId()));
         }
+
     }
 
     /**
-     * @return string
-     */
-    public function getMode(): string
-    {
-        return $this->mode;
-    }
-
-    /**
-     * @param string $mode
+     * @param bool $b
      * @return Entry
      */
-    public function setMode(string $mode): Entry
+    public function setPublic($b = true)
     {
-        $this->mode = $mode;
+        $this->public = $b;
         return $this;
     }
 
@@ -203,7 +209,7 @@ JS;
      */
     public function isPublic()
     {
-        return ($this->getMode() == self::MODE_PUBLIC);
+        return $this->public;
     }
 
     /**

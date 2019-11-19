@@ -32,35 +32,40 @@ class Assessment extends \Uni\FormIface
         $layout->removeRow('assessorGroup', 'col-md-6');
         $layout->removeRow('includeZero', 'col-md-6');
         $layout->removeRow('icon', 'col-md-6');
-        
-        //$this->appendField(new Field\Input('uid'));
-        //$this->appendField(new Field\Select('courseId', array()))->prependOption('-- Select --', '');
-        $this->appendField(new Field\Input('name'));
+
+        $tab = 'Details';
+
+        $this->appendField(new Field\Input('name'))->setTabGroup($tab);
         $this->appendField(new Field\Select('assessorGroup', \Ca\Db\Assessment::getAssessorGroupList($this->getAssessment()->getAssessorGroup())))
-            ->setNotes('Who is the user group to submit the assessment evaluations.');
+            ->setTabGroup($tab)->setNotes('Who is the user group to submit the assessment evaluations.');
 
         $list = array('tk tk-clear', 'tk tk-goals', 'fa fa-eye', 'fa fa-user-circle-o', 'fa fa-bell', 'fa fa-certificate', 'fa fa-tv', 'fa fa-drivers-license',
             'fa fa-leaf', 'fa fa-trophy', 'fa fa-ambulance', 'fa fa-rebel', 'fa fa-empire', 'fa fa-font-awesome', 'fa fa-heartbeat',
             'fa fa-medkit', 'fa fa-user-md', 'fa fa-user-secret', 'fa fa-heart');
         $this->appendField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))
-            ->addCss('iconpicker')->setNotes('Select an identifying icon for this assessment');
+            ->setTabGroup($tab)->addCss('iconpicker')->setNotes('Select an identifying icon for this assessment');
 
-        $this->appendField(new Field\Checkbox('includeZero'))->setCheckboxLabel('When calculating the score should 0 value results be included.');
+        $this->appendField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
+            ->setCheckboxLabel('When calculating the score should 0 value results be included.');
 
         // TODO: Hide this when assessor group is 'student'
-        $this->appendField(new Field\Select('placementStatus[]', \App\Db\Placement::getStatusList()))->addCss('tk-dual-select')
+        $this->appendField(new Field\Select('placementStatus[]', \App\Db\Placement::getStatusList()))
+            ->addCss('tk-dual-select')->setTabGroup($tab)
             ->setNotes('Select the placement status values when assessments become available and can be submitted.');
 
         $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('profileId' => $this->getAssessment()->getCourseId()));
-        $ptiField = $this->appendField(new Field\Select('placementTypeId[]', $list))
+        $ptiField = $this->appendField(new Field\Select('placementTypeId[]', $list))->setTabGroup($tab)
             ->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')
             ->setNotes('Enable this assessment for the selected placement types.');
 
         $list = \Ca\Db\AssessmentMap::create()->findPlacementTypes($this->getAssessment()->getId());
         $ptiField->setValue($list);
 
+        $tab = 'Instructions';
 
-        $this->appendField(new Field\Textarea('description'))->setLabel('Instructions');
+        $this->appendField(new Field\Textarea('description'))->setLabel('Instructions')->setTabGroup($tab)
+            ->setNotes('Enter any student instructions on how to complete placement entries.')
+            ->addCss('mce')->setAttr('data-elfinder-path', $this->getConfig()->getInstitution()->getDataPath().'/media');;
 
         $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
         $this->appendField(new Event\Submit('save', array($this, 'doSubmit')));

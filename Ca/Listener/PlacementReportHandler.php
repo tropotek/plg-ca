@@ -70,7 +70,6 @@ class PlacementReportHandler implements Subscriber
                             'assessmentId' => $assessment->getId(),
                             'placementId' => $placement->getId())
                     )->current();
-
                     $url = \App\Uri::createSubjectUrl('/ca/entryEdit.html')
                         ->set('placementId', $placement->getId())
                         ->set('assessmentId', $assessment->getId());
@@ -121,6 +120,10 @@ class PlacementReportHandler implements Subscriber
             'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT
         ));
 
+        if ($this->controller->getBackUrl() &&
+            ($this->controller->getBackUrl()->basename() != 'entryEdit.html' ||
+            $this->controller->getBackUrl()->basename() != 'reportEdit.html')) return;
+
         /** @var \Ca\Db\Assessment $assessment */
         foreach ($assessmentList as $assessment) {
                 if (!$assessment->isAvailable($placement)) {
@@ -140,8 +143,8 @@ class PlacementReportHandler implements Subscriber
                 return;
         }
 
-        $url = \Uni\Uri::createSubjectUrl('/index.html');
-        $event->setRedirect($url);
+//        $url = \Uni\Uri::createSubjectUrl('/index.html');
+//        $event->setRedirect($url);
     }
 
     /**

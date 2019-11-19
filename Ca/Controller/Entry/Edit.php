@@ -6,8 +6,6 @@ use Dom\Template;
 use Tk\Request;
 
 /**
- * TODO: Add Route to routes.php:
- *      $routes->add('ca-entry-edit', Route::create('/staff/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
  *
  * @author Mick Mifsud
  * @created 2019-11-06
@@ -147,23 +145,23 @@ class Edit extends AdminEditIface
         }
 
         // Staff view student self assessment
-        if ($request->get('assessmentId') && $request->get('studentId') && $this->getUser()->isStaff()) {
-            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
-                    'assessmentId' => $request->get('assessmentId'),
-                    'studentId' => $request->get('studentId'))
-            )->current();
-            if ($e) $this->entry = $e;
-        }
+//        if ($request->get('assessmentId') && $request->get('studentId') && $this->getUser()->isStaff()) {
+//            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
+//                    'assessmentId' => $request->get('assessmentId'),
+//                    'studentId' => $request->get('studentId'))
+//            )->current();
+//            if ($e) $this->entry = $e;
+//        }
 
         // Assumed to be student self assessment form
-        if (!$request->has('studentId') && !$request->has('subjectId') && $this->getUser() && $this->getUser()->isStudent()) {
-            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
-                    'assessmentId' => $this->getEntry()->getAssessmentId(),
-                    'subjectId' => $this->getEntry()->getSubjectId(),
-                    'studentId' => $this->getEntry()->getStudentId())
-            )->current();
-            if ($e) $this->entry = $e;
-        }
+//        if (!$request->has('studentId') && !$request->has('subjectId') && $this->getUser() && $this->getUser()->isStudent()) {
+//            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
+//                    'assessmentId' => $this->getEntry()->getAssessmentId(),
+//                    'subjectId' => $this->getEntry()->getSubjectId(),
+//                    'studentId' => $this->getEntry()->getStudentId())
+//            )->current();
+//            if ($e) $this->entry = $e;
+//        }
 
         if ($this->isPublic()) {
             if ($this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_APPROVED || $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_NOT_APPROVED) {
@@ -198,7 +196,7 @@ class Edit extends AdminEditIface
 
         $this->setPageTitle($this->getEntry()->getAssessment()->name);
 
-        $this->setForm(\Ca\Form\Entry::create()->setModel($this->getEntry()));
+        $this->setForm(\Ca\Form\Entry::create($this->isPublic())->setModel($this->getEntry()));
         if ($this->getEntry()->getAssessment()->isSelfAssessment()) {
             $this->getForm()->remove('assessorName');
             $this->getForm()->remove('assessorEmail');
@@ -265,7 +263,6 @@ class Edit extends AdminEditIface
             }
         }
 
-
         $title = $this->getEntry()->getAssessment()->getName();
         if ($this->getEntry()->getPlacement()) {
             $title .= ': ' . $this->getEntry()->getPlacement()->getTitle(true);
@@ -275,10 +272,11 @@ class Edit extends AdminEditIface
         }
         $template->setAttr('panel', 'data-panel-title', $title);
 
-        if ($this->getEntry()->getAssessment()->icon) {
+        if ($this->getEntry()->getAssessment()->getIcon()) {
             $template->setAttr('panel', 'data-panel-icon', $this->getEntry()->getAssessment()->icon);
         }
         if ($this->getEntry()->getAssessment()->getDescription()) {
+
             $template->insertHtml('instructions', $this->getEntry()->getAssessment()->getDescription());
             $template->setVisible('instructions');
         }
@@ -296,8 +294,8 @@ class Edit extends AdminEditIface
     {
         $xhtml = <<<HTML
 <div class="EntryEdit">
-  <div class="tk-panel" data-panel-title="Skill Entry Edit" data-panel-icon="fa fa-question" var="panel">
-      <div class="instructions" choice="instructions" var="instructions"></div>
+  <div class="tk-panel" data-panel-title="Entry Edit" data-panel-icon="fa fa-question" var="panel">
+      <div class="ca-description" choice="instructions" var="instructions"></div>
       <hr choice="instructions"/>
   </div>
 </div>
@@ -317,7 +315,7 @@ HTML;
   <div class="container">
     <div class="layout layout-stack-sm layout-main-left">
       <div class="layout-main" choice="available">
-        <div var="instructions"></div>
+        <div class="ca-description" var="instructions"></div>
         <div var="panel"></div>
       </div>
       <div class="layout-main" choice="not-available">

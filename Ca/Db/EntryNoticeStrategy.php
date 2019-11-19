@@ -42,7 +42,7 @@ class EntryNoticeStrategy extends \App\Db\NoticeStrategyInterface
         if($status->name === \Ca\Db\Entry::STATUS_AMEND && $entry->getAssessment()->isSelfAssessment()) {
             $notice->setParam(\App\Db\Notice::PARAM_STUDENT_URL,
                 \App\Uri::createSubjectUrl('/ca/entryEdit.html', $entry->getSubject(), '/student')
-                    ->set('placementId', $entry->getId())->set('assessmentId', $entry->getAssessmentId())->toRelativeString(false));
+                    ->set('placementId', $entry->getPlacement()->getId())->set('assessmentId', $entry->getAssessmentId())->toRelativeString(false));
 
             $notice->subject = sprintf('Your %s record requires updating.', $assessmentName);
             $notice->body .= sprintf('%s: `%s`', htmlentities($assessmentName), htmlentities($entry->getTitle()));

@@ -47,7 +47,6 @@ class ItemHelper
 
         $field->setRequired($item->isRequired());
 
-
         if ($item->getDescription()) {
             $field->setNotes($item->getDescription());
         }

@@ -41,10 +41,10 @@ class Entry extends \Uni\FormIface
         } else {
             $this->appendField(new Field\Html('title'))->setFieldset($fieldset);
         }
-        if (!$this->isPublic()) {
-            $avg = $this->getEntry()->getAverage();
-            $this->appendField(new Field\Html('average', sprintf('%.2f', $this->getEntry()->getAverage())))->setFieldset($fieldset);
-        }
+//        if (!$this->isPublic()) {
+//            $avg = $this->getEntry()->getAverage();
+//            $this->appendField(new Field\Html('average', sprintf('%.2f', $this->getEntry()->getAverage())))->setFieldset($fieldset);
+//        }
         if ($this->getUser()->isStaff() && !$this->isPublic()) {
             $this->appendField(new \App\Form\Field\CheckSelect('status', \Ca\Db\Entry::getStatusList($this->getEntry()->getStatus())))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset($fieldset);
@@ -78,11 +78,10 @@ class Entry extends \Uni\FormIface
             if (!$field) continue;
             $this->appendField($field)->setFieldset($fieldset, 'ca-row');
 
-            // TODO:
-//            $val = \Skill\Db\EntryMap::create()->findValue($this->getEntry()->getId(), $item->getId());
-//            if ($val) {
-//                $fld->setValue($val->value);
-//            }
+            $val = \Ca\Db\EntryMap::create()->findValue($this->getEntry()->getId(), $item->getId());
+            if ($val) {
+                $field->setValue($val->value);
+            }
 
         }
 
@@ -149,25 +148,29 @@ JS;
             return;
         }
 
+        $isNew = (bool)$this->getEntry()->getId();
+
+        if ($this->getUser()->isStudent() && $this->getEntry()->getAssessment()->isSelfAssessment() && $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_AMEND)
+            $this->getPlacement()->status = \App\Db\Placement::STATUS_PENDING;
+
+        $this->getEntry()->save();
+
+
         // Save Item values
         \Ca\Db\EntryMap::create()->removeValue($this->getEntry()->getVolatileId());
         foreach ($form->getValues('/^item\-/') as $name => $val) {
             $id = (int)substr($name, strrpos($name, '-') + 1);
-            \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, (int)$val);
+            \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, $val);
         }
 
-        $isNew = (bool)$this->getEntry()->getId();
-        $this->getEntry()->save();
-
-
-//        // Create status if changed and trigger notifications
-//        if (!$this->isPublic() && $form->getField('status')) {
-//            \App\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
-//                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
-//        } else {
-//            \App\Db\Status::create($this->getEntry(), $this->getEntry()->status, true, '',
-//                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
-//        }
+        // Create status if changed and trigger notifications
+        if (!$this->isPublic() && $form->getField('status')) {
+            \App\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
+                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
+        } else {
+            \App\Db\Status::create($this->getEntry(), $this->getEntry()->getStatus(), true, '',
+                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
+        }
 
 
         \Tk\Alert::addSuccess('Record saved!');

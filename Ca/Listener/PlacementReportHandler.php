@@ -47,6 +47,47 @@ class PlacementReportHandler implements Subscriber
     }
 
     /**
+     * @param \Tk\Event\Event $event
+     */
+    public function onPageInit($event)
+    {
+        if ($this->controller) {
+
+            if (!$this->getConfig()->getUser()->isStudent() && $this->controller instanceof \App\Controller\Placement\ReportEdit) {
+                $placement = $this->controller->getPlacement();
+                $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
+                    'subjectId' => $this->subject->getId(),
+                    'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT
+                ));
+
+                /** @var \Ca\Db\Assessment $assessment */
+                foreach ($assessmentList as $assessment) {
+                    if (!$assessment->isAvailable($placement)) {
+                        continue;
+                    }
+                    /** @var \Ca\Db\Entry $entry */
+                    $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                            'assessmentId' => $assessment->getId(),
+                            'placementId' => $placement->getId())
+                    )->current();
+
+                    $url = \App\Uri::createSubjectUrl('/ca/entryEdit.html')
+                        ->set('placementId', $placement->getId())
+                        ->set('assessmentId', $assessment->getId());
+                    /** @var \Tk\Ui\Link $btn */
+                    $btn = $this->controller->getActionPanel()->append(\Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon()));
+                    $btn->setAttr('title', 'Edit ' . $assessment->getName());
+                    if (!$entry) {
+                        $btn->removeCss('btn-default')->addCss('btn-success')->setAttr('title', 'Create ' . $assessment->getName());
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    /**
      * Check the user has access to this controller
      *
      * @param \Tk\Event\TableEvent $event
@@ -127,6 +168,7 @@ class PlacementReportHandler implements Subscriber
     {
         return array(
             KernelEvents::CONTROLLER => array('onControllerInit', 0),
+            \Tk\PageEvents::CONTROLLER_INIT => array('onPageInit', 0),
             \Tk\Form\FormEvents::FORM_SUBMIT => array(array('onSubmit', 0))
         );
     }

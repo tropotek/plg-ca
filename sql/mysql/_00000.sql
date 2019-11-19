@@ -217,6 +217,7 @@ INSERT INTO ca_assessment (uid, course_id, name, icon, placement_status, assesso
     (3, 2, 'Supervisor Feedback', 'fa fa-user-md', 'approved,assessing,evaluating,completed,failed', 'company', 0, '', NOW(), NOW())
 ;
 
+TRUNCATE ca_assessment_placement_type;
 INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (1, 8);
 INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (2, 8);
 INSERT INTO ca_assessment_placement_type (assessment_id, placement_type_id) VALUES (2, 9);
@@ -293,7 +294,6 @@ INSERT INTO ca_domain (institution_id, name, description, label, modified, creat
     (1, 'Personal And Professional Development', '', 'PD', NOW(), NOW()),
     (1, 'Clinical And Technical Skills', '', 'CS', NOW(), NOW()),
     (1, 'Communication Skills', '', 'COM', NOW(), NOW()),
---    (1, 'Knowledge And Problem Solving', '', 'KPS', NOW(), NOW()),                          -- Not a recognised domain???? {should be SB domain}
     (1, 'Scientific Basis Of Clinical Practice', '', 'SB', NOW(), NOW()),
     (1, 'Safely Approach, Handle And Restrain Animals (Exotic)', '', 'EX', NOW(), NOW()),
     (1, 'Ethics And Animal Welfare', '', 'AW', NOW(), NOW()),
@@ -466,9 +466,6 @@ INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID()
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, gradable, modified, created) VALUES (3, 1, 0, 'What did the student do well on this placement?', '', 0, NOW(), NOW());
 
 UPDATE ca_item SET order_by = id WHERE 1;
-
-
-
 
 
 

@@ -35,7 +35,7 @@ class Active extends AdminManagerIface
         //$this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/assessmentEdit.html'));
         $this->getTable()->init();
 
-        $filter = array();
+        $filter = array('courseId' => $this->getProfileId());
         $this->getTable()->setList($this->getTable()->findList($filter));
     }
 

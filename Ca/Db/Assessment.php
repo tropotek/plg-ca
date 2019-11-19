@@ -124,6 +124,16 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * Return a key that is used for the mail templates
+     *
+     * @return string|string[]|null
+     */
+    public function getNameKey()
+    {
+        return preg_replace('/[^a-z0-9-_]/i', '', $this->getName());
+    }
+
+    /**
      * @param string $icon
      * @return Assessment
      */

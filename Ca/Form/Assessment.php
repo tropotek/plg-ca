@@ -85,6 +85,7 @@ class Assessment extends \Uni\FormIface
      */
     public function doSubmit($form, $event)
     {
+        $originalKey = $this->getAssessment()->getNameKey();
         // Load the object with form data
         \Ca\Db\AssessmentMap::create()->mapForm($form->getValues(), $this->getAssessment());
 
@@ -101,6 +102,15 @@ class Assessment extends \Uni\FormIface
 
         $isNew = (bool)$this->getAssessment()->getId();
         $this->getAssessment()->save();
+
+        // Do Custom data saving
+        if ($originalKey != $this->getAssessment()->getNameKey()) {
+            // Update all mail templates with the new tag
+            $stm = $this->getConfig()->getDb()->prepare('UPDATE mail_template SET template = replace(template, ?, ?) WHERE profile_id = ?;');
+            $stm->execute(array('{'.$originalKey.'}', '{'.$this->getAssessment()->getNameKey().'}', $this->getPlacementType()->getProfileId()));
+            $stm->execute(array('{/'.$originalKey.'}', '{/'.$this->getAssessment()->getNameKey().'}', $this->getPlacementType()->getProfileId()));
+            $stm->execute(array('{'.$originalKey.'::', '{'.$this->getAssessment()->getNameKey().'::', $this->getPlacementType()->getProfileId()));
+        }
 
         \Ca\Db\AssessmentMap::create()->removePlacementType($this->getAssessment()->getId());
         if (is_array($placemenTypeIds) && count($placemenTypeIds)) {

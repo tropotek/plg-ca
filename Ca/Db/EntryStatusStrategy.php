@@ -30,8 +30,9 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
                     return true;
                 break;
             case Entry::STATUS_AMEND:
-                if ($prevStatusName)
+                if ($prevStatusName) {
                     return true;
+                }
                 break;
             case Entry::STATUS_NOT_APPROVED:
                 if (Entry::STATUS_PENDING == $prevStatusName)
@@ -68,10 +69,6 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         \App\Util\StatusMessage::setPlacement($message, $placement);
 
         // A`dd entry details
-        $message->set('collection::id', $model->getAssessment()->getId());
-        $message->set('collection::name', $model->getAssessment()->getName());
-        $message->set('collection::instructions', $model->getAssessment()->getDescription());
-
         $message->set('assessment::id', $model->getAssessment()->getId());
         $message->set('assessment::name', $model->getAssessment()->getName());
         $message->set('assessment::description', $model->getAssessment()->getDescription());
@@ -81,6 +78,19 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         $message->set('entry::assessor', $model->getAssessorName());
         $message->set('entry::status', $model->getStatus());
         $message->set('entry::notes', nl2br($model->getNotes(), true));
+
+
+        // Add assessment blocks
+        $list = \Ca\Db\AssessmentMap::create()->findFiltered(array('profileId' => $placement->getSubject()->getProfile()->getId()));
+        /* @var \Ca\Db\Assessment $assessment */
+        foreach($list as $assessment) {
+            $key = $assessment->getNameKey();
+            if ($model->getAssessmentId() == $assessment->getId()) {
+                $message->set($key, true);
+            } else {
+                $message->set('not'.$key, true);
+            }
+        }
 
         switch ($mailTemplate->recipient) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:

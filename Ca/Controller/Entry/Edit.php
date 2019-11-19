@@ -196,9 +196,6 @@ class Edit extends AdminEditIface
 
         // ---------------------- End Entry Setup -------------------
 
-        // TODO: The entry is saving but not re-populating its values yet......
-        vd('TODO: The entry is saving but not re-populating its values yet. ' . $this->getEntry()->getId());
-
         $this->setPageTitle($this->getEntry()->getAssessment()->name);
 
         $this->setForm(\Ca\Form\Entry::create()->setModel($this->getEntry()));
@@ -227,10 +224,12 @@ class Edit extends AdminEditIface
     public function initActionPanel()
     {
         if ($this->getEntry()->getId() && ($this->getUser() && $this->getUser()->isStaff())) {
-            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
-                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId()), 'fa fa-eye'));
-            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
-                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId())->set('p', 'p'), 'fa fa-file-pdf-o')->setAttr('target', '_blank'));
+            // TODO: Lets implement these at a later stage
+//            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
+//                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId()), 'fa fa-eye'));
+//            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
+//                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId())->set('p', 'p'), 'fa fa-file-pdf-o')
+//                ->setAttr('target', '_blank'));
         }
     }
 

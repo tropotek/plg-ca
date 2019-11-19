@@ -183,7 +183,7 @@ class EntryMap extends Mapper
     {
         /** @var Item $item */
         $item = $this->find($itemId);
-        if ($item) {
+        if ($item && $item->getScale()->getType() == Scale::TYPE_VALUE) {
             $max = $item->getScale()->getMaxValue();
             if ($value < 0) $value = 0;
             if ($value > $max) $value = $max;

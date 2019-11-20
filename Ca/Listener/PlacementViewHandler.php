@@ -36,9 +36,10 @@ class PlacementViewHandler implements Subscriber
             );
             foreach ($list as $assessment) {
                 if (!$placement->getPlacementType() || !$placement->getPlacementType()->enableReport) continue;
+                if (!$assessment->isAvailable($placement)) continue;
 
                 $btn = null;
-                if ($assessment->isSelfAssessment() && $assessment->isAvailable($placement)) {
+                if ($assessment->isSelfAssessment()) {
                     /** @var \Ca\Db\Entry $entry */
                     $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
                         'assessmentId' => $assessment->getId(),

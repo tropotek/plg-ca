@@ -56,7 +56,7 @@ $routes->add('ca-staff-entry-edit', Route::create('/staff/{subjectCode}/ca/entry
 $routes->add('ca-staff-entry-view', Route::create('/staff/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
 
 $routes->add('ca-student-entry-edit', Route::create('/student/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));
-//$routes->add('ca-student-entry-view', Route::create('/student/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
+$routes->add('ca-student-entry-view', Route::create('/student/{subjectCode}/ca/entryView.html', 'Ca\Controller\Entry\View::doDefault'));
 
 
 // TODO: All these need to be reviewed

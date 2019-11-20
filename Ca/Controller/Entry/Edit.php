@@ -197,11 +197,11 @@ class Edit extends AdminEditIface
         $this->setPageTitle($this->getEntry()->getAssessment()->name);
 
         $this->setForm(\Ca\Form\Entry::create($this->isPublic())->setModel($this->getEntry()));
-        if ($this->getEntry()->getAssessment()->isSelfAssessment()) {
-            $this->getForm()->remove('assessorName');
-            $this->getForm()->remove('assessorEmail');
-            $this->getForm()->remove('average');
-            $this->getForm()->remove('absent');
+        if ($this->getEntry()->getAssessment()->isSelfAssessment() && !$this->getUser()->isStaff()) {
+            $this->getForm()->removeField('assessorName');
+            $this->getForm()->removeField('assessorEmail');
+            $this->getForm()->removeField('average');
+            $this->getForm()->removeField('absent');
         }
         $this->initForm($request);
         $this->getForm()->execute();
@@ -223,8 +223,8 @@ class Edit extends AdminEditIface
     {
         if ($this->getEntry()->getId() && ($this->getUser() && $this->getUser()->isStaff())) {
             // TODO: Lets implement these at a later stage
-//            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
-//                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId()), 'fa fa-eye'));
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
+                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId()), 'fa fa-eye'));
 //            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
 //                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId())->set('p', 'p'), 'fa fa-file-pdf-o')
 //                ->setAttr('target', '_blank'));

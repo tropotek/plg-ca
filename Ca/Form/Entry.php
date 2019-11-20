@@ -183,11 +183,7 @@ JS;
 
         \Tk\Alert::addSuccess('Record saved!');
 
-        $event->setRedirect($this->getBackUrl());  // <<<---- For some reasonn this is not working for student pages.
-        if ($this->getEntry()->getAssessment()->isSelfAssessment()) {
-            $event->setRedirect(\Uni\Uri::createSubjectUrl('/placementView.html')
-                ->set('placementId', $this->getEntry()->getPlacement()->getId()));
-        }
+        $event->setRedirect($this->getBackUrl());
         if ($form->getTriggeredEvent()->getName() == 'save') {
             $event->setRedirect(\Tk\Uri::create()->set('entryId', $this->getEntry()->getId()));
         }

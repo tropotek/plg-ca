@@ -53,6 +53,10 @@ class PlacementReportHandler implements Subscriber
     {
         if ($this->controller) {
 
+            //TODO: Do we need this link in the reportEdit page
+            return;
+            //TODO: -------------------------------------------
+
             if (!$this->getConfig()->getUser()->isStudent() && $this->controller instanceof \App\Controller\Placement\ReportEdit) {
                 $placement = $this->controller->getPlacement();
                 $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(

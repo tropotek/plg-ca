@@ -36,25 +36,14 @@ class PlacementViewHandler implements Subscriber
             );
             foreach ($list as $assessment) {
                 if (!$placement->getPlacementType() || !$placement->getPlacementType()->enableReport) continue;
-                $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
-                    'assessmentId' => $assessment->getId(),
-                    'placementId' => $placement->getId(),
-                    'status' => \Ca\Db\Entry::STATUS_APPROVED
-                ))->current();
-                if ($entry) {
-                    $url = \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $entry->getId());
-                    $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
-                    $btn->setAttr('title', 'View ' . $assessment->getName());
-                    $template->appendTemplate('placement-actions', $btn->show());
-                }
 
+                $btn = null;
                 if ($assessment->isSelfAssessment() && $assessment->isAvailable($placement)) {
                     /** @var \Ca\Db\Entry $entry */
                     $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
                         'assessmentId' => $assessment->getId(),
                         'placementId' => $placement->getId()
                     ))->current();
-                    $btn = null;
                     if ($entry) {
                         if ($entry->getStatus() == \Ca\Db\Entry::STATUS_PENDING || $entry->getStatus() == \Ca\Db\Entry::STATUS_AMEND) {
                             $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
@@ -75,8 +64,21 @@ class PlacementViewHandler implements Subscriber
                         $btn->addCss('btn-success');
                     }
 
-                    if ($btn)
-                        $template->appendTemplate('placement-actions', $btn->show());
+                } else {
+                    $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                        'assessmentId' => $assessment->getId(),
+                        'placementId' => $placement->getId(),
+                        'status' => \Ca\Db\Entry::STATUS_APPROVED
+                    ))->current();
+                    if ($entry) {
+                        $url = \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $entry->getId());
+                        $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
+                        $btn->setAttr('title', 'View ' . $assessment->getName());
+                    }
+                }
+                if ($btn) {
+                    $btn->addCss('btn-sm');
+                    $template->appendTemplate('placement-actions', $btn->show());
                 }
             }
         }

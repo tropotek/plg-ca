@@ -44,17 +44,20 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Assessment',
-            $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
+        if ($this->getUser()->hasPermission(\Uni\Db\Permission::TYPE_COORDINATOR)) {
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Assessment',
+                $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
 
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Domains',
-            \Uni\Uri::createHomeUrl('/ca/domainManager.html')->set('profileId', $this->getProfileId()), 'fa fa-black-tie'));
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Domains',
+                \Uni\Uri::createHomeUrl('/ca/domainManager.html')->set('profileId', $this->getProfileId()), 'fa fa-black-tie'));
 
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Competencies',
-            \Uni\Uri::createHomeUrl('/ca/competencyManager.html')->set('profileId', $this->getProfileId()), 'fa fa-leaf'));
-
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Scales',
-            \Uni\Uri::createHomeUrl('/ca/scaleManager.html')->set('profileId', $this->getProfileId()), 'fa fa-balance-scale'));
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Competencies',
+                \Uni\Uri::createHomeUrl('/ca/competencyManager.html')->set('profileId', $this->getProfileId()), 'fa fa-leaf'));
+        }
+        if ($this->getUser()->hasPermission(\Uni\Db\Permission::TYPE_ADMIN)) {
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Scales',
+                \Uni\Uri::createHomeUrl('/ca/scaleManager.html')->set('profileId', $this->getProfileId()), 'fa fa-balance-scale'));
+        }
     }
 
     /**

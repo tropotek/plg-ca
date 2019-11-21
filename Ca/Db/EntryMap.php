@@ -136,8 +136,12 @@ class EntryMap extends Mapper
         if (!empty($filter['average'])) {
             $filter->appendWhere('a.average = %s AND ', (float)$filter['average']);
         }
+//        if (!empty($filter['status'])) {
+//            $filter->appendWhere('a.status = %s AND ', $this->quote($filter['status']));
+//        }
         if (!empty($filter['status'])) {
-            $filter->appendWhere('a.status = %s AND ', $this->quote($filter['status']));
+            $w = $this->makeMultiQuery($filter['status'], 'a.status');
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
 

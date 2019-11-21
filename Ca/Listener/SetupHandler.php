@@ -80,6 +80,7 @@ class SetupHandler implements Subscriber
                 //$dispatcher->addSubscriber(new \Ca\Listener\StudentManagerButtonHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\SubjectDashboardHandler($subject));
                 //$dispatcher->addSubscriber(new \Ca\Listener\SidebarHandler($subject));
+                $dispatcher->addSubscriber(new \Ca\Listener\StudentAssessmentHandler());
             }
             $dispatcher->addSubscriber(new \Ca\Listener\ProfileEditHandler());
         }

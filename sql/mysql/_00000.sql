@@ -212,9 +212,10 @@ CREATE TABLE IF NOT EXISTS ca_value (
 
 TRUNCATE ca_assessment;
 INSERT INTO ca_assessment (uid, course_id, name, icon, placement_status, assessor_group, include_zero, description, modified, created) VALUES
-    (1, 2, 'GOALS', 'tk tk-goals', 'assessing,evaluating,completed,failed', 'company', 0, '', NOW(), NOW()),
+--    (1, 2, 'GOALS', 'tk tk-goals', 'assessing,evaluating,completed,failed', 'company', 0, '', NOW(), NOW()),
+    (1, 2, 'Supervisor Evaluation', 'fa fa-user-md', 'assessing,evaluating,completed,failed', 'company', 0, '', NOW(), NOW()),
     (2, 2, 'Self Assessment', 'fa fa-user-circle-o', 'assessing,evaluating,completed,failed', 'student', 0, '', NOW(), NOW()),
-    (3, 2, 'Supervisor Feedback', 'fa fa-user-md', 'approved,assessing,evaluating,completed,failed', 'company', 0, '', NOW(), NOW())
+    (3, 2, 'Supervisor Evaluation', 'fa fa-user-md', 'assessing,evaluating,completed,failed', 'company', 0, '', NOW(), NOW())
 ;
 
 TRUNCATE ca_assessment_placement_type;

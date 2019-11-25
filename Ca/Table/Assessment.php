@@ -52,8 +52,8 @@ class Assessment extends \Uni\TableIface
         });
         $this->appendCell(new Cell\ArrayObject('placementStatus'));
         $this->appendCell(new Cell\Text('assessorGroup'));
-        $this->appendCell(new Cell\Boolean('multiple'));
-        $this->appendCell(new Cell\Boolean('includeZero'));
+        //$this->appendCell(new Cell\Boolean('multiple'));
+        //$this->appendCell(new Cell\Boolean('includeZero'));
         //$this->appendCell(new Cell\Date('publishResult'));
 
         $this->appendCell(new Cell\Date('modified'));

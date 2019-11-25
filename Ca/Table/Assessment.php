@@ -40,6 +40,16 @@ class Assessment extends \Uni\TableIface
             return sprintf('<i class="%s"></i>', $ico);
         });
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
+        $this->appendCell(new Cell\Text('placementTypes'))->setOnPropertyValue(function ($cell, $obj, $value) {
+            /* @var $obj \Ca\Db\Assessment */
+            $list = $obj->getPlacementTypes();
+            $value = '';
+            foreach ($list as $placementType) {
+                $value .= $placementType->name . ', ';
+            }
+            $value = trim($value, ', ');
+            return $value;
+        });
         $this->appendCell(new Cell\ArrayObject('placementStatus'));
         $this->appendCell(new Cell\Text('assessorGroup'));
         $this->appendCell(new Cell\Boolean('multiple'));

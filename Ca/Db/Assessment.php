@@ -170,6 +170,18 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @param null|\Tk\Db\Tool $tool
+     * @return \Tk\Db\Map\ArrayObject|\App\Db\PlacementType[]
+     * @throws \Exception
+     */
+    public function getPlacementTypes($tool = null)
+    {
+        $arr = AssessmentMap::create()->findPlacementTypes($this->getId());
+        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('id' => $arr), $tool);
+        return $list;
+    }
+
+    /**
      * @param string $assessorGroup
      * @return Assessment
      */

@@ -37,7 +37,7 @@ class Item extends \Uni\FormIface
         //$this->appendField(new Field\Input('uid'));
         //$this->appendField(new Field\Select('assessmentId', array()))->prependOption('-- Select --', '');
         $item = $this->getItem();
-        $this->appendField(new Field\Input('name'))->setNotes('(Optional) This value is optional and the first competency will be used if this is blank.')
+        $this->appendField(new Field\Input('name'))->setLabel('Question')->setNotes('(Optional) This value is optional and the first competency will be used if this is blank.')
             ->setOnShow(function ($template, $field) use ($item) {
             /* @var $field Field\Input */
             if (!$item->getName()) {

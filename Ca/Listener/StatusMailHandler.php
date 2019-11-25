@@ -29,11 +29,12 @@ class StatusMailHandler implements Subscriber
                     $filter = array(
                         'active' => true,
                         'subjectId' => $message->get('placement::subjectId'),
-                        'role' => \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY,
                         'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY,
-                        //'requirePlacement' => true,
                         'placementTypeId' => $placement->placementTypeId
                     );
+
+                    $caLinkHtml = '';
+                    $caLinkText = '';
                     $list = \Ca\Db\AssessmentMap::create()->findFiltered($filter);
                     /** @var \Ca\Db\Assessment $assessment */
                     foreach ($list as $assessment) {
@@ -57,17 +58,22 @@ class StatusMailHandler implements Subscriber
 //                            case \Ca\Db\Assessment::ASSESSOR_GROUP_STAFF:
 //                                break;
                         }
-                        $caLinkHtml = sprintf('<a href="%s" title="%s">%s</a>', htmlentities($url),
+                        $asLinkHtml = sprintf('<a href="%s" title="%s">%s</a>', htmlentities($url),
                             htmlentities($assessment->getName()) . $avail, htmlentities($assessment->getName()) . $avail);
-                        $caLinkText = sprintf('%s: %s', htmlentities($assessment->getName()) . $avail, htmlentities($url));
-                        $message->set($key.'::linkHtml', $caLinkHtml);
-                        $message->set($key.'::linkText', $caLinkText);
+                        $asLinkText = sprintf('%s: %s', htmlentities($assessment->getName()) . $avail, htmlentities($url));
+                        $message->set($key.'::linkHtml', $asLinkHtml);
+                        $message->set($key.'::linkText', $asLinkText);
 //                        $message->set($key.'::id', $assessment->getId());
-//                        $message->set($key.'::name', $assessment->getName());
+                        $message->set($key.'::name', $assessment->getName());
 //                        $message->set($key.'::placementStatus', $assessment->getPlacementStatus());
 //                        $message->set($key.'::description', $assessment->getDescription());
-
+                        $caLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url),
+                            htmlentities($assessment->getName()) . $avail, htmlentities($assessment->getName()) . $avail);
+                        $caLinkText .= sprintf('%s: %s | ', htmlentities($assessment->getName()) . $avail, htmlentities($url));
                     }
+
+                    $message->set('ca::linkHtml', rtrim($caLinkHtml, ' | '));
+                    $message->set('ca::linkText', rtrim($caLinkText, ' | '));
                 }
             }
         }
@@ -87,6 +93,8 @@ class StatusMailHandler implements Subscriber
         $list['{entry::assessor}'] = 'Assessor Name';
         $list['{entry::status}'] = 'approved';
         $list['{entry::notes}'] = 'Notes Text';
+        $list['{ca::linkHtml}'] = 'All available assessment HTML links';
+        $list['{ca::linkText}'] = 'All available assessment Text links';
 
         $aList = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $profile->getId()));
         foreach ($aList as $assessment) {
@@ -96,7 +104,7 @@ class StatusMailHandler implements Subscriber
             $list[sprintf('{%s::linkHtml}', $key)] = '<a href="http://www.example.com/form.html" title="Assessment">Assessment</a>';
             $list[sprintf('{%s::linkText}', $key)] = 'Assessment: http://www.example.com/form.html';
 //            $list[sprintf('{%s::id}', $key)] = 1;
-//            $list[sprintf('{%s::name}', $key)] = 'Assessment Name';
+            $list[sprintf('{%s::name}', $key)] = '"'.$assessment->getName().'"';
 //            $list[sprintf('{%s::placementStatus}', $key)] = 'approved, failed, ...';
 //            $list[sprintf('{%s::description}', $key)] = 'HTML discription text';
         }

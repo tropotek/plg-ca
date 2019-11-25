@@ -39,9 +39,10 @@ class Assessment extends \Uni\FormIface
         $this->appendField(new Field\Select('assessorGroup', \Ca\Db\Assessment::getAssessorGroupList($this->getAssessment()->getAssessorGroup())))
             ->setTabGroup($tab)->setNotes('Who is the user group to submit the assessment evaluations.');
 
-        $list = array('tk tk-clear', 'tk tk-goals', 'fa fa-eye', 'fa fa-user-circle-o', 'fa fa-bell', 'fa fa-certificate', 'fa fa-tv', 'fa fa-drivers-license',
-            'fa fa-leaf', 'fa fa-trophy', 'fa fa-ambulance', 'fa fa-rebel', 'fa fa-empire', 'fa fa-font-awesome', 'fa fa-heartbeat',
-            'fa fa-medkit', 'fa fa-user-md', 'fa fa-user-secret', 'fa fa-heart');
+        $list = array('fa fa-user', 'fa fa-user-o', 'fa fa-user-md', 'fa fa-user-secret', 'fa fa-user-circle-o', 'fa fa-group',
+            'fa fa-certificate', 'fa fa-ambulance', 'fa fa-vcard', 'fa fa-vcard-o', 'fa fa-handshake-o',
+            'fa fa-building', 'fa fa-building-o', 'fa fa-industry', 'fa fa-institution', 'fa fa-hospital-o', 'fa fa-tree', 'fa fa-graduation-cap', 'fa fa-globe',
+            'fa fa-trophy', 'fa fa-font-awesome', 'fa fa-heartbeat', 'fa fa-medkit', 'fa fa-heart', 'fa fa-truck', 'fa fa-ambulance');
         $this->appendField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))
             ->setTabGroup($tab)->addCss('iconpicker')->setNotes('Select an identifying icon for this assessment');
 

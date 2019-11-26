@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS ca_entry (
     title VARCHAR(255) NOT NULL DEFAULT '',              -- A title for the assessment instance
     assessor_name VARCHAR(128) DEFAULT '' NOT NULL,      -- Name of person assessing the student if not supervisor.
     assessor_email VARCHAR(128) DEFAULT '' NOT NULL,     -- Email of assesor
-    absent INT(4) DEFAULT '0' NOT NULL,                  -- Number of days absent from placement.
+    absent INT(4) DEFAULT 0 NOT NULL,                    -- Number of days absent from placement.
     average DECIMAL(6, 2) NOT NULL DEFAULT 0.0,          -- Average calculated from all item values
     status VARCHAR(64) NOT NULL DEFAULT '',              -- pending, approved, not-approved
     notes TEXT,                                          -- Staff only notes
@@ -385,8 +385,8 @@ INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, requ
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 9);
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 4, 1, '', '', 0, 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 10);
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 1, 'What areas of professionalism and ethics do you feel you need to further develop?', '', 0, 1, NOW(), NOW());
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 1, 'How do you plan to further develop your competency in these areas of professionalism and ethics?', '', 0, 1, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 1, 'What areas of professionalism and ethics do you feel you need to further develop?', '', 1, 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 1, 'How do you plan to further develop your competency in these areas of professionalism and ethics?', '', 1, 0, NOW(), NOW());
 
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 4, 2, '', '', 0, 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 11);

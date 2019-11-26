@@ -260,13 +260,13 @@ INSERT INTO ca_competency (institution_id, name, description, modified, created)
     (1, 'Communicates effectively with clients, students, veterinary colleagues and staff through a range of media', '', NOW(), NOW()),
     (1, 'Actively participates in case management including prioritisation and completion of tasks', '', NOW(), NOW()),
     (1, 'Engages in self-directed learning, demonstrates an ability to reflect upon their performance and invites feedback ', '', NOW(), NOW()),
-    (1, 'Demonstrates understanding of legal, ethical and welfare issues encountered in the veterinary profession and animal production systems', '', NOW(), NOW()),
-    (1, 'Demonstrates understanding of responsible dispensing of medications that complies with professional, regulatory and legal requirements', '', NOW(), NOW()),
-    (1, 'Demonstrates understanding of the need for clinical records to comply with professional, regulatory and legal requirements', '', NOW(), NOW()),
+    (1, 'Demonstrates an understanding of legal, ethical and welfare issues encountered in the veterinary profession and animal production systems', '', NOW(), NOW()),
+    (1, 'Demonstrates an understanding of responsible dispensing of medications that complies with professional, regulatory and legal requirements', '', NOW(), NOW()),
+    (1, 'Demonstrates an understanding of the need for clinical records to comply with professional, regulatory and legal requirements', '', NOW(), NOW()),
     (1, 'Recognises actual or potential animal pain or distress', '', NOW(), NOW()),
     (1, 'Recognises actual or potential animal pain or distress and discusses relevant methods of management', '', NOW(), NOW()),
     (1, 'Recognises when euthanasia is appropriate and discusses relevant humane techniques for euthanasia', '', NOW(), NOW()),
-    (1, 'Practices safe, low stress, animal handling techniques', '', NOW(), NOW()),
+    (1, 'Demonstrates safe, low stress, animal handling techniques', '', NOW(), NOW()),
     (1, 'Recognises patients requiring emergency care', '', NOW(), NOW()),
     (1, 'Recognises patients requiring emergency care and discusses appropriate management', '', NOW(), NOW()),
     (1, 'Observes basic diagnostic procedures and practical skills', '', NOW(), NOW()),
@@ -278,16 +278,16 @@ INSERT INTO ca_competency (institution_id, name, description, modified, created)
     (1, 'Performs common surgical procedures on a stable patient', '', NOW(), NOW()),
     (1, 'Develops a pre and post-operative management plan for common surgical procedures', '', NOW(), NOW()),
     (1, 'Discusses a pre and post-operative management plan for common surgical procedures ', '', NOW(), NOW()),
-    (1, 'Demonstrates understanding of health, safety and biosecurity in a veterinary setting', '', NOW(), NOW()),
+    (1, 'Demonstrates an understanding of health, safety and biosecurity in a veterinary setting', '', NOW(), NOW()),
     (1, 'Demonstrates ability to calculate an appropriate drug dose and knowledge of withholding periods where appropriate', '', NOW(), NOW()),
     (1, 'Demonstrates an understanding of anatomy, physiology and pathophysiology', '', NOW(), NOW()),
     (1, 'Demonstrates ability to find information in the literature', '', NOW(), NOW()),
     (1, 'Applies principles of anatomy, physiology and pathophysiology to the diagnosis, prevention, and treatment of clinical cases', '', NOW(), NOW()),
     (1, 'Creates a prioritised differential diagnosis list assimilating information from the history, clinical examination and diagnostic tests', '', NOW(), NOW()),
     (1, 'Develops an adaptive management plan that respects client wishes and finances and available resources (including personal skills and equipment)', '', NOW(), NOW()),
-    (1, 'Demonstrates understanding of appropriate preventative health care programs', '', NOW(), NOW()),
-    (1, 'Demonstrates understanding of an appropriate response to possible zoonotic, exotic or notifiable diseases', '', NOW(), NOW()),
-    (1, 'Demonstrates understanding of appropriate plans to maintain and/or investigate breakdowns in food safety and public health', '', NOW(), NOW())
+    (1, 'Demonstrates an understanding of appropriate preventative health care programs', '', NOW(), NOW()),
+    (1, 'Demonstrates an understanding of an appropriate response to possible zoonotic, exotic or notifiable diseases', '', NOW(), NOW()),
+    (1, 'Demonstrates an understanding of appropriate plans to maintain and/or investigate breakdowns in food safety and public health', '', NOW(), NOW())
 ;
 
 TRUNCATE ca_domain;
@@ -295,7 +295,8 @@ INSERT INTO ca_domain (institution_id, name, description, label, modified, creat
     (1, 'Personal And Professional Development', '', 'PD', NOW(), NOW()),
     (1, 'Clinical And Technical Skills', '', 'CS', NOW(), NOW()),
     (1, 'Communication Skills', '', 'COM', NOW(), NOW()),
-    (1, 'Scientific Basis Of Clinical Practice', '', 'SB', NOW(), NOW()),
+--    (1, 'Scientific Basis Of Clinical Practice', '', 'SB', NOW(), NOW()),
+    (1, 'Knowledge And Problem Solving', '', 'KPS', NOW(), NOW()),
     (1, 'Safely Approach, Handle And Restrain Animals (Exotic)', '', 'EX', NOW(), NOW()),
     (1, 'Ethics And Animal Welfare', '', 'AW', NOW(), NOW()),
     (1, 'Biosecurity And Population Health', '', 'BIOS', NOW(), NOW())
@@ -362,8 +363,8 @@ INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID()
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (1, 1, 4, ' Please provide specific feedback to the student regarding areas of knowledge and problem solving that require further development.', '', 1, 0, NOW(), NOW());
 
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (1, 1, 0, 'What did the student do well on this placement?', '', 1, 0, NOW(), NOW());
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (1, 1, 0, 'What areas do you think the student should focus on improving to be day-one ready by the end of DVM4, provide any comment if you have any specific concerns?', '', 1, 0, NOW(), NOW());
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (1, 5, 0, 'Do you believe this student is on track to being day one practice ready by the end of DVM4?', '', 1, 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (1, 1, 0, 'What areas do you think the student should focus on improving to be day-one ready by the end of DVM4?', '', 1, 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (1, 5, 0, 'Holistic Assessment: Do you believe this student is on track to being day one practice ready by the end of DVM4?', '', 1, 0, NOW(), NOW());
 
 
 -- Self Assessment
@@ -404,6 +405,7 @@ INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, requ
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 21);
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 4, 2, '', '', 0, 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 23);
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 4, 'What procedures did you perform on this placement?', '', 1, 0, NOW(), NOW());
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 2, 'What areas of clinical and technical skills do you feel you need to further develop?', '', 1, 0, NOW(), NOW());
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 2, 'How do you plan to further develop your competency in these areas of clinical and technical skills?', '', 1, 0, NOW(), NOW());
 
@@ -424,9 +426,9 @@ INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID()
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 4, 'What areas of knowledge and problem solving do you feel you need to further develop?', '', 1, 0, NOW(), NOW());
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 4, 'How do you plan to further develop your competency in these areas of knowledge and problem solving?', '', 1, 0, NOW(), NOW());
 
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 0, 'Briefly describe a case you dealt with during a placement where you were actively involved in working up, managing and treating the case (300 words or less).', '', 1, 0, NOW(), NOW());
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 0, 'Do you have any reasons to believe you will not being day one practice ready by November?', '', 1, 0, NOW(), NOW());
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 5, 0, 'Do you feel you are on track to being day one practice ready in November?', '', 1, 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 0, 'What where the highlights of this placement?', '', 1, 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 1, 0, 'Briefly describe a case you dealt with during a placement where you were actively involved in working up, managing and treating the case (1000 words or less).', '', 1, 0, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (2, 5, 0, 'Holistic Assessment: Do you belive you are on track to being day one practice ready by the end of DVM 4?', '', 1, 0, NOW(), NOW());
 
 -- Supervisor Feedback (Weeks 1-4)
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (3, 4, 1, '', '', 0, 1, NOW(), NOW());
@@ -461,7 +463,7 @@ INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID()
 
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (3, 4, 4, '', '', 0, 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 25);
-INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (3, 4, 2, '', '', 0, 1, NOW(), NOW());
+INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (3, 4, 4, '', '', 0, 1, NOW(), NOW());
 INSERT INTO ca_item_competency (item_id, competency_id) VALUES (LAST_INSERT_ID(), 26);
 
 INSERT INTO ca_item (assessment_id, scale_id, domain_id, name, description, required, gradable, modified, created) VALUES (3, 1, 0, 'What did the student do well on this placement?', '', 1, 0, NOW(), NOW());

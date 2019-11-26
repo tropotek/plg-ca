@@ -70,6 +70,8 @@ class Manager extends AdminManagerIface
 
         $template->appendTemplate('panel', $this->getTable()->show());
 
+
+
         return $template;
     }
 

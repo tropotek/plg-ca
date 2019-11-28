@@ -142,7 +142,7 @@ class AssessmentMap extends Mapper
             $filter->appendWhere('b.placement_type_id = %s AND ', (int)$filter['placementTypeId']);
         }
 
-        if (!empty($filter['subjectId'])) {
+        if (!empty($filter['subjectId'])) {     // If selecting by subjectId then same as looking for active assessment for that subject
             $filter->appendFrom(',  %s c ',
                 $this->quoteTable('ca_assessment_subject'));
             $filter->appendWhere('a.id = c.assessment_id AND c.subject_id = %s AND ', (int)$filter['subjectId']);

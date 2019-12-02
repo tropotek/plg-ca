@@ -47,7 +47,7 @@ class Entry extends \Uni\FormIface
         $this->addCss('ca-entry-edit');
 
         $fieldset = 'Entry Details';
-        if ($this->getUser()->isStaff() && !$this->isPublic()) {
+        if ($this->getUser() && $this->getUser()->isStaff() && !$this->isPublic()) {
             $this->appendField(new Field\Input('title'))->setFieldset($fieldset);
         } else {
             $this->appendField(new Field\Html('title'))->setFieldset($fieldset);

@@ -53,12 +53,12 @@ class Edit extends AdminEditIface
     public function initActionPanel()
     {
         $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Items',
-            \Uni\Uri::createHomeUrl('/ca/itemManager.html')
+            \Uni\Uri::createHomeUrl('/itemManager.html')
                 ->set('profileId', $this->assessment->getCourseId())
                 ->set('assessmentId', $this->assessment->getId()),
             'fa fa-question'));
         $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Form Preview',
-        \Uni\Uri::createHomeUrl('/ca/assessmentPreview.html')
+        \Uni\Uri::createHomeUrl('/assessmentPreview.html')
             ->set('profileId', $this->assessment->getCourseId())
             ->set('assessmentId', $this->assessment->getId()),
         'fa fa-eye'));

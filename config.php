@@ -77,6 +77,6 @@ $routes->add('ca-student-entry-view', Route::create('/student/{subjectCode}/ca/e
 // Guest Pages
 // TODO: We also need to review this, would be good to make it secure somehow to stop students from seeing it.
 $routes->add('ca-public-entry-submit', Route::create('/inst/{institutionHash}/assessment.html', 'Ca\Controller\Entry\Edit::doPublicSubmission'));
-$routes->add('ca-public-entry-submit', Route::create('/inst/{institutionHash}/ca/skillEdit.html', 'Ca\Controller\Entry\Edit::doPublicSubmission'));
+$routes->add('ca-public-entry-submit2', Route::create('/inst/{institutionHash}/ca/skillEdit.html', 'Ca\Controller\Entry\Edit::doPublicSubmission'));
 
 

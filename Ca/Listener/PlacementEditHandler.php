@@ -72,7 +72,7 @@ class PlacementEditHandler implements Subscriber
             if ($placement->getId()) {
                 /** @var \Ca\Db\Assessment $assessment */
                 foreach ($this->list as $assessment) {
-                    $url = \Uni\Uri::createInstitutionUrl('/ca/skillEdit.html', $placement->getSubject()->getInstitution())
+                    $url = \Uni\Uri::createInstitutionUrl('/assessment.html', $placement->getSubject()->getInstitution())
                         ->set('h', $placement->getHash())
                         ->set('assessmentId', $assessment->getId());
 

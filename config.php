@@ -74,9 +74,9 @@ $routes->add('ca-student-entry-view', Route::create('/student/{subjectCode}/ca/e
 //$routes->add('ca-student-entry-results', Route::create('/student/{subjectCode}/ca/entryResults.html', 'Ca\Controller\Report\StudentResults::doDefault'));
 
 
-// Guest Pages
-// TODO: We also need to review this, would be good to make it secure somehow to stop students from seeing it.
+// Public Pages
 $routes->add('ca-public-entry-submit', Route::create('/inst/{institutionHash}/assessment.html', 'Ca\Controller\Entry\Edit::doPublicSubmission'));
+// TODO: Deprecated this URL
 $routes->add('ca-public-entry-submit2', Route::create('/inst/{institutionHash}/ca/skillEdit.html', 'Ca\Controller\Entry\Edit::doPublicSubmission'));
 
 

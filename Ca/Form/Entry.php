@@ -114,8 +114,9 @@ jQuery(function ($) {
   }
 });
 JS;
-        if (!$this->isPublic() && $this->getUser() && $this->getUser()->isStaff())
+        if (!$this->isPublic() && $this->getUser() && $this->getUser()->isStaff()) {
             $template->appendJs($js);
+        }
     }
 
     /**
@@ -186,6 +187,10 @@ JS;
         $event->setRedirect($this->getBackUrl());
         if ($form->getTriggeredEvent()->getName() == 'save') {
             $event->setRedirect(\Tk\Uri::create()->set('entryId', $this->getEntry()->getId()));
+        }
+        if ($form->getTriggeredEvent()->getName() == 'update' && $this->getUser()->isStaff()) {
+            $url = \App\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacementId());
+            $event->setRedirect($url);
         }
 
     }

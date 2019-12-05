@@ -256,7 +256,7 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $errors = $this->validateScaleId($errors);
         //$errors = $this->validateDomainId($errors);
 
-        if (!$this->name && $this->competencyList()->count() < 1) {
+        if (!$this->name && $this->getCompetencyList()->count() < 1) {
             $errors['name'] = 'Please provide a field value or select a competency.';
         }
 

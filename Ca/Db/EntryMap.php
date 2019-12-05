@@ -186,7 +186,8 @@ class EntryMap extends Mapper
     public function saveValue($entryId, $itemId, $value)
     {
         /** @var Item $item */
-        $item = $this->find($itemId);
+        //$item = $this->find($itemId);
+        $item = ItemMap::create()->find($itemId);
         if ($item && $item->getScale()->getType() == Scale::TYPE_VALUE) {
             $max = $item->getScale()->getMaxValue();
             if ($value < 0) $value = 0;

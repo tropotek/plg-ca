@@ -48,6 +48,8 @@ class Assessment extends \Uni\FormIface
 
         $this->appendField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
             ->setCheckboxLabel('When calculating the score should 0 value results be included.');
+        $this->appendField(new Field\Checkbox('enableCheckbox'))->setLabel('Subject Assessment Table')->setTabGroup($tab)
+            ->setCheckboxLabel('Display a checkbox on the Subject student assessment table when Entry marked approved');
 
         // TODO: Hide this when assessor group is 'student'
         $this->appendField(new Field\Select('placementStatus[]', \App\Db\Placement::getStatusList()))

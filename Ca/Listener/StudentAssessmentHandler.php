@@ -26,7 +26,8 @@ class StudentAssessmentHandler implements Subscriber
             $report = $placement->getReport();
             $list = \Ca\Db\AssessmentMap::create()->findFiltered(array(
                 'subjectId' => $subject->getId(),
-                'placementTypeId' => $placement->getPlacementTypeId()
+                'placementTypeId' => $placement->getPlacementTypeId(),
+                'enableCheckbox' => true,
             ), \Tk\Db\Tool::create('FIELD(`name`, \'Self Assessment\') DESC'));
             foreach($list as $assessment) {
                 /** @var \Ca\Db\Entry $entry */
@@ -36,14 +37,16 @@ class StudentAssessmentHandler implements Subscriber
                     'status' => array(\Ca\Db\Entry::STATUS_APPROVED, \Ca\Db\Entry::STATUS_PENDING, \Ca\Db\Entry::STATUS_AMEND)
                 ))->current();
                 $css = '';
+                $status = '';
                 if ($entry) {
+                    $status = $entry->getStatus();
                     switch ($entry->getStatus()) {
                         case \Ca\Db\Entry::STATUS_PENDING:
                         case \Ca\Db\Entry::STATUS_AMEND:
                             $css = 'text-default';
                     }
-                    $studentAssessment->addCheckColumn($assessment->getName(), $placement->getId(), ($entry != null), $css, $entry->getStatus());
-                };
+                }
+                $studentAssessment->addCheckColumn($assessment->getName(), $placement->getId(), ($entry != null), $css, $status);
             }
         }
     }

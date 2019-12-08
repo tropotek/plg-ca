@@ -50,11 +50,15 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public $assessorGroup = 'student';
 
-
     /**
      * @var bool
      */
     public $includeZero = false;
+
+    /**
+     * @var bool
+     */
+    public $enableCheckbox = false;
 
     /**
      * @var string
@@ -215,6 +219,24 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function isIncludeZero() : bool
     {
         return $this->includeZero;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnableCheckbox(): bool
+    {
+        return $this->enableCheckbox;
+    }
+
+    /**
+     * @param bool $enableCheckbox
+     * @return Assessment
+     */
+    public function setEnableCheckbox($enableCheckbox): Assessment
+    {
+        $this->enableCheckbox = $enableCheckbox;
+        return $this;
     }
 
     /**

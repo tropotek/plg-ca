@@ -9,7 +9,7 @@ namespace Ca\Db;
  */
 class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
-    use \App\Db\Traits\CourseTrait;
+    use \Uni\Db\Traits\CourseTrait;
 
     const ASSESSOR_GROUP_STUDENT = 'student';
     const ASSESSOR_GROUP_COMPANY = 'company';

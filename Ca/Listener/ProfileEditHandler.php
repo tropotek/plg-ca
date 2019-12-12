@@ -21,12 +21,12 @@ class ProfileEditHandler implements Subscriber
         /** @var \App\Controller\Profile\Edit $controller */
         $controller = $event->get('controller');
         if ($controller instanceof \App\Controller\Profile\Edit) {
-            if ($controller->getUser()->isStaff() && $controller->getProfile()) {
+            if ($controller->getUser()->isStaff() && $controller->getCourse()) {
                 /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
                 $actionPanel = $controller->getActionPanel();
                 $actionPanel->append(\Tk\Ui\Link::createBtn('Assessment Forms',
                     \App\Uri::createHomeUrl('/ca/assessmentManager.html')
-                        ->set('profileId', $controller->getProfile()->getId()), 'fa fa-gavel'));
+                        ->set('profileId', $controller->getCourse()->getId()), 'fa fa-gavel'));
             }
         }
     }

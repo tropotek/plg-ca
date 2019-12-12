@@ -35,7 +35,7 @@ class Manager extends AdminManagerIface
         $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/assessmentEdit.html'));
         $this->getTable()->init();
 
-        $filter = array('courseId' => $this->getProfileId());
+        $filter = array('courseId' => $this->getCourseId());
         $this->getTable()->setList($this->getTable()->findList($filter));
     }
 
@@ -49,14 +49,14 @@ class Manager extends AdminManagerIface
                 $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
 
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Domains',
-                \Uni\Uri::createHomeUrl('/ca/domainManager.html')->set('profileId', $this->getProfileId()), 'fa fa-black-tie'));
+                \Uni\Uri::createHomeUrl('/ca/domainManager.html')->set('profileId', $this->getCourseId()), 'fa fa-black-tie'));
 
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Competencies',
-                \Uni\Uri::createHomeUrl('/ca/competencyManager.html')->set('profileId', $this->getProfileId()), 'fa fa-leaf'));
+                \Uni\Uri::createHomeUrl('/ca/competencyManager.html')->set('profileId', $this->getCourseId()), 'fa fa-leaf'));
         }
         if ($this->getUser()->hasPermission(\Uni\Db\Permission::TYPE_ADMIN)) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Scales',
-                \Uni\Uri::createHomeUrl('/ca/scaleManager.html')->set('profileId', $this->getProfileId()), 'fa fa-balance-scale'));
+                \Uni\Uri::createHomeUrl('/ca/scaleManager.html')->set('profileId', $this->getCourseId()), 'fa fa-balance-scale'));
         }
     }
 

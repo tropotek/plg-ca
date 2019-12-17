@@ -74,7 +74,7 @@ class PlacementReportHandler implements Subscriber
                             'assessmentId' => $assessment->getId(),
                             'placementId' => $placement->getId())
                     )->current();
-                    $url = \App\Uri::createSubjectUrl('/ca/entryEdit.html')
+                    $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
                         ->set('placementId', $placement->getId())
                         ->set('assessmentId', $assessment->getId());
                     /** @var \Tk\Ui\Link $btn */
@@ -139,7 +139,7 @@ class PlacementReportHandler implements Subscriber
                     'placementId' => $placement->getId())
                 )->current();
                 if ($entry && $entry->getStatus() != \Ca\Db\Entry::STATUS_PENDING && $entry->getStatus() != \Ca\Db\Entry::STATUS_AMEND) continue;
-                $url = \App\Uri::createSubjectUrl('/ca/entryEdit.html')
+                $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
                     ->set('placementId', $placement->getId())
                     ->set('assessmentId', $assessment->getId());
                 \Tk\Alert::addInfo('Please submit the following ' . $assessment->getName() . ' Form');

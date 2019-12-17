@@ -110,8 +110,6 @@ class AssessmentMap extends Mapper
         }
         if (!empty($filter['courseId'])) {
             $filter->appendWhere('a.course_id = %s AND ', (int)$filter['courseId']);
-        } else if (!empty($filter['profileId'])) {
-            $filter->appendWhere('a.course_id = %s AND ', (int)$filter['profileId']);
         }
         if (!empty($filter['name'])) {
             $filter->appendWhere('a.name = %s AND ', $this->quote($filter['name']));

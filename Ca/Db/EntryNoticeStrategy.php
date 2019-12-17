@@ -22,7 +22,7 @@ class EntryNoticeStrategy extends \App\Db\NoticeStrategyInterface
         $obj = $notice->getModel();
         $notice->setParam(Notice::PARAM_ICON, 'fa fa-gavel');
         $notice->setParam(\App\Db\Notice::PARAM_STAFF_URL,
-            \App\Uri::createSubjectUrl('/ca/entryEdit.html', $notice->getSubject(), '/staff')
+            \Uni\Uri::createSubjectUrl('/ca/entryEdit.html', $notice->getSubject(), '/staff')
                 ->set('placementId', $obj->getPlacementId())->toRelativeString(false));
     }
 
@@ -37,20 +37,21 @@ class EntryNoticeStrategy extends \App\Db\NoticeStrategyInterface
         $student = $entry->getStudent();
         $assessmentName = $entry->getAssessment()->getName();
         $notice = \App\Db\Notice::create($entry);
-        $notice->type = $status->name;
+        $notice->setType($status->getName());
 
         if($status->name === \Ca\Db\Entry::STATUS_AMEND && $entry->getAssessment()->isSelfAssessment()) {
             $notice->setParam(\App\Db\Notice::PARAM_STUDENT_URL,
-                \App\Uri::createSubjectUrl('/ca/entryEdit.html', $entry->getSubject(), '/student')
-                    ->set('placementId', $entry->getPlacement()->getId())->set('assessmentId', $entry->getAssessmentId())->toRelativeString(false));
+                \Uni\Uri::createSubjectUrl('/ca/entryEdit.html', $entry->getSubject(), '/student')
+                    ->set('placementId', $entry->getPlacement()->getId())->set('assessmentId', $entry->getAssessmentId())
+                    ->toRelativeString(false));
 
-            $notice->subject = sprintf('Your %s record requires updating.', $assessmentName);
+            $notice->msgSubject = sprintf('Your %s record requires updating.', $assessmentName);
             $notice->body .= sprintf('%s: `%s`', htmlentities($assessmentName), htmlentities($entry->getTitle()));
-            if ($status->message)
-                $notice->body .= "<br/>\n" . $status->message;
+            if ($status->getMessage())
+                $notice->body .= "<br/>\n" . $status->getMessage();
         }
 
-        if ($notice->subject) {   // Send notification message
+        if ($notice->msgSubject) {   // Send notification message
             $notice->save();
             $notice->addRecipient($student);
         }

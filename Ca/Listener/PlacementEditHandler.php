@@ -80,8 +80,8 @@ class PlacementEditHandler implements Subscriber
                         ->setTabGroup('Details')->setReadonly()->setLabel($assessment->getName())
                         ->setFieldset('Public Assessment Url`s')->setValue($url->toString())
                         ->setNotes('Copy this URL to send to the ' .
-                            \App\Db\Phrase::findValue('company', $placement->getSubject()->getProfileId()) .
-                            ' to access this ' . \App\Db\Phrase::findValue('placement', $placement->getSubject()->getProfileId(), true) .
+                            \App\Db\Phrase::findValue('company', $placement->getSubject()->getCourseId()) .
+                            ' to access this ' . \App\Db\Phrase::findValue('placement', $placement->getSubject()->getCourseId(), true) .
                             ' ' . $assessment->getName() . ' assessment form.')
                     ->setCopyEnabled();
                 }
@@ -148,7 +148,8 @@ class PlacementEditHandler implements Subscriber
     {
 //        $plugin = Plugin::getInstance();
 //        $config = $plugin->getConfig();
-        //$config->getLog()->info($plugin->getName() . ': onControllerShow(\'profile\', '.$this->profileId.') ');
+
+
     }
 
     /**

@@ -1,6 +1,9 @@
 <?php
 namespace Ca\Db;
 
+use Bs\Db\Traits\OrderByTrait;
+use Bs\Db\Traits\TimestampTrait;
+
 /**
  * @author Mick Mifsud
  * @created 2019-11-05
@@ -12,6 +15,8 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     use Traits\AssessmentTrait;
     use Traits\ScaleTrait;
     use Traits\DomainTrait;
+    use TimestampTrait;
+    use OrderByTrait;
 
     /**
      * @var int
@@ -84,8 +89,7 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function __construct()
     {
-        $this->modified = new \DateTime();
-        $this->created = new \DateTime();
+        $this->_TimestampTrait();
 
     }
     
@@ -180,60 +184,6 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param int $orderBy
-     * @return Item
-     */
-    public function setOrderBy($orderBy) : Item
-    {
-        $this->orderBy = $orderBy;
-        return $this;
-    }
-
-    /**
-     * return int
-     */
-    public function getOrderBy() : int
-    {
-        return $this->orderBy;
-    }
-
-    /**
-     * @param \DateTime $modified
-     * @return Item
-     */
-    public function setModified($modified) : Item
-    {
-        $this->modified = $modified;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getModified() : \DateTime
-    {
-        return $this->modified;
-    }
-
-    /**
-     * @param \DateTime $created
-     * @return Item
-     */
-    public function setCreated($created) : Item
-    {
-        $this->created = $created;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getCreated() : \DateTime
-    {
-        return $this->created;
-    }
-
-    /**
      * @return Competency[]|\Tk\Db\Map\ArrayObject|null
      * @throws \Exception
      */
@@ -247,6 +197,7 @@ class Item extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     
     /**
      * @return array
+     * @throws \Exception
      */
     public function validate()
     {

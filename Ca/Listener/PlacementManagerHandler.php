@@ -65,7 +65,7 @@ class PlacementManagerHandler implements Subscriber
 
             /** @var \Ca\Db\Assessment $assessment */
             foreach ($assessmentList as $assessment) {
-                $url = \App\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $assessment->getId());
+                $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $assessment->getId());
 
                 $cell = $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
                     ->setOnShow(function ($cell, $obj, $btn) use ($assessment) {
@@ -76,7 +76,7 @@ class PlacementManagerHandler implements Subscriber
                         )->current();
                         if (!$placementAssessment) $placementAssessment = $assessment;
 
-                        $btn->setUrl(\App\Uri::createSubjectUrl('/ca/entryEdit.html', $obj->getSubject())
+                        $btn->setUrl(\Uni\Uri::createSubjectUrl('/ca/entryEdit.html', $obj->getSubject())
                             ->set('assessmentId', $placementAssessment->getId()));
                         $btn->getUrl()->set('placementId', $obj->getId());
                         if (!$placementAssessment->isAvailable($obj)) {

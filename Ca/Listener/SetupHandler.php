@@ -68,8 +68,8 @@ class SetupHandler implements Subscriber
 //            $dispatcher->addSubscriber(new \Ca\Listener\ExampleHandler(Plugin::ZONE_SUBJECT, $subject->getId()));
         }
 
-        $profile = \App\Config::getInstance()->getProfile();
-        if ($profile && $plugin->isZonePluginEnabled(Plugin::ZONE_SUBJECT_PROFILE, $profile->getId())) {
+        $course = \App\Config::getInstance()->getCourse();
+        if ($course && $plugin->isZonePluginEnabled(Plugin::ZONE_COURSE, $course->getId())) {
             $subject = \Uni\Config::getInstance()->getSubject();
             if ($subject) {
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler($subject));
@@ -82,7 +82,7 @@ class SetupHandler implements Subscriber
                 //$dispatcher->addSubscriber(new \Ca\Listener\SidebarHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\StudentAssessmentHandler());
             }
-            $dispatcher->addSubscriber(new \Ca\Listener\ProfileEditHandler());
+            $dispatcher->addSubscriber(new \Ca\Listener\CourseEditHandler());
         }
         $dispatcher->addSubscriber(new \Ca\Listener\SubjectEditHandler());
         $dispatcher->addSubscriber(new \Ca\Listener\StatusMailHandler());

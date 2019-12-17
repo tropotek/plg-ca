@@ -32,7 +32,7 @@ class Manager extends AdminManagerIface
     public function doDefault(Request $request)
     {
         $this->setTable(\Ca\Table\Competency::create());
-        $this->getTable(); //->setEditUrl(\Bs\Uri::createHomeUrl('/ca/competencyEdit.html')->set('profileId', $this->getProfileId()));
+        $this->getTable();
         $this->getTable()->init();
 
         $filter = array(

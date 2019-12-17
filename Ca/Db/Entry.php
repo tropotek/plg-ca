@@ -1,9 +1,13 @@
 <?php
 namespace Ca\Db;
 
+use App\Db\Traits\PlacementTrait;
+use Bs\Db\Traits\TimestampTrait;
+use Ca\Db\Traits\AssessmentTrait;
 use Tk\Form\Field\Select;
 use Tk\ObjectUtil;
 use Uni\Config;
+use Uni\Db\Traits\SubjectTrait;
 
 /**
  * @author Mick Mifsud
@@ -13,9 +17,10 @@ use Uni\Config;
  */
 class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
-    use Traits\AssessmentTrait;
-    use \Uni\Db\Traits\SubjectTrait;
-    use \App\Db\Traits\PlacementTrait;
+    use AssessmentTrait;
+    use SubjectTrait;
+    use PlacementTrait;
+    use TimestampTrait;
 
     const STATUS_PENDING        = 'pending';
     const STATUS_APPROVED       = 'approved';
@@ -113,8 +118,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function __construct()
     {
-        $this->modified = new \DateTime();
-        $this->created = new \DateTime();
+        $this->_TimestampTrait();
 
     }
 
@@ -309,42 +313,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param \DateTime $modified
-     * @return Entry
-     */
-    public function setModified($modified) : Entry
-    {
-        $this->modified = $modified;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getModified() : \DateTime
-    {
-        return $this->modified;
-    }
-
-    /**
-     * @param \DateTime $created
-     * @return Entry
-     */
-    public function setCreated($created) : Entry
-    {
-        $this->created = $created;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getCreated() : \DateTime
-    {
-        return $this->created;
-    }
-
-    /**
      * Get the entry average score.
      *
      * @return float
@@ -386,23 +354,23 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $errors = $this->validateAssessmentId($errors);
         $errors = $this->validateSubjectId($errors);
 
-        if (!$this->studentId) {
+        if (!$this->getStudentId()) {
             $errors['studentId'] = 'Invalid value: studentId';
         }
 
-        if (!$this->title) {
+        if (!$this->getTitle()) {
             $errors['title'] = 'Invalid value: title';
         }
 
-        if (!$this->assessorName) {
+        if (!$this->getAssessorName()) {
             $errors['assessorName'] = 'Invalid value: assessorName';
         }
 
-        if (!$this->assessorEmail) {
+        if (!$this->getAssessorEmail()) {
             $errors['assessorEmail'] = 'Invalid value: assessorEmail';
         }
 
-        if (!$this->status) {
+        if (!$this->getStatus()) {
             $errors['status'] = 'Invalid value: status';
         }
 

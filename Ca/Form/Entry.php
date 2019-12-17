@@ -97,7 +97,7 @@ class Entry extends \Uni\FormIface
 
         if ($this->isPublic()) {
             $this->appendField(new Event\Submit('submit', array($this, 'doSubmit')))->addCss('btn-success')->setIconRight('fa fa-arrow-right')->addCss('pull-right')->setLabel('Submit');
-            $this->appendField(new Event\Link('cancel', \App\Uri::create('/index.html')));
+            $this->appendField(new Event\Link('cancel', \Uni\Uri::create('/index.html')));
         } else {
             $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
             $this->appendField(new Event\Submit('save', array($this, 'doSubmit')));
@@ -176,10 +176,10 @@ JS;
         // Create status if changed and trigger notifications
         if (!$this->isPublic() && $form->getField('status') instanceof \App\Form\Field\CheckSelect) {
             \App\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
-                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
+                $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
         } else {
             \App\Db\Status::create($this->getEntry(), $this->getEntry()->getStatus(), true, '',
-                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
+                $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
         }
 
         \Tk\Alert::addSuccess('Record saved!');
@@ -189,7 +189,7 @@ JS;
             $event->setRedirect(\Tk\Uri::create()->set('entryId', $this->getEntry()->getId()));
         }
         if ($form->getTriggeredEvent()->getName() == 'update' && $this->getUser()->isStaff()) {
-            $url = \App\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacementId());
+            $url = \Uni\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacementId());
             $event->setRedirect($url);
         }
 

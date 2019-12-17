@@ -1,6 +1,8 @@
 <?php
 namespace Ca\Db;
 
+use Bs\Db\Traits\TimestampTrait;
+
 /**
  * @author Mick Mifsud
  * @created 2019-10-31
@@ -10,6 +12,7 @@ namespace Ca\Db;
 class Option extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
     use Traits\ScaleTrait;
+    use TimestampTrait;
 
     /**
      * @var int
@@ -52,8 +55,7 @@ class Option extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function __construct()
     {
-        $this->modified = new \DateTime();
-        $this->created = new \DateTime();
+        $this->_TimestampTrait();
 
     }
 
@@ -112,42 +114,6 @@ class Option extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param \DateTime $modified
-     * @return Option
-     */
-    public function setModified($modified) : Option
-    {
-        $this->modified = $modified;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getModified() : \DateTime
-    {
-        return $this->modified;
-    }
-
-    /**
-     * @param \DateTime $created
-     * @return Option
-     */
-    public function setCreated($created) : Option
-    {
-        $this->created = $created;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getCreated() : \DateTime
-    {
-        return $this->created;
-    }
-    
-    /**
      * @return array
      */
     public function validate()
@@ -155,7 +121,7 @@ class Option extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $errors = array();
         $errors = $this->validateScaleId($errors);
 
-        if (!$this->name) {
+        if (!$this->getName()) {
             $errors['name'] = 'Invalid value: name';
         }
         return $errors;

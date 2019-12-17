@@ -224,9 +224,9 @@ class Edit extends AdminEditIface
         if ($this->getEntry()->getId() && ($this->getUser() && $this->getUser()->isStaff())) {
             // TODO: Lets implement these at a later stage
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
-                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId()), 'fa fa-eye'));
+                \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId()), 'fa fa-eye'));
 //            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
-//                \App\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId())->set('p', 'p'), 'fa fa-file-pdf-o')
+//                \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId())->set('p', 'p'), 'fa fa-file-pdf-o')
 //                ->setAttr('target', '_blank'));
         }
     }

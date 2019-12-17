@@ -1,6 +1,9 @@
 <?php
 namespace Ca\Db;
 
+use Bs\Db\Traits\TimestampTrait;
+use Uni\Db\Traits\CourseTrait;
+
 /**
  * @author Mick Mifsud
  * @created 2019-10-31
@@ -9,7 +12,8 @@ namespace Ca\Db;
  */
 class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
-    use \Uni\Db\Traits\CourseTrait;
+    use CourseTrait;
+    use TimestampTrait;
 
     const ASSESSOR_GROUP_STUDENT = 'student';
     const ASSESSOR_GROUP_COMPANY = 'company';
@@ -86,8 +90,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function __construct()
     {
-        $this->modified = new \DateTime();
-        $this->created = new \DateTime();
+        $this->_TimestampTrait();
 
     }
     
@@ -294,42 +297,6 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function getNotes() : string
     {
         return $this->notes;
-    }
-
-    /**
-     * @param \DateTime $modified
-     * @return Assessment
-     */
-    public function setModified($modified) : Assessment
-    {
-        $this->modified = $modified;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getModified() : \DateTime
-    {
-        return $this->modified;
-    }
-
-    /**
-     * @param \DateTime $created
-     * @return Assessment
-     */
-    public function setCreated($created) : Assessment
-    {
-        $this->created = $created;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getCreated() : \DateTime
-    {
-        return $this->created;
     }
 
     /**

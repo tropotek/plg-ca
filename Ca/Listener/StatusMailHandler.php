@@ -17,7 +17,7 @@ class StatusMailHandler implements Subscriber
      */
     public function onSendAllStatusMessages(\App\Event\StatusEvent $event)
     {
-        if (!$event->getStatus()->notify || !$event->getStatus()->getProfile()->notifications) return;   // do not send messages
+        if (!$event->getStatus()->isNotify() || !$event->getStatus()->getCourse()->getProfile()->isNotifications()) return;   // do not send messages
 
         /** @var \Tk\Mail\CurlyMessage $message */
         foreach ($event->getMessageList() as $message) {
@@ -79,9 +79,13 @@ class StatusMailHandler implements Subscriber
         }
     }
 
+    /**
+     * @param \Tk\Event\Event $event
+     * @throws \Exception
+     */
     public function onTagList(\Tk\Event\Event $event)
     {
-        $profile = $event->get('profile');
+        $course = $event->get('course');
         $list = $event->get('list');
 
         $list['{assessment::id}'] = 1;
@@ -96,7 +100,7 @@ class StatusMailHandler implements Subscriber
         $list['{ca::linkHtml}'] = 'All available assessment HTML links';
         $list['{ca::linkText}'] = 'All available assessment Text links';
 
-        $aList = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $profile->getId()));
+        $aList = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $course->getId()));
         foreach ($aList as $assessment) {
             $key = $assessment->getNameKey();
             $tag = sprintf('{%s}{/%s}', $key, $key);

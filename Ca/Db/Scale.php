@@ -1,6 +1,9 @@
 <?php
 namespace Ca\Db;
 
+use Bs\Db\Traits\TimestampTrait;
+use Uni\Db\Traits\InstitutionTrait;
+
 /**
  * @author Mick Mifsud
  * @created 2019-10-31
@@ -9,7 +12,8 @@ namespace Ca\Db;
  */
 class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
-    use \Uni\Db\Traits\InstitutionTrait;
+    use InstitutionTrait;
+    use TimestampTrait;
 
     const TYPE_TEXT = 'text';
     const TYPE_VALUE = 'value';
@@ -77,8 +81,7 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function __construct()
     {
         $this->institutionId = $this->getConfig()->getInstitutionId();
-        $this->modified = new \DateTime();
-        $this->created = new \DateTime();
+        $this->_TimestampTrait();
 
     }
     
@@ -209,42 +212,6 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param \DateTime $modified
-     * @return Scale
-     */
-    public function setModified($modified) : Scale
-    {
-        $this->modified = $modified;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getModified() : \DateTime
-    {
-        return $this->modified;
-    }
-
-    /**
-     * @param \DateTime $created
-     * @return Scale
-     */
-    public function setCreated($created) : Scale
-    {
-        $this->created = $created;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getCreated() : \DateTime
-    {
-        return $this->created;
-    }
-    
-    /**
      * @return array
      */
     public function validate()
@@ -252,19 +219,19 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $errors = array();
         $errors = $this->validateInstitutionId($errors);
 
-        if (!$this->name) {
+        if (!$this->getName()) {
             $errors['name'] = 'Invalid value: name';
         }
 
-        if (!$this->type) {
+        if (!$this->getType()) {
             $errors['type'] = 'Invalid value: type';
         }
 
-        if ($this->type == self::TYPE_CHOICE && $this->getMultiple() && !$this->calcType) {
+        if ($this->getType() == self::TYPE_CHOICE && $this->getMultiple() && !$this->getCalcType()) {
             $errors['calcType'] = 'Invalid value: calcType';
         }
 
-        if ($this->type == self::TYPE_VALUE && !$this->maxValue) {
+        if ($this->getType() == self::TYPE_VALUE && !$this->getMaxValue()) {
             $errors['maxValue'] = 'Invalid value: maxValue';
         }
 

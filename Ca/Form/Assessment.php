@@ -56,7 +56,7 @@ class Assessment extends \Uni\FormIface
             ->addCss('tk-dual-select')->setTabGroup($tab)
             ->setNotes('Select the placement status values when assessments become available and can be submitted.');
 
-        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('profileId' => $this->getAssessment()->getCourseId()));
+        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('courseId' => $this->getAssessment()->getCourseId()));
         $ptiField = $this->appendField(new Field\Select('placementTypeId[]', $list))->setTabGroup($tab)
             ->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')
             ->setNotes('Enable this assessment for the selected placement types.');
@@ -114,10 +114,10 @@ class Assessment extends \Uni\FormIface
         // Do Custom data saving
         if ($originalKey != $this->getAssessment()->getNameKey()) {
             // Update all mail templates with the new tag
-            $stm = $this->getConfig()->getDb()->prepare('UPDATE mail_template SET template = replace(template, ?, ?) WHERE profile_id = ?;');
-            $stm->execute(array('{'.$originalKey.'}', '{'.$this->getAssessment()->getNameKey().'}', $this->getPlacementType()->getProfileId()));
-            $stm->execute(array('{/'.$originalKey.'}', '{/'.$this->getAssessment()->getNameKey().'}', $this->getPlacementType()->getProfileId()));
-            $stm->execute(array('{'.$originalKey.'::', '{'.$this->getAssessment()->getNameKey().'::', $this->getPlacementType()->getProfileId()));
+            $stm = $this->getConfig()->getDb()->prepare('UPDATE mail_template SET template = replace(template, ?, ?) WHERE course_id = ?;');
+            $stm->execute(array('{'.$originalKey.'}', '{'.$this->getAssessment()->getNameKey().'}', $this->getAssessment()->getCourseId()));
+            $stm->execute(array('{/'.$originalKey.'}', '{/'.$this->getAssessment()->getNameKey().'}', $this->getAssessment()->getCourseId()));
+            $stm->execute(array('{'.$originalKey.'::', '{'.$this->getAssessment()->getNameKey().'::', $this->getAssessment()->getCourseId()));
         }
 
         \Ca\Db\AssessmentMap::create()->removePlacementType($this->getAssessment()->getId());

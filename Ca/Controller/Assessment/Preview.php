@@ -76,11 +76,6 @@ class Preview extends AdminEditIface
      */
     public function initActionPanel()
     {
-//        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Items',
-//            \Uni\Uri::createHomeUrl('/ca/itemManager.html')
-//                ->set('profileId', $this->assessment->getCourseId())
-//                ->set('assessmentId', $this->assessment->getId()),
-//            'fa fa-question'));
     }
 
 

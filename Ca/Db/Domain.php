@@ -1,6 +1,9 @@
 <?php
 namespace Ca\Db;
 
+use Bs\Db\Traits\TimestampTrait;
+use Uni\Db\Traits\InstitutionTrait;
+
 /**
  * @author Mick Mifsud
  * @created 2019-10-31
@@ -9,7 +12,8 @@ namespace Ca\Db;
  */
 class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
-    use \Uni\Db\Traits\InstitutionTrait;
+    use InstitutionTrait;
+    use TimestampTrait;
 
     /**
      * @var int
@@ -62,8 +66,7 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function __construct()
     {
-        $this->modified = new \DateTime();
-        $this->created = new \DateTime();
+        $this->_TimestampTrait();
 
     }
     
@@ -156,42 +159,6 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     {
         return $this->orderBy;
     }
-
-    /**
-     * @param \DateTime $modified
-     * @return Domain
-     */
-    public function setModified($modified) : Domain
-    {
-        $this->modified = $modified;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getModified() : \DateTime
-    {
-        return $this->modified;
-    }
-
-    /**
-     * @param \DateTime $created
-     * @return Domain
-     */
-    public function setCreated($created) : Domain
-    {
-        $this->created = $created;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getCreated() : \DateTime
-    {
-        return $this->created;
-    }
     
     /**
      * @return array
@@ -201,11 +168,11 @@ class Domain extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $errors = array();
         $errors = $this->validateInstitutionId($errors);
 
-        if (!$this->name) {
+        if (!$this->getName()) {
             $errors['name'] = 'Invalid value: name';
         }
 
-        if (!$this->label) {
+        if (!$this->getLabel()) {
             $errors['label'] = 'Invalid value: label';
         }
 

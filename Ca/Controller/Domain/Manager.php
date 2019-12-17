@@ -32,7 +32,7 @@ class Manager extends AdminManagerIface
     public function doDefault(Request $request)
     {
         $this->setTable(\Ca\Table\Domain::create());
-        $this->getTable(); //->setEditUrl(\Bs\Uri::createHomeUrl('/ca/domainEdit.html')->set('profileId', $this->getProfileId()));
+        $this->getTable();
         $this->getTable()->init();
 
         $filter = array(
@@ -46,8 +46,6 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-//        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Domain',
-//            $this->getTable()->getEditUrl(), 'fa fa-black-tie fa-add-action'));
     }
 
     /**

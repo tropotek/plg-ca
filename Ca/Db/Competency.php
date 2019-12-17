@@ -1,6 +1,9 @@
 <?php
 namespace Ca\Db;
 
+use Bs\Db\Traits\TimestampTrait;
+use Uni\Db\Traits\InstitutionTrait;
+
 /**
  * @author Mick Mifsud
  * @created 2019-10-31
@@ -9,7 +12,8 @@ namespace Ca\Db;
  */
 class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
-    use \Uni\Db\Traits\InstitutionTrait;
+    use InstitutionTrait;
+    use TimestampTrait;
 
     /**
      * @var int
@@ -52,8 +56,7 @@ class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function __construct()
     {
-        $this->modified = new \DateTime();
-        $this->created = new \DateTime();
+        $this->_TimestampTrait();
 
     }
     
@@ -111,42 +114,7 @@ class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         return $this->description;
     }
 
-    /**
-     * @param \DateTime $modified
-     * @return Competency
-     */
-    public function setModified($modified) : Competency
-    {
-        $this->modified = $modified;
-        return $this;
-    }
 
-    /**
-     * return \DateTime
-     */
-    public function getModified() : \DateTime
-    {
-        return $this->modified;
-    }
-
-    /**
-     * @param \DateTime $created
-     * @return Competency
-     */
-    public function setCreated($created) : Competency
-    {
-        $this->created = $created;
-        return $this;
-    }
-
-    /**
-     * return \DateTime
-     */
-    public function getCreated() : \DateTime
-    {
-        return $this->created;
-    }
-    
     /**
      * @return array
      */
@@ -155,7 +123,7 @@ class Competency extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $errors = array();
         $errors = $this->validateInstitutionId($errors);
 
-        if (!$this->name) {
+        if (!$this->getName()) {
             $errors['name'] = 'Invalid value: name';
         }
 

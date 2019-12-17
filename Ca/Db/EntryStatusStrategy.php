@@ -54,13 +54,13 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         $model = $status->getModel();
 
         $placement = $model->getPlacement();
-        if (!$placement->getPlacementType()->notifications) {
-            \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->name . '] Notifications Disabled');
+        if (!$placement->getPlacementType()->isNotifications()) {
+            \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->getName() . '] Notifications Disabled');
             return null;
         }
-        $message = \Tk\Mail\CurlyMessage::create($mailTemplate->template);
-        $message->setSubject('[#'.$model->getId().'] ' . $model->getAssessment()->getName() . ' Entry ' . ucfirst($status->name) . ' for ' . $placement->getTitle(true) . ' ');
-        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getProfile()->email, $status->getSubjectName()));
+        $message = \Tk\Mail\CurlyMessage::create($mailTemplate->getTemplate());
+        $message->setSubject('[#'.$model->getId().'] ' . $model->getAssessment()->getName() . ' Entry ' . ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ');
+        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getCourse()->getEmail(), $status->getSubjectName()));
 
         // Setup the message vars
         \App\Util\StatusMessage::setStudent($message, $placement->getUser());
@@ -81,7 +81,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
 
         // Add assessment blocks
-        $list = \Ca\Db\AssessmentMap::create()->findFiltered(array('profileId' => $placement->getSubject()->getProfile()->getId()));
+        $list = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $placement->getSubject()->getCourseId()));
         /* @var \Ca\Db\Assessment $assessment */
         foreach($list as $assessment) {
             $key = $assessment->getNameKey();
@@ -92,30 +92,30 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
             }
         }
 
-        switch ($mailTemplate->recipient) {
+        switch ($mailTemplate->getRecipient()) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
                 if ($placement->getUser()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getUser()->email, $placement->getUser()->name));
+                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getUser()->getEmail(), $placement->getUser()->getName()));
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_COMPANY:
                 if ($placement->getCompany()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->email, $placement->getCompany()->name));
+                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->getEmail(), $placement->getCompany()->getName()));
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_SUPERVISOR:
-                if ($placement->getSupervisor() && $placement->getSupervisor()->email)
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getSupervisor()->email, $placement->getSupervisor()->name));
+                if ($placement->getSupervisor() && $placement->getSupervisor()->getEmail())
+                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getSupervisor()->getEmail(), $placement->getSupervisor()->getName()));
                 break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
-                $staffList = $status->getSubject()->getStaffList();
+                $staffList = $status->getSubject()->getCourse()->getUsers();
                 if (count($staffList)) {
                     /** @var \App\Db\User $s */
                     foreach ($staffList as $s) {
-                        $message->addBcc(\Tk\Mail\Message::joinEmail($s->email, $s->name));
+                        $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));
                     }
-                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getSubject()->getProfile()->email, $status->getSubjectName()));
-                    $message->set('recipient::email', $status->getSubject()->getProfile()->email);
+                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getSubject()->getCourse()->getEmail(), $status->getSubjectName()));
+                    $message->set('recipient::email', $status->getSubject()->getCourse()->getEmail());
                     $message->set('recipient::name', $status->getSubjectName());
                 }
                 break;
@@ -155,7 +155,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
         $userName = $model->getPlacement()->getUser()->getName();
         if ($model->getPlacement()) {
-            $from = 'from <em>' . htmlentities($model->getPlacement()->getCompany()->name) . '</em>';
+            $from = 'from <em>' . htmlentities($model->getPlacement()->getCompany()->getName()) . '</em>';
         }
 
         $html = sprintf('<div class="status-placement"><div><em>%s</em> %s submitted a %s Assessment Entry for <em>%s</em></div>
@@ -182,6 +182,6 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     {
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
-        return $model->getAssessment()->getName() . ' ' . \Tk\ObjectUtil::basename($this->getStatus()->fkey);
+        return $model->getAssessment()->getName() . ' ' . \Tk\ObjectUtil::basename($this->getStatus()->getFkey());
     }
 }

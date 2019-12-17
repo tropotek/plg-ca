@@ -32,8 +32,7 @@ class Manager extends AdminManagerIface
     public function doDefault(Request $request)
     {
         $this->setTable(\Ca\Table\Scale::create());
-        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/optionManager.html')->set('profileId', $this->getCourseId()));
-            //->setEditUrl(\Bs\Uri::createHomeUrl('/ca/scaleEdit.html')->set('profileId', $this->getProfileId()));
+        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/optionManager.html')->set('courseId', $this->getCourseId()));
         $this->getTable()->init();
 
         $filter = array();

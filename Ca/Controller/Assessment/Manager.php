@@ -46,7 +46,7 @@ class Manager extends AdminManagerIface
     {
         if ($this->getUser()->hasPermission(\Uni\Db\Permission::TYPE_COORDINATOR)) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Assessment',
-                $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
+                $this->getTable()->getEditUrl()->set('courseId', $this->getCourseId()), 'fa fa-book fa-add-action'));
 
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Domains',
                 \Uni\Uri::createHomeUrl('/ca/domainManager.html')->set('courseId', $this->getCourseId()), 'fa fa-black-tie'));

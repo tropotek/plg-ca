@@ -2,6 +2,7 @@
 namespace Ca\Listener;
 
 use Symfony\Component\HttpKernel\KernelEvents;
+use Tk\ConfigTrait;
 use Tk\Event\Subscriber;
 
 /**
@@ -12,7 +13,7 @@ use Tk\Event\Subscriber;
  */
 class PlacementReportHandler implements Subscriber
 {
-
+    use ConfigTrait;
 
     /**
      * @var \App\Db\Subject|\Uni\Db\SubjectIface
@@ -178,14 +179,6 @@ class PlacementReportHandler implements Subscriber
             \Tk\PageEvents::CONTROLLER_INIT => array('onPageInit', 0),
             \Tk\Form\FormEvents::FORM_SUBMIT => array(array('onSubmit', 0))
         );
-    }
-
-    /**
-     * @return \App\Config|\Tk\Config
-     */
-    protected function getConfig()
-    {
-        return \App\Config::getInstance();
     }
 
 }

@@ -38,6 +38,7 @@ class Edit extends AdminEditIface
     public function doDefault(Request $request)
     {
         $this->assessment = new \Ca\Db\Assessment();
+        $this->assessment->setCourseId((int)$request->get('courseId', 0));
         if ($request->get('assessmentId')) {
             $this->assessment = \Ca\Db\AssessmentMap::create()->find($request->get('assessmentId'));
         }
@@ -52,6 +53,8 @@ class Edit extends AdminEditIface
      */
     public function initActionPanel()
     {
+        if (!$this->assessment->getId()) return;
+
         $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Items',
             \Uni\Uri::createHomeUrl('/ca/itemManager.html')
                 ->set('courseId', $this->assessment->getCourseId())

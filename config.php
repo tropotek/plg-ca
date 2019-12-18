@@ -1,4 +1,5 @@
 <?php
+
 use Tk\Routing\Route;
 
 $config = \App\Config::getInstance();

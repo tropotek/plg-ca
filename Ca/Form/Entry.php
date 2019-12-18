@@ -1,11 +1,9 @@
 <?php
 namespace Ca\Form;
 
-use Ca\Db\CompetencyMap;
-use Ca\Db\Option;
-use Tk\Form\Field;
-use Tk\Form\Event;
 use Tk\Form;
+use Tk\Form\Event;
+use Tk\Form\Field;
 
 /**
  * Example:

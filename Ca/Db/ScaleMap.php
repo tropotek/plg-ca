@@ -1,12 +1,12 @@
 <?php
 namespace Ca\Db;
 
-use Tk\Db\Tool;
-use Tk\Db\Map\ArrayObject;
+use Bs\Db\Mapper;
 use Tk\DataMap\Db;
 use Tk\DataMap\Form;
-use Bs\Db\Mapper;
 use Tk\Db\Filter;
+use Tk\Db\Map\ArrayObject;
+use Tk\Db\Tool;
 
 /**
  * @author Mick Mifsud

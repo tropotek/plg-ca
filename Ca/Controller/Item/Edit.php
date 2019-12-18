@@ -6,8 +6,6 @@ use Dom\Template;
 use Tk\Alert;
 use Tk\Request;
 use Tk\Ui\Dialog\AjaxSelect;
-use Uni\Config;
-use Uni\Db\Subject;
 use Uni\Uri;
 
 /**

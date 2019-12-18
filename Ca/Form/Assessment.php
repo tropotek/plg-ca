@@ -1,9 +1,9 @@
 <?php
 namespace Ca\Form;
 
-use Tk\Form\Field;
-use Tk\Form\Event;
 use Tk\Form;
+use Tk\Form\Event;
+use Tk\Form\Field;
 
 /**
  * Example:

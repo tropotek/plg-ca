@@ -2,9 +2,9 @@
 namespace Ca\Form\Field;
 
 use Ca\Db\CompetencyMap;
+use Ca\Db\Item;
 use Ca\Db\Option;
 use Ca\Db\Scale;
-use Ca\Db\Item;
 use Tk\Form\Field;
 
 /**

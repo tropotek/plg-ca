@@ -1,8 +1,8 @@
 <?php
 namespace Ca\Db;
 
-use \App\Db\Notice;
-use \App\Db\Status;
+use App\Db\Notice;
+use App\Db\Status;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>

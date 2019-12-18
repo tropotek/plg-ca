@@ -1,9 +1,9 @@
 <?php
 namespace Ca\Listener;
 
-use Tk\Event\Subscriber;
 use Ca\Plugin;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Tk\Event\Subscriber;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>

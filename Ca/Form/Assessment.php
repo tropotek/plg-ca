@@ -57,7 +57,7 @@ class Assessment extends \Uni\FormIface
             ->setNotes('Select the placement status values when assessments become available and can be submitted.');
 
         $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('courseId' => $this->getAssessment()->getCourseId()));
-        vd($this->getDb()->getLastQuery());
+
         $ptiField = $this->appendField(new Field\Select('placementTypeId[]', $list))->setTabGroup($tab)
             ->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')
             ->setNotes('Enable this assessment for the selected placement types.');

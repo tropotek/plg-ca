@@ -105,44 +105,46 @@ class Edit extends AdminEditIface
 
         if ($request->get('entryId')) {
             $this->entry = \Ca\Db\EntryMap::create()->find($request->get('entryId'));
-        }
+        } else {
+            if (preg_match('/[0-9a-f]{32}/i', $request->get('h'))) {
+                // EG: h=13644394c4d1473f1547513fc21d7934
+                // http://ems.vet.unimelb.edu.au/assessment.html?h=13644394c4d1473f1547513fc21d7934&assessmentId=2
+                $placement = \App\Db\PlacementMap::create()->findByHash($request->get('h'));
+                if (!$placement) {
+                    \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
+                    $this->getConfig()->getUserHomeUrl()->redirect();
+                }
+                $e = \Ca\Db\EntryMap::create()->findFiltered(array(
+                        'assessmentId' => $request->get('assessmentId'),
+                        'placementId' => $placement->getId()
+                    )
+                )->current();
 
-        if (preg_match('/[0-9a-f]{32}/i', $request->get('h'))) {
-            // EG: h=13644394c4d1473f1547513fc21d7934
-            // http://ems.vet.unimelb.edu.au/assessment.html?h=13644394c4d1473f1547513fc21d7934&assessmentId=2
-            $placement = \App\Db\PlacementMap::create()->findByHash($request->get('h'));
-            if (!$placement) {
-                \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
-                $this->getConfig()->getUserHomeUrl()->redirect();
-            }
-            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
-                    'assessmentId' => $request->get('assessmentId'),
-                    'placementId' => $placement->getId()
-                )
-            )->current();
-
-            if ($e) {
-                $this->entry = $e;
-            } else {
-                $this->getEntry()->setPlacementId($placement->getId());
-                $this->getEntry()->setStudentId($this->getEntry()->getPlacement()->userId);
-                $this->getEntry()->setSubjectId($this->getEntry()->getPlacement()->subjectId);
-                if (!$this->getEntry()->getAssessment()) {
-                    throw new \Tk\Exception('Invalid Assessment. Please contact the subject coordinator.');
+                if ($e) {
+                    $this->entry = $e;
+                } else {
+                    $this->getEntry()->setPlacementId($placement->getId());
+                    $this->getEntry()->setStudentId($this->getEntry()->getPlacement()->userId);
+                    $this->getEntry()->setSubjectId($this->getEntry()->getPlacement()->subjectId);
+                    if (!$this->getEntry()->getAssessment()) {
+                        throw new \Tk\Exception('Invalid Assessment. Please contact the subject coordinator.');
+                    }
                 }
             }
-        }
-        if (!$this->getEntry()->getSubjectId() && $this->getSubject()) {
-            $this->getEntry()->setSubjectId($this->getSubject()->getId());
-        }
 
-        if ($request->get('assessmentId') && $request->get('placementId')) {
-            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
+            if ($request->get('assessmentId') && $request->get('placementId')) {
+                $filter = array(
                     'assessmentId' => $request->get('assessmentId'),
-                    'placementId' => $request->get('placementId'))
-            )->current();
-            if ($e) $this->entry = $e;
+                    'placementId' => $request->get('placementId')
+                );
+                $e = \Ca\Db\EntryMap::create()->findFiltered($filter)->current();
+                if ($e) $this->entry = $e;
+            }
         }
+            // TODO: Do not think this is needed, at any rate use the placement subjectId if needed!!!
+//            if (!$this->getEntry()->getSubjectId() && $this->getSubject()) {
+//                $this->getEntry()->setSubjectId($this->getSubject()->getId());
+//            }
 
         // Staff view student self assessment
 //        if ($request->get('assessmentId') && $request->get('studentId') && $this->getUser()->isStaff()) {

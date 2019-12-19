@@ -108,28 +108,43 @@ class SubjectDashboardHandler implements Subscriber
                 'subjectId' => $subject->getId()
             ));
             foreach ($list as $assessment) {
-                $actionCell->addButton(\Tk\Table\Cell\ActionButton::create($assessment->name,
-                    \Uni\Uri::createSubjectUrl('/ca/entryView.html'), $assessment->icon))
+                $actionCell->addButton(\Tk\Table\Cell\ActionButton::create($assessment->getName(),
+                    \Uni\Uri::createSubjectUrl('/ca/entryView.html'), $assessment->getIcon()))
                     ->setShowLabel()
                     ->setOnShow(function ($cell, $obj, $btn) use ($assessment) {
                         /** @var \Tk\Table\Cell\Actions $cell */
                         /** @var \App\Db\Placement $obj */
                         /** @var \Tk\Table\Cell\ActionButton $btn */
-                        if (!$obj->getPlacementType() || !$obj->getPlacementType()->enableReport || $obj->status != \App\Db\Placement::STATUS_COMPLETED || !$assessment->isAvailable($obj)) {
+                        if (!$obj->getPlacementType() || !$obj->getPlacementType()->isEnableReport() || !$assessment->isAvailable($obj)) {
                             $btn->setVisible(false);
                             return;
                         }
-
-                        $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                        $filter = array(
                             'assessmentId' => $assessment->getId(),
-                            'placementId' => $obj->getId(),
-                            'status' => \Ca\Db\Entry::STATUS_APPROVED
-                        ))->current();
-                        if (!$entry) {
-                            $btn->setVisible(false);
-                            return;
+                            'placementId' => $obj->getId()
+                        );
+                        $entry = \Ca\Db\EntryMap::create()->findFiltered($filter)->current();
+                        if ($entry) {
+                            $btn->setAttr('title', 'View ' . $assessment->getName());
+                            if ($assessment->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT) {
+                                if ($entry->hasStatus(array(\Ca\Db\Entry::STATUS_PENDING, \Ca\Db\Entry::STATUS_AMEND))) {
+                                    $btn->addCss('btn-info');
+                                    $btn->setAttr('title', 'Edit ' . $assessment->getName());
+                                }
+                            } else {
+                                if (!$entry->hasStatus(array(\Ca\Db\Entry::STATUS_APPROVED))) {
+                                    $btn->setVisible(false);
+                                }
+                            }
+                            $btn->getUrl()->set('entryId', $entry->getId());
+                        } else {
+                            if ($assessment->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT) {
+                                    $btn->setAttr('title', 'Create ' . $assessment->getName());
+                                $btn->addCss('btn-success');
+                            } else {
+                                $btn->setVisible(false);
+                            }
                         }
-                        $btn->getUrl()->set('entryId', $entry->getId());
                     });
             }
 

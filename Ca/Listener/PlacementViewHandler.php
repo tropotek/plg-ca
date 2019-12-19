@@ -51,7 +51,6 @@ class PlacementViewHandler implements Subscriber
                                 ->set('assessmentId', $assessment->getId())->set('placementId', $placement->getId());
                             $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
                             $btn->setAttr('title', 'Edit ' . $assessment->getName());
-                            $btn->addCss('btn-success');
                         } else {
                             $url = \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $entry->getId());
                             $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());

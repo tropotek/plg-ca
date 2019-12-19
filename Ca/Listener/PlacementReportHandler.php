@@ -15,6 +15,8 @@ class PlacementReportHandler implements Subscriber
 {
     use ConfigTrait;
 
+    const SID = 'submitted';
+
     /**
      * @var \App\Db\Subject|\Uni\Db\SubjectIface
      */
@@ -25,6 +27,12 @@ class PlacementReportHandler implements Subscriber
      */
     protected $controller = null;
 
+    /**
+     * a list of recently submitted assessments
+     *
+     * @var array|mixed
+     */
+    private $submitted = array();
 
     /**
      * PlacementManagerHandler constructor.
@@ -33,6 +41,9 @@ class PlacementReportHandler implements Subscriber
     public function __construct($subject)
     {
         $this->subject = $subject;
+        if (!$this->getSession()->get(self::SID))
+            $this->getSession()->set(self::SID, $this->submitted);
+        $this->submitted = $this->getSession()->get(self::SID);
     }
 
     /**
@@ -44,6 +55,9 @@ class PlacementReportHandler implements Subscriber
         $controller = \Tk\Event\Event::findControllerObject($event);
         if ($controller instanceof \App\Controller\Placement\ReportEdit || $controller instanceof \Ca\Controller\Entry\Edit) {
             $this->controller = $controller;
+            if ($controller instanceof \App\Controller\Placement\ReportEdit) {
+                $this->getSession()->remove(self::SID);
+            }
         }
     }
 
@@ -54,39 +68,7 @@ class PlacementReportHandler implements Subscriber
     {
         if ($this->controller) {
 
-            //TODO: Do we need this link in the reportEdit page
-            return;
-            //TODO: -------------------------------------------
 
-            if (!$this->getConfig()->getUser()->isStudent() && $this->controller instanceof \App\Controller\Placement\ReportEdit) {
-                $placement = $this->controller->getPlacement();
-                $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
-                    'subjectId' => $this->subject->getId(),
-                    'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT
-                ));
-
-                /** @var \Ca\Db\Assessment $assessment */
-                foreach ($assessmentList as $assessment) {
-                    if (!$assessment->isAvailable($placement)) {
-                        continue;
-                    }
-                    /** @var \Ca\Db\Entry $entry */
-                    $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
-                            'assessmentId' => $assessment->getId(),
-                            'placementId' => $placement->getId())
-                    )->current();
-                    $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
-                        ->set('placementId', $placement->getId())
-                        ->set('assessmentId', $assessment->getId());
-                    /** @var \Tk\Ui\Link $btn */
-                    $btn = $this->controller->getActionPanel()->append(\Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon()));
-                    $btn->setAttr('title', 'Edit ' . $assessment->getName());
-                    if (!$entry) {
-                        $btn->removeCss('btn-default')->addCss('btn-success')->setAttr('title', 'Create ' . $assessment->getName());
-                    }
-
-                }
-            }
 
         }
     }
@@ -97,12 +79,24 @@ class PlacementReportHandler implements Subscriber
      * @param \Tk\Event\TableEvent $event
      * @throws \Exception
      */
-    public function onSubmit(\Tk\Event\FormEvent $event)
+    public function onFormLoad(\Tk\Event\FormEvent $event)
     {
         if (!$this->controller) return;
-        $submitEvent = $event->getForm()->getTriggeredEvent();
-        $submitEvent->appendCallback(array($this, 'onSave'));
 
+        $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
+            'courseId' => $this->subject->getCourseId(),
+            'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT
+        ));
+
+        $submitEvent = $event->getForm()->getField('update');
+        if ($event->getForm()->getField('save'))
+            $event->getForm()->removeField('save');
+        if ($assessmentList->count()) {
+            $submitEvent->setLabel('Next');
+            $submitEvent->addCss('pull-right');
+            $submitEvent->setIconRight('fa fa-arrow-right')->setIcon('');
+            $submitEvent->appendCallback(array($this, 'onSave'));
+        }
     }
 
     /**
@@ -121,17 +115,13 @@ class PlacementReportHandler implements Subscriber
 
         $placement = $this->controller->getPlacement();
         $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
-            'subjectId' => $this->subject->getId(),
+            'courseId' => $this->subject->getCourseId(),
             'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT
         ));
 
-        if ($this->controller->getBackUrl() &&
-            ($this->controller->getBackUrl()->basename() != 'entryEdit.html' ||
-            $this->controller->getBackUrl()->basename() != 'reportEdit.html')) return;
-
         /** @var \Ca\Db\Assessment $assessment */
         foreach ($assessmentList as $assessment) {
-                if (!$assessment->isAvailable($placement)) {
+                if (!$assessment->isAvailable($placement) || $this->isSubmitted($assessment)) {
                     continue;
                 }
                 /** @var \Ca\Db\Entry $entry */
@@ -145,11 +135,21 @@ class PlacementReportHandler implements Subscriber
                     ->set('assessmentId', $assessment->getId());
                 \Tk\Alert::addInfo('Please submit the following ' . $assessment->getName() . ' Form');
                 $event->setRedirect($url);
+
+                $this->submitted[$assessment->getId()] = $assessment->getId();
+                $this->getSession()->set(self::SID, $this->submitted);
                 return;
         }
+        $event->setRedirect(\Uni\Uri::createSubjectUrl('/index.html'));
+        $this->getSession()->remove(self::SID);
+    }
 
-//        $url = \Uni\Uri::createSubjectUrl('/index.html');
-//        $event->setRedirect($url);
+    /**
+     * @param \Ca\Db\Assessment $assessment
+     */
+    public function isSubmitted($assessment)
+    {
+        return in_array($assessment->getId(), $this->submitted);
     }
 
     /**
@@ -177,7 +177,7 @@ class PlacementReportHandler implements Subscriber
         return array(
             KernelEvents::CONTROLLER => array('onControllerInit', 0),
             \Tk\PageEvents::CONTROLLER_INIT => array('onPageInit', 0),
-            \Tk\Form\FormEvents::FORM_SUBMIT => array(array('onSubmit', 0))
+            \Tk\Form\FormEvents::FORM_LOAD => array(array('onFormLoad', 0))
         );
     }
 

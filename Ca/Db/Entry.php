@@ -7,6 +7,7 @@ use Ca\Db\Traits\AssessmentTrait;
 use Tk\Form\Field\Select;
 use Tk\ObjectUtil;
 use Uni\Config;
+use Uni\Db\Traits\StatusTrait;
 use Uni\Db\Traits\SubjectTrait;
 
 /**
@@ -21,6 +22,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     use SubjectTrait;
     use PlacementTrait;
     use TimestampTrait;
+    use StatusTrait;
 
     const STATUS_PENDING        = 'pending';
     const STATUS_APPROVED       = 'approved';
@@ -85,7 +87,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var string
      */
-    public $status = 'pending';
+    public $status = self::STATUS_PENDING;
 
     /**
      * @var string
@@ -274,24 +276,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         if ($this->average == 0)
             $this->calculateAverage();
         return $this->average;
-    }
-
-    /**
-     * @param string $status
-     * @return Entry
-     */
-    public function setStatus($status) : Entry
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    /**
-     * return string
-     */
-    public function getStatus() : string
-    {
-        return $this->status;
     }
 
     /**

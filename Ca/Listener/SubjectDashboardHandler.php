@@ -119,17 +119,15 @@ class SubjectDashboardHandler implements Subscriber
                             $btn->setVisible(false);
                             return;
                         }
-                        $filter = array(
-                            'assessmentId' => $assessment->getId(),
-                            'placementId' => $obj->getId()
-                        );
-                        $entry = \Ca\Db\EntryMap::create()->findFiltered($filter)->current();
+
+                        $entry = $assessment->findEntry($obj);
                         if ($entry) {
                             $btn->setAttr('title', 'View ' . $assessment->getName());
                             if ($assessment->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT) {
                                 if ($entry->hasStatus(array(\Ca\Db\Entry::STATUS_PENDING, \Ca\Db\Entry::STATUS_AMEND))) {
                                     $btn->addCss('btn-info');
                                     $btn->setAttr('title', 'Edit ' . $assessment->getName());
+                                    $btn->setUrl(\Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('placementId', $obj->getId())->set('assessmentId', $assessment->getId()));
                                 }
                             } else {
                                 if (!$entry->hasStatus(array(\Ca\Db\Entry::STATUS_APPROVED))) {
@@ -139,8 +137,9 @@ class SubjectDashboardHandler implements Subscriber
                             $btn->getUrl()->set('entryId', $entry->getId());
                         } else {
                             if ($assessment->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT) {
-                                    $btn->setAttr('title', 'Create ' . $assessment->getName());
+                                $btn->setAttr('title', 'Create ' . $assessment->getName());
                                 $btn->addCss('btn-success');
+                                $btn->setUrl(\Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('placementId', $obj->getId())->set('assessmentId', $assessment->getId()));
                             } else {
                                 $btn->setVisible(false);
                             }

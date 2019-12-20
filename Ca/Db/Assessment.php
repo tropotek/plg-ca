@@ -342,6 +342,66 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @param \App\Db\Placement $placement
+     * @param \Uni\Db\User $user (null = public user)
+     * @return bool
+     * @throws \Exception
+     */
+    public function canReadEntry($placement, $user=null)
+    {
+        if (!$this->getId() || !$this->isActive($placement->getSubjectId()) || !$this->isAvailable($placement)) return false;
+        // TODO: I think this need a bit more checks
+        if ($user) {        // Only users can read entries at this stage
+            if ($user->isStaff()) {
+                return true;
+            } else {    // Student
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param \App\Db\Placement $placement
+     * @param \Uni\Db\User $user (null = public user)
+     * @return bool
+     * @throws \Exception
+     */
+    public function canWriteEntry($placement, $user=null)
+    {
+        if (!$this->getId() || !$this->isActive($placement->getSubjectId()) || !$this->isAvailable($placement)) return false;
+        if ($user) {
+            if ($user->isStaff()) {
+                true;
+            } else {    // Student
+                $entry = $this->findEntry($placement);
+                if ($entry && $entry->hasStatus(array(\Ca\Db\Entry::STATUS_PENDING, \Ca\Db\Entry::STATUS_AMEND))) {
+                    return true;
+                }
+            }
+        } else {
+            if ($this->getAssessorGroup() == self::ASSESSOR_GROUP_COMPANY) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param \App\Db\Placement $placement
+     * @return \Tk\Db\Map\Model|\App\Db\Placement|null
+     * @throws \Exception
+     */
+    public function findEntry($placement)
+    {
+        $filter = array(
+            'assessmentId' => $this->getId(),
+            'placementId' => $placement->getId()
+        );
+        return \Ca\Db\EntryMap::create()->findFiltered($filter)->current();
+    }
+
+    /**
      * If the assessor group is student then this is a self assessment
      * Self assessment forms should be shown after the student submit their
      *

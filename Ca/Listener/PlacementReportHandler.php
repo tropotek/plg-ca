@@ -63,13 +63,18 @@ class PlacementReportHandler implements Subscriber
 
     /**
      * @param \Tk\Event\Event $event
+     * @throws \Exception
      */
     public function onPageInit($event)
     {
         if ($this->controller) {
-
-
-
+            if ($this->getRequest()->has('entryId')) {
+                /** @var \Ca\Db\Entry $entry */
+                $entry = \Ca\Db\EntryMap::create()->find($this->getRequest()->get('entryId'));
+                if ($entry) {
+                    $this->addAssessment($entry->getAssessmentId());
+                }
+            }
         }
     }
 
@@ -106,7 +111,6 @@ class PlacementReportHandler implements Subscriber
      */
     public function onSave($form, $event)
     {
-
         if ($form->hasErrors()) {
             return;
         }
@@ -121,7 +125,7 @@ class PlacementReportHandler implements Subscriber
 
         /** @var \Ca\Db\Assessment $assessment */
         foreach ($assessmentList as $assessment) {
-                if (!$assessment->isAvailable($placement) || $this->isSubmitted($assessment)) {
+                if (!$assessment->isAvailable($placement) || $this->isSubmitted($assessment->getId())) {
                     continue;
                 }
                 /** @var \Ca\Db\Entry $entry */
@@ -136,8 +140,7 @@ class PlacementReportHandler implements Subscriber
                 \Tk\Alert::addInfo('Please submit the following ' . $assessment->getName() . ' Form');
                 $event->setRedirect($url);
 
-                $this->submitted[$assessment->getId()] = $assessment->getId();
-                $this->getSession()->set(self::SID, $this->submitted);
+                $this->addAssessment($assessment->getId());
                 return;
         }
         $event->setRedirect(\Uni\Uri::createSubjectUrl('/index.html'));
@@ -145,11 +148,17 @@ class PlacementReportHandler implements Subscriber
     }
 
     /**
-     * @param \Ca\Db\Assessment $assessment
+     * @param int $assessmentId
      */
-    public function isSubmitted($assessment)
+    public function isSubmitted($assessmentId)
     {
-        return in_array($assessment->getId(), $this->submitted);
+        return in_array($assessmentId, $this->submitted);
+    }
+
+    public function addAssessment($assessmentId)
+    {
+        $this->submitted[$assessmentId] = $assessmentId;
+        $this->getSession()->set(self::SID, $this->submitted);
     }
 
     /**

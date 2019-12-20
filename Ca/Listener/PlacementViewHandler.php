@@ -51,6 +51,7 @@ class PlacementViewHandler implements Subscriber
                                 ->set('assessmentId', $assessment->getId())->set('placementId', $placement->getId());
                             $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
                             $btn->setAttr('title', 'Edit ' . $assessment->getName());
+                            $btn->addCss('btn-info');
                         } else {
                             $url = \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $entry->getId());
                             $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
@@ -78,7 +79,7 @@ class PlacementViewHandler implements Subscriber
                 }
                 if ($btn) {
                     $btn->addCss('btn-sm');
-                    $template->appendTemplate('placement-actions', $btn->show());
+                    $template->prependTemplate('placement-actions', $btn->show());
                 }
             }
         }

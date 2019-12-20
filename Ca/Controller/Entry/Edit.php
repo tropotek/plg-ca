@@ -146,6 +146,7 @@ class Edit extends AdminEditIface
 //                $this->getEntry()->setSubjectId($this->getSubject()->getId());
 //            }
 
+
         // Staff view student self assessment
 //        if ($request->get('assessmentId') && $request->get('studentId') && $this->getUser()->isStaff()) {
 //            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
@@ -166,7 +167,7 @@ class Edit extends AdminEditIface
 //        }
 
         if ($this->isPublic()) {
-            if ($this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_APPROVED || $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_NOT_APPROVED) {
+            if ($this->getEntry()->hasStatus(array(\Ca\Db\Entry::STATUS_APPROVED, \Ca\Db\Entry::STATUS_NOT_APPROVED))) {
                 $this->errors[] = 'This entry has already been submitted.';
                 return;
             }
@@ -174,17 +175,33 @@ class Edit extends AdminEditIface
                 $this->errors[] = 'This entry is no longer available.';
                 return;
             }
+        } else {
+            if ($this->getUser()->isStudent()) {
+                if ($this->getEntry()->getId() && $this->getEntry()->getPlacement()) {
+                    if (!$this->getEntry()->getAssessment()->canWriteEntry($this->getEntry()->getPlacement(), $this->getUser())) {
+                        if (!$this->getEntry()->getAssessment()->canReadEntry($this->getEntry()->getPlacement(), $this->getUser())) {
+                            \Tk\Alert::addError('You do not have access to this file, please contact your coordinator.');
+                            \Uni\Uri::createSubjectUrl('/index.html')->redirect();
+                        }
+                        if ($this->getEntry()->getId()) {
+                            \Uni\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->getEntry()->getId())->redirect();
+                        }
+                        //\Tk\Alert::addError('');
+
+                    }
+                }
+            }
         }
 
         if (!$this->getEntry()->getId() && $this->getEntry()->getPlacement()) {
             $this->getEntry()->setTitle($this->getEntry()->getPlacement()->getTitle(true));
             if ($this->getEntry()->getPlacement()->getCompany()) {
-                $this->getEntry()->setAssessorName($this->getEntry()->getPlacement()->getCompany()->name);
-                $this->getEntry()->setAssessorEmail($this->getEntry()->getPlacement()->getCompany()->email);
+                $this->getEntry()->setAssessorName($this->getEntry()->getPlacement()->getCompany()->getName());
+                $this->getEntry()->setAssessorEmail($this->getEntry()->getPlacement()->getCompany()->getEmail());
             }
             if ($this->getEntry()->getPlacement()->getSupervisor()) {
-                $this->getEntry()->setAssessorName($this->getEntry()->getPlacement()->getSupervisor()->name);
-                $this->getEntry()->setAssessorEmail($this->getEntry()->getPlacement()->getSupervisor()->email);
+                $this->getEntry()->setAssessorName($this->getEntry()->getPlacement()->getSupervisor()->getName());
+                $this->getEntry()->setAssessorEmail($this->getEntry()->getPlacement()->getSupervisor()->getEmail());
             }
         }
 
@@ -196,7 +213,7 @@ class Edit extends AdminEditIface
 
         // ---------------------- End Entry Setup -------------------
 
-        $this->setPageTitle($this->getEntry()->getAssessment()->name);
+        $this->setPageTitle($this->getEntry()->getAssessment()->getName());
 
         $this->setForm(\Ca\Form\Entry::create($this->isPublic())->setModel($this->getEntry()));
         if ($this->getEntry()->getAssessment()->isSelfAssessment() && !$this->getUser()->isStaff()) {
@@ -212,7 +229,7 @@ class Edit extends AdminEditIface
             $this->statusTable = \App\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')->init();
             $filter = array(
                 'model' => $this->getEntry(),
-                'subjectId' => $this->getEntry()->subjectId
+                'subjectId' => $this->getEntry()->getSubjectId()
             );
             $this->statusTable->setList($this->statusTable->findList($filter, $this->statusTable->getTool('created DESC')));
         }
@@ -241,11 +258,14 @@ class Edit extends AdminEditIface
         $this->initActionPanel();
         $template = parent::show();
 
+        if (count($this->errors)) {
+            foreach ($this->errors as $error) {
+                \Tk\Alert::addWarning($error);
+            }
+        }
+
         if ($this->isPublic()) {
             if (count($this->errors)) {
-                foreach ($this->errors as $error) {
-                    \Tk\Alert::addWarning($error);
-                }
                 $template->setVisible('not-available');
                 $template->setAttr('contact', 'href', \Tk\Uri::create('/contact.html')
                     ->set('subjectId', $this->getEntry()->getSubjectId()));

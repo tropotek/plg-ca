@@ -186,8 +186,6 @@ class Edit extends AdminEditIface
                         if ($this->getEntry()->getId()) {
                             \Uni\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->getEntry()->getId())->redirect();
                         }
-                        //\Tk\Alert::addError('');
-
                     }
                 }
             }

@@ -124,10 +124,12 @@ class Edit extends AdminEditIface
                     $this->entry = $e;
                 } else {
                     $this->getEntry()->setPlacementId($placement->getId());
-                    $this->getEntry()->setStudentId($this->getEntry()->getPlacement()->userId);
-                    $this->getEntry()->setSubjectId($this->getEntry()->getPlacement()->subjectId);
+                    $this->getEntry()->setStudentId($this->getEntry()->getPlacement()->getUnits());
+                    $this->getEntry()->setSubjectId($this->getEntry()->getPlacement()->getSubjectId());
                     if (!$this->getEntry()->getAssessment()) {
-                        throw new \Tk\Exception('Invalid Assessment. Please contact the subject coordinator.');
+                        $this->errors[] = 'Invalid Assessment Found! Please contact the subject coordinator.';
+                        return;
+                        //throw new \Tk\Exception('Invalid Assessment. Please contact the subject coordinator.');
                     }
                 }
             }

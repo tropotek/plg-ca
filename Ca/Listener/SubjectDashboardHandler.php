@@ -136,7 +136,7 @@ class SubjectDashboardHandler implements Subscriber
                             }
                             $btn->getUrl()->set('entryId', $entry->getId());
                         } else {
-                            if ($assessment->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT) {
+                            if ($assessment->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT && $obj->getReport()) {
                                 $btn->setAttr('title', 'Create ' . $assessment->getName());
                                 $btn->addCss('btn-success');
                                 $btn->setUrl(\Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('placementId', $obj->getId())->set('assessmentId', $assessment->getId()));

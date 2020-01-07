@@ -93,7 +93,10 @@ class Edit extends AdminEditIface
         if ($this->getUser()) {
             $this->getEntry()->setAssessorId($this->getUser()->getId());
         }
-        $this->getEntry()->setSubjectId((int)$request->get('subjectId'));
+        $this->getEntry()->setSubjectId($this->getConfig()->getSubjectId());
+        if ($request->has('subjectId')) {
+            $this->getEntry()->setSubjectId((int)$request->get('subjectId'));
+        }
         $this->getEntry()->setAssessmentId((int)$request->get('assessmentId'));
         $this->getEntry()->setPlacementId((int)$request->get('placementId'));
         if ($this->getEntry()->getPlacement()) {

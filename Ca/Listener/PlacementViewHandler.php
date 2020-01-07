@@ -58,11 +58,13 @@ class PlacementViewHandler implements Subscriber
                             $btn->setAttr('title', 'View ' . $assessment->getName());
                         }
                     } else {
-                        $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
-                            ->set('assessmentId', $assessment->getId())->set('placementId', $placement->getId());
-                        $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
-                        $btn->setAttr('title', 'Create ' . $assessment->getName());
-                        $btn->addCss('btn-success');
+                        if ($placement->getReport()) {
+                            $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
+                                ->set('assessmentId', $assessment->getId())->set('placementId', $placement->getId());
+                            $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
+                            $btn->setAttr('title', 'Create ' . $assessment->getName());
+                            $btn->addCss('btn-success');
+                        }
                     }
 
                 } else {

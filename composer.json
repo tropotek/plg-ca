@@ -9,9 +9,9 @@
         "assessment",
         "EMS"
     ],
-    "time": "2020-01-07",
+    "time": "2019-10-15",
     "license": "MIT",
-    "version": "3.0.36",
+    "version": "master",
     "access": "admin, subject",
     "authors":  [
          {

@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 3.0.36 [2020-01-07]:
+-------------------------------
+  - Fixing minor bugs ready for new release
+  - Added CA buttons to student placement list as requested.
+
+
 Ver 3.0.34 [2019-12-09]:
 -------------------------------
 

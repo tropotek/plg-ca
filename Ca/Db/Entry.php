@@ -339,23 +339,27 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $errors = $this->validateSubjectId($errors);
 
         if (!$this->getStudentId()) {
-            $errors['studentId'] = 'Invalid value: studentId';
+            $errors['studentId'] = 'Invalid Student ID';
         }
 
         if (!$this->getTitle()) {
-            $errors['title'] = 'Invalid value: title';
+            $errors['title'] = 'Invalid Title';
         }
 
         if (!$this->getAssessorName()) {
-            $errors['assessorName'] = 'Invalid value: assessorName';
+            $errors['assessorName'] = 'Invalid Assessor Name';
         }
 
-        if (!$this->getAssessorEmail()) {
-            $errors['assessorEmail'] = 'Invalid value: assessorEmail';
+        if (!filter_var($this->getAssessorEmail(), FILTER_VALIDATE_EMAIL)) {
+            $errors['assessorEmail'] = 'Invalid Assessor Email';
         }
+
+//        if ($this->getAssessorEmail() && !filter_var($this->getAssessorEmail(), FILTER_VALIDATE_EMAIL)) {
+//            $errors['assessorEmail'] = 'Invalid Assessor Email';
+//        }
 
         if (!$this->getStatus()) {
-            $errors['status'] = 'Invalid value: status';
+            $errors['status'] = 'Invalid Status value';
         }
 
         return $errors;

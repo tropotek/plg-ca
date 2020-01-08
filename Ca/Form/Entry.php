@@ -123,6 +123,9 @@ JS;
      */
     public function execute($request = null)
     {
+        if ($this->getEntry()->getId() && !$this->getEntry()->getAssessorEmail() && $this->getEntry()->getAssessor())
+            $this->getEntry()->setAssessorEmail($this->getEntry()->getAssessor()->getEmail());
+
         $this->load(\Ca\Db\EntryMap::create()->unmapForm($this->getEntry()));
         parent::execute($request);
     }

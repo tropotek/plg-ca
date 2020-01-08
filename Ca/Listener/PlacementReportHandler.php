@@ -67,15 +67,16 @@ class PlacementReportHandler implements Subscriber
      */
     public function onPageInit($event)
     {
-        if ($this->controller) {
-            if ($this->getRequest()->has('entryId')) {
-                /** @var \Ca\Db\Entry $entry */
-                $entry = \Ca\Db\EntryMap::create()->find($this->getRequest()->get('entryId'));
-                if ($entry) {
-                    $this->addAssessment($entry->getAssessmentId());
-                }
+        if (!$this->controller || !$this->getUser()->isStudent()) return;
+
+        if ($this->getRequest()->has('entryId')) {
+            /** @var \Ca\Db\Entry $entry */
+            $entry = \Ca\Db\EntryMap::create()->find($this->getRequest()->get('entryId'));
+            if ($entry) {
+                $this->addAssessment($entry->getAssessmentId());
             }
         }
+
     }
 
     /**
@@ -86,7 +87,7 @@ class PlacementReportHandler implements Subscriber
      */
     public function onFormLoad(\Tk\Event\FormEvent $event)
     {
-        if (!$this->controller) return;
+        if (!$this->controller || !$this->getUser()->isStudent()) return;
 
         $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
             'courseId' => $this->subject->getCourseId(),
@@ -96,6 +97,7 @@ class PlacementReportHandler implements Subscriber
         $submitEvent = $event->getForm()->getField('update');
         if ($event->getForm()->getField('save'))
             $event->getForm()->removeField('save');
+
         if ($assessmentList->count()) {
             $submitEvent->setLabel('Next');
             $submitEvent->addCss('pull-right');

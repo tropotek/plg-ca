@@ -189,6 +189,20 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @return string
+     * @throws \Exception
+     */
+    public function getPlacementTypeName()
+    {
+        $list = $this->getPlacementTypes();
+        $str = '';
+        foreach ($list as $placementType) {
+            $str .= $placementType->getName();
+        }
+        return $str;
+    }
+
+    /**
      * @param string $assessorGroup
      * @return Assessment
      */

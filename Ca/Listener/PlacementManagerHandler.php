@@ -63,6 +63,9 @@ class PlacementManagerHandler implements Subscriber
             /** @var \Tk\Table\Cell\ButtonCollection $actionsCell */
             $actionsCell = $event->getTable()->findCell('actions');
 
+            vd();
+            $event->getTable()->resetSession();
+
             /** @var \Ca\Db\Assessment $assessment */
             foreach ($assessmentList as $assessment) {
                 $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $assessment->getId());
@@ -102,6 +105,33 @@ class PlacementManagerHandler implements Subscriber
                 } else {
                     $cell->setGroup('ca');
                 }
+                // Add Entry Columns for csv exports
+                $aName = 'assessment_'.$assessment->getId();
+                $aLabel = $assessment->getName();
+                if ($assessment->getPlacementTypes()->count() == 1)
+                    $aLabel .= ' ['.$assessment->getPlacementTypeName().']';
+                $cell = $event->getTable()->appendCell(new \Tk\Table\Cell\Text($aName), 'placementReportId')->setLabel($aLabel)->setOrderProperty('')
+                    ->setOnPropertyValue(function ($cell, $obj, $value) use ($assessment) {
+                        /** @var $obj \App\Db\Placement */
+                        $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
+                            array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
+                        )->current();
+                        if (!$placementAssessment) $placementAssessment = $assessment;
+
+                        if ($placementAssessment->isAvailable($obj)) {
+                            $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                                'assessmentId' => $placementAssessment->getId(),
+                                'placementId' => $obj->getId())
+                            )->current();
+                            if ($entry) {
+                                return 'Yes';
+                            }
+                        }
+                        return 'No';
+                    });
+                /** @var \Tk\Table\Action\ColumnSelect $columns */
+                $columns = $event->getTable()->findAction('columns');
+                $columns->addUnselected($aName);
             }
         }
     }

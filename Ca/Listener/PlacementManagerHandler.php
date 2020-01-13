@@ -63,9 +63,6 @@ class PlacementManagerHandler implements Subscriber
             /** @var \Tk\Table\Cell\ButtonCollection $actionsCell */
             $actionsCell = $event->getTable()->findCell('actions');
 
-            vd();
-            $event->getTable()->resetSession();
-
             /** @var \Ca\Db\Assessment $assessment */
             foreach ($assessmentList as $assessment) {
                 $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $assessment->getId());

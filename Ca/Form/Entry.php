@@ -55,7 +55,7 @@ class Entry extends \Uni\FormIface
 //            $this->appendField(new Field\Html('average', sprintf('%.2f', $this->getEntry()->getAverage())))->setFieldset($fieldset);
 //        }
         if (!$this->isPublic() && $this->getUser() && $this->getUser()->isStaff()) {
-            $this->appendField(new \Uni\Form\Field\StatusSelect('status', \Ca\Db\Entry::getStatusList($this->getEntry()->getStatus())))
+            $this->appendField(new \App\Form\Field\StatusSelect('status', \Ca\Db\Entry::getStatusList($this->getEntry()->getStatus())))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset($fieldset);
         } else {
             $this->appendField(new \Tk\Form\Field\Html('status'))->setFieldset($fieldset);

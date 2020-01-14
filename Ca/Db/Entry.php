@@ -308,28 +308,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * return the status list for a select field
-     * @param null|string $status
-     * @return array
-     */
-    public static function getStatusList($status = null)
-    {
-        $arr = Select::arrayToSelectList(ObjectUtil::getClassConstants(__CLASS__, 'STATUS'));
-        if (is_string($status)) {
-            $arr2 = array();
-            foreach ($arr as $k => $v) {
-                if ($v == $status) {
-                    $arr2[$k.' (Current)'] = $v;
-                } else {
-                    $arr2[$k] = $v;
-                }
-            }
-            $arr = $arr2;
-        }
-        return $arr;
-    }
-    
-    /**
      * @return array
      */
     public function validate()

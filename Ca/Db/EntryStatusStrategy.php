@@ -2,6 +2,9 @@
 namespace Ca\Db;
 
 
+use App\Db\MailTemplate;
+use Tk\Mail\CurlyMessage;
+
 /**
  * @author Michael Mifsud <info@tropotek.com>
  * @see http://www.tropotek.com/
@@ -44,11 +47,10 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
 
     /**
      * @param \Uni\Db\Status $status
-     * @param \App\Db\MailTemplate $mailTemplate
-     * @return null|\Tk\Mail\CurlyMessage
+     * @param CurlyMessage $message
      * @throws \Exception
      */
-    public function makeStatusMessage($status, $mailTemplate)
+    public function formatStatusMessage($status, $message)
     {
         /** @var Entry $model */
         $model = $status->getModel();
@@ -56,9 +58,8 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
         $placement = $model->getPlacement();
         if (!$placement->getPlacementType()->isNotifications()) {
             \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->getName() . '] Notifications Disabled');
-            return null;
         }
-        $message = \Tk\Mail\CurlyMessage::create($mailTemplate->getTemplate());
+
         $message->setSubject('[#'.$model->getId().'] ' . $model->getAssessment()->getName() . ' Entry ' . ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ');
         $message->setFrom(\Tk\Mail\Message::joinEmail($status->getCourse()->getEmail(), $status->getSubjectName()));
 
@@ -92,6 +93,9 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
             }
         }
 
+        /** @var MailTemplate $mailTemplate */
+        $mailTemplate = $message->get('_mailTemplate');
+
         switch ($mailTemplate->getRecipient()) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
                 if ($placement->getUser()) {
@@ -120,8 +124,6 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
                 }
                 break;
         }
-
-        return $message;
     }
 
 

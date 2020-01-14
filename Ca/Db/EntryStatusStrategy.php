@@ -7,13 +7,13 @@ namespace Ca\Db;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
+class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
 {
 
     /**
      * return true to trigger the status change events
      *
-     * @param \App\Db\Status $status
+     * @param \Uni\Db\Status $status
      * @return boolean
      * @throws \Exception
      */
@@ -43,7 +43,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     }
 
     /**
-     * @param \App\Db\Status $status
+     * @param \Uni\Db\Status $status
      * @param \App\Db\MailTemplate $mailTemplate
      * @return null|\Tk\Mail\CurlyMessage
      * @throws \Exception

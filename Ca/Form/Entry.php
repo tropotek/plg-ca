@@ -55,7 +55,7 @@ class Entry extends \Uni\FormIface
 //            $this->appendField(new Field\Html('average', sprintf('%.2f', $this->getEntry()->getAverage())))->setFieldset($fieldset);
 //        }
         if (!$this->isPublic() && $this->getUser() && $this->getUser()->isStaff()) {
-            $this->appendField(new \App\Form\Field\CheckSelect('status', \Ca\Db\Entry::getStatusList($this->getEntry()->getStatus())))
+            $this->appendField(new \Uni\Form\Field\StatusSelect('status', \Ca\Db\Entry::getStatusList($this->getEntry()->getStatus())))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset($fieldset);
         } else {
             $this->appendField(new \Tk\Form\Field\Html('status'))->setFieldset($fieldset);
@@ -172,11 +172,11 @@ JS;
         }
 
         // Create status if changed and trigger notifications
-        if (!$this->isPublic() && $form->getField('status') instanceof \App\Form\Field\CheckSelect) {
-            \App\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
+        if (!$this->isPublic() && $form->getField('status') instanceof \Uni\Form\Field\StatusSelect) {
+            \Uni\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
                 $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
         } else {
-            \App\Db\Status::create($this->getEntry(), $this->getEntry()->getStatus(), true, '',
+            \Uni\Db\Status::create($this->getEntry(), $this->getEntry()->getStatus(), true, '',
                 $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
         }
 

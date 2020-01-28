@@ -47,7 +47,7 @@ class Option extends \Uni\TableIface
         $option->setScaleId($this->getRequest()->get('scaleId'));
         $form->setOption($option);
         $this->optionDialog = \Tk\Ui\Dialog\Form::createFormDialog($form, 'Create Option');
-        $this->optionDialog->execute($this->getRequest());
+        $this->optionDialog->execute();
         $this->getRenderer()->getTemplate()->appendBodyTemplate($this->optionDialog->show());
 
 

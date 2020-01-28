@@ -58,7 +58,7 @@ class Edit extends AdminEditIface
             $this->competencyDialog->setNotes('Select the competencies for this Assessment Item.');
             $this->competencyDialog->setOnSelect(array($this, 'onSelect'));
             $this->competencyDialog->setOnAjax(array($this, 'onAjax'));
-            $this->competencyDialog->execute($request);
+            $this->competencyDialog->execute();
 
             $this->table = \Ca\Table\Competency::create();
             $this->table->init();

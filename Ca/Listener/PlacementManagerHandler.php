@@ -68,7 +68,7 @@ class PlacementManagerHandler implements Subscriber
                 $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $assessment->getId());
 
                 $cell = $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
-                    ->setOnShow(function ($cell, $obj, $btn) use ($assessment) {
+                    ->addOnShow(function ($cell, $obj, $btn) use ($assessment) {
                         /* @var $obj \App\Db\Placement */
                         /* @var $btn \Tk\Table\Cell\ActionButton */
                         $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(

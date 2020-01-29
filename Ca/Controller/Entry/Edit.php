@@ -43,7 +43,7 @@ class Edit extends AdminEditIface
     public function __construct()
     {
         $this->setPageTitle('Entry Edit');
-        if ($this->getUser() && $this->getUser()->isStudent()) {
+        if ($this->getAuthUser() && $this->getAuthUser()->isStudent()) {
             $this->getActionPanel()->setEnabled(false);
         }
     }
@@ -90,8 +90,8 @@ class Edit extends AdminEditIface
     {
         // ---------------------- Start Entry Setup -------------------
         $this->entry = new \Ca\Db\Entry();
-        if ($this->getUser()) {
-            $this->getEntry()->setAssessorId($this->getUser()->getId());
+        if ($this->getAuthUser()) {
+            $this->getEntry()->setAssessorId($this->getAuthUser()->getId());
         }
         $this->getEntry()->setSubjectId($this->getConfig()->getSubjectId());
         if ($request->has('subjectId')) {
@@ -181,10 +181,10 @@ class Edit extends AdminEditIface
                 return;
             }
         } else {
-            if ($this->getUser()->isStudent()) {
+            if ($this->getAuthUser()->isStudent()) {
                 if ($this->getEntry()->getId() && $this->getEntry()->getPlacement()) {
-                    if (!$this->getEntry()->getAssessment()->canWriteEntry($this->getEntry()->getPlacement(), $this->getUser())) {
-                        if (!$this->getEntry()->getAssessment()->canReadEntry($this->getEntry()->getPlacement(), $this->getUser())) {
+                    if (!$this->getEntry()->getAssessment()->canWriteEntry($this->getEntry()->getPlacement(), $this->getAuthUser())) {
+                        if (!$this->getEntry()->getAssessment()->canReadEntry($this->getEntry()->getPlacement(), $this->getAuthUser())) {
                             \Tk\Alert::addError('You do not have access to this file, please contact your coordinator.');
                             \Uni\Uri::createSubjectUrl('/index.html')->redirect();
                         }
@@ -219,7 +219,7 @@ class Edit extends AdminEditIface
         $this->setPageTitle($this->getEntry()->getAssessment()->getName());
 
         $this->setForm(\Ca\Form\Entry::create($this->isPublic())->setModel($this->getEntry()));
-        if ($this->getEntry()->getAssessment()->isSelfAssessment() && !$this->getUser()->isStaff()) {
+        if ($this->getEntry()->getAssessment()->isSelfAssessment() && !$this->getAuthUser()->isStaff()) {
             $this->getForm()->removeField('assessorName');
             $this->getForm()->removeField('assessorEmail');
             $this->getForm()->removeField('average');
@@ -228,7 +228,7 @@ class Edit extends AdminEditIface
         $this->initForm($request);
         $this->getForm()->execute();
 
-        if ($this->getUser() && $this->getUser()->isStaff() && $this->getEntry()->getId()) {
+        if ($this->getAuthUser() && $this->getAuthUser()->isStaff() && $this->getEntry()->getId()) {
             $this->statusTable = \Uni\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')->init();
             $filter = array(
                 'model' => $this->getEntry(),
@@ -243,7 +243,7 @@ class Edit extends AdminEditIface
      */
     public function initActionPanel()
     {
-        if ($this->getEntry()->getId() && ($this->getUser() && $this->getUser()->isStaff())) {
+        if ($this->getEntry()->getId() && ($this->getAuthUser() && $this->getAuthUser()->isStaff())) {
             // TODO: Lets implement these at a later stage
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
                 \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId()), 'fa fa-eye'));
@@ -278,7 +278,7 @@ class Edit extends AdminEditIface
             }
         } else {
             $template->setVisible('edit');
-            if ($this->getUser()->isStaff()) {
+            if ($this->getAuthUser()->isStaff()) {
                 if ($this->getEntry()->getId()) {
                     if ($this->statusTable) {
                         $template->appendTemplate('statusLog', $this->statusTable->show());

@@ -29,7 +29,7 @@ class View extends AdminEditIface
     public function __construct()
     {
         $this->setPageTitle('Entry View');
-        if ($this->getUser() && $this->getUser()->isStudent()) {
+        if ($this->getAuthUser() && $this->getAuthUser()->isStudent()) {
             $this->getActionPanel()->setEnabled(false);
         }
     }
@@ -63,7 +63,7 @@ class View extends AdminEditIface
         $this->setPageTitle('View ' . $this->getEntry()->getAssessment()->getName());
 
         $this->setForm(\Ca\Form\Entry::create()->setModel($this->getEntry()));
-        if ($this->getEntry()->getAssessment()->isSelfAssessment() && !$this->getUser()->isStaff()) {
+        if ($this->getEntry()->getAssessment()->isSelfAssessment() && !$this->getAuthUser()->isStaff()) {
             $this->getForm()->removeField('assessorName');
             $this->getForm()->removeField('assessorEmail');
             $this->getForm()->removeField('average');

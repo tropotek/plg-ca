@@ -45,7 +45,7 @@ class Entry extends \Uni\FormIface
         $this->addCss('ca-entry-edit');
 
         $fieldset = 'Entry Details';
-        if ($this->getUser() && $this->getUser()->isStaff() && !$this->isPublic()) {
+        if ($this->getAuthUser() && $this->getAuthUser()->isStaff() && !$this->isPublic()) {
             $this->appendField(new Field\Input('title'))->setFieldset($fieldset);
         } else {
             $this->appendField(new Field\Html('title'))->setFieldset($fieldset);
@@ -54,7 +54,7 @@ class Entry extends \Uni\FormIface
 //            $avg = $this->getEntry()->getAverage();
 //            $this->appendField(new Field\Html('average', sprintf('%.2f', $this->getEntry()->getAverage())))->setFieldset($fieldset);
 //        }
-        if (!$this->isPublic() && $this->getUser() && $this->getUser()->isStaff()) {
+        if (!$this->isPublic() && $this->getAuthUser() && $this->getAuthUser()->isStaff()) {
             $this->appendField(new \App\Form\Field\StatusSelect('status', \Ca\Db\Entry::getStatusList($this->getEntry()->getStatus())))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset($fieldset);
         } else {
@@ -112,7 +112,7 @@ jQuery(function ($) {
   }
 });
 JS;
-        if (!$this->isPublic() && $this->getUser() && $this->getUser()->isStaff()) {
+        if (!$this->isPublic() && $this->getAuthUser() && $this->getAuthUser()->isStaff()) {
             $template->appendJs($js);
         }
     }
@@ -160,7 +160,7 @@ JS;
 
         $isNew = (bool)$this->getEntry()->getId();
 
-        if ($this->getUser() && $this->getUser()->isStudent() && $this->getEntry()->getAssessment()->isSelfAssessment() && $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_AMEND)
+        if ($this->getAuthUser() && $this->getAuthUser()->isStudent() && $this->getEntry()->getAssessment()->isSelfAssessment() && $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_AMEND)
             $this->getEntry()->status = \Ca\Db\Entry::STATUS_PENDING;
         $this->getEntry()->save();
 
@@ -184,7 +184,7 @@ JS;
         if ($form->getTriggeredEvent()->getName() == 'save') {
             $event->setRedirect(\Tk\Uri::create()->set('entryId', $this->getEntry()->getId()));
         }
-        if ($form->getTriggeredEvent()->getName() == 'update' && $this->getUser()->isStaff()) {
+        if ($form->getTriggeredEvent()->getName() == 'update' && $this->getAuthUser()->isStaff()) {
             $url = \Uni\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacementId());
             $event->setRedirect($url);
         }

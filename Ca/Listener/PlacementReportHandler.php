@@ -67,7 +67,7 @@ class PlacementReportHandler implements Subscriber
      */
     public function onPageInit($event)
     {
-        if (!$this->controller || !$this->getUser()->isStudent()) return;
+        if (!$this->controller || !$this->getAuthUser()->isStudent()) return;
 
         if ($this->getRequest()->has('entryId')) {
             /** @var \Ca\Db\Entry $entry */
@@ -87,7 +87,7 @@ class PlacementReportHandler implements Subscriber
      */
     public function onFormLoad(\Tk\Event\FormEvent $event)
     {
-        if (!$this->controller || !$this->getUser()->isStudent()) return;
+        if (!$this->controller || !$this->getAuthUser()->isStudent()) return;
 
         $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
             'courseId' => $this->subject->getCourseId(),

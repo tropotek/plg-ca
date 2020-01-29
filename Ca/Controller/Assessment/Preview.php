@@ -51,11 +51,11 @@ class Preview extends AdminEditIface
         // Setup dummy Entry object
         $this->entry = new \Ca\Db\Entry();
         $this->entry->setSubjectId(1);
-        $this->entry->setStudentId($this->getUser()->getId());
+        $this->entry->setStudentId($this->getAuthUser()->getId());
         $this->entry->setAssessmentId($this->assessment->getId());
         $this->entry->setTitle('Student Name @ Some Company [Dates] Assessment');
-        $this->entry->setAssessorName($this->getUser()->getName());
-        $this->entry->setAssessorEmail($this->getUser()->getEmail());
+        $this->entry->setAssessorName($this->getAuthUser()->getName());
+        $this->entry->setAssessorEmail($this->getAuthUser()->getEmail());
         $this->entry->setAbsent(0);
         $this->entry->id = -1;
 

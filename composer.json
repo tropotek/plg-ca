@@ -9,7 +9,7 @@
         "assessment",
         "EMS"
     ],
-    "time": "2019-10-15",
+    "time": "2020-01-29",
     "license": "MIT",
     "authors":  [
          {
@@ -28,5 +28,6 @@
         }
     },
     "require":  {
-    }
+    },
+    "version": "3.0.50"
 }

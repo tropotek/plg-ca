@@ -117,7 +117,7 @@ class PlacementReportHandler implements Subscriber
             return;
         }
 
-        if (!$this->getConfig()->getUser()->isStudent()) return;
+        if (!$this->getConfig()->getAuthUser()->isStudent()) return;
 
         $placement = $this->controller->getPlacement();
         $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(

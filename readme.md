@@ -4,7 +4,7 @@ __Project:__ [ttek-plg/plg-ca](http://packagist.org/packages/ttek-plg/plg-ca)
 __Web:__ <http://www.tropotek.com/>  
 __Authors:__ Michael Mifsud <http://www.tropotek.com/>  
   
-Compentency Assessment Tool plugin. Send requests to clients to complete a form and assess a student, also does self assessments.
+Competency Assessment Tool plugin. Send requests to clients to complete a form and assess a student, also does self assessments.
 
 ## Contents
 

@@ -3,6 +3,7 @@ namespace Ca\Listener;
 
 use Ca\Plugin;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Tk\ConfigTrait;
 use Tk\Event\Subscriber;
 
 /**
@@ -12,9 +13,10 @@ use Tk\Event\Subscriber;
  */
 class SetupHandler implements Subscriber
 {
+    use ConfigTrait;
 
     /**
-     * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+     * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
      * @throws \Exception
      */
     public function onRequest($event)
@@ -31,11 +33,11 @@ class SetupHandler implements Subscriber
         $config = \Uni\Config::getInstance();
         $dispatcher = $config->getEventDispatcher();
 
-        // TODO: figure a way out of this, this shows in the cmd list but fails to execute????
-        //$app = $config->getConsoleApplication()->add(new \Ca\Console\Cache());
-
-        //$dispatcher->addSubscriber(new \Ca\Listener\CronHandler());
-        //$dispatcher->addSubscriber(new \Ca\Listener\StatusMailHandler());
+        // TODO: Remove this for the release....
+        if ($this->getConfig()->isDebug()) {
+            $dispatcher->addSubscriber(new \Ca\Listener\CronHandler());
+            $dispatcher->addSubscriber(new \Ca\Listener\StatusMailHandler());
+        }
 
         $this->setup();
     }

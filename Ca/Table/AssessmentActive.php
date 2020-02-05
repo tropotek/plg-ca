@@ -30,7 +30,7 @@ class AssessmentActive extends \Uni\TableIface
     public function init()
     {
         $this->appendCell(new Cell\Checkbox('id'));
-        $this->appendCell(new Cell\Text('icon'))->setOnCellHtml(function ($cell, $obj, $html) {
+        $this->appendCell(new Cell\Text('icon'))->addOnCellHtml(function ($cell, $obj, $html) {
             $ico = 'fa fa-file-o';
             if ($obj->getIcon())
                 $ico = $obj->getIcon();
@@ -39,7 +39,7 @@ class AssessmentActive extends \Uni\TableIface
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
 
         $this->appendCell(new Cell\Text('activeSubject'))->setLabel('Subject Active')
-            ->setOnCellHtml(function ($cell, $obj, $html) {
+            ->addOnCellHtml(function ($cell, $obj, $html) {
                 /* @var $cell Cell\Text */
                 /* @var $obj \Ca\Db\Assessment */
                 $subject = \Uni\Config::getInstance()->getSubject();
@@ -54,7 +54,7 @@ class AssessmentActive extends \Uni\TableIface
                 return $html;
             });
 //        $this->appendCell(new Cell\Text('publishStudent'))->setLabel('Student Publish')
-//            ->setOnCellHtml(function ($cell, $obj, $html) {
+//            ->addOnCellHtml(function ($cell, $obj, $html) {
 //                /* @var $cell Cell\Text */
 //                /* @var $obj \Ca\Db\Assessment */
 //                $name = 'pub-'.$obj->getId();

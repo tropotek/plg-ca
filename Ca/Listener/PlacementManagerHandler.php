@@ -108,7 +108,7 @@ class PlacementManagerHandler implements Subscriber
                 if ($assessment->getPlacementTypes()->count() == 1)
                     $aLabel .= ' ['.$assessment->getPlacementTypeName().']';
                 $cell = $event->getTable()->appendCell(new \Tk\Table\Cell\Text($aName), 'placementReportId')->setLabel($aLabel)->setOrderProperty('')
-                    ->setOnPropertyValue(function ($cell, $obj, $value) use ($assessment) {
+                    ->addOnPropertyValue(function ($cell, $obj, $value) use ($assessment) {
                         /** @var $obj \App\Db\Placement */
                         $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
                             array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
@@ -149,7 +149,7 @@ class PlacementManagerHandler implements Subscriber
             $table = $event->getTable();
             $table->appendCell(\Tk\Table\Cell\Link::create('assessmentLinks'))
                 ->setLabel('Assessment Links')
-                ->setOnPropertyValue(function ($cell, $obj, $value) use ($assessmentList) {
+                ->addOnPropertyValue(function ($cell, $obj, $value) use ($assessmentList) {
                     /** @var \App\Db\Placement $obj */
                     $value = '';
                     /** @var \Ca\Db\Assessment $assessment */
@@ -160,7 +160,7 @@ class PlacementManagerHandler implements Subscriber
                     }
                     return $value;
                 })
-                ->setOnCellHtml(function ($cell, $obj, $html) use ($assessmentList) {
+                ->addOnCellHtml(function ($cell, $obj, $html) use ($assessmentList) {
                     /** @var \Tk\Table\Cell\Link $cell */
                     /** @var \App\Db\Placement $obj */
                     $html = '';

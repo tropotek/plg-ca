@@ -65,6 +65,20 @@ class Assessment extends \Uni\FormIface
         $list = \Ca\Db\AssessmentMap::create()->findPlacementTypes($this->getAssessment()->getId());
         $ptiField->setValue($list);
 
+        $tab = 'Reminder Notifications';
+
+        $this->appendField(new Field\Checkbox('enableReminder'))->setLabel('')->setTabGroup($tab)
+            ->addCss('tk-input-toggle')
+            ->setCheckboxLabel('Enable Reminder Notifications');
+        $this->appendField(new Field\Input('reminderInitialDays'))->setTabGroup($tab)
+            ->setNotes('The number of days to send the first reminder after the placement end date.');
+        $this->appendField(new Field\Input('reminderRepeatDays'))->setTabGroup($tab)
+            ->setNotes('The number of days to send subsequent reminders after the initial date has passed.');
+        $this->appendField(new Field\Input('reminderRepeatCycles'))->setTabGroup($tab)
+            ->setNotes('The number of times to send subsequent reminders');
+
+
+
         $tab = 'Instructions';
 
         $this->appendField(new Field\Textarea('description'))->setLabel('Instructions')->setTabGroup($tab)

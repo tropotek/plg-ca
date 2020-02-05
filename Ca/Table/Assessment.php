@@ -33,14 +33,14 @@ class Assessment extends \Uni\TableIface
         $this->appendCell(new Cell\Checkbox('id'));
         //$this->appendCell(new Cell\Text('uid'));
         //$this->appendCell(new Cell\Text('courseId'));
-        $this->appendCell(new Cell\Text('icon'))->setOnCellHtml(function ($cell, $obj, $html) {
+        $this->appendCell(new Cell\Text('icon'))->addOnCellHtml(function ($cell, $obj, $html) {
             $ico = 'fa fa-file-o';
             if ($obj->getIcon())
                 $ico = $obj->getIcon();
             return sprintf('<i class="%s"></i>', $ico);
         });
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
-        $this->appendCell(new Cell\Text('placementTypes'))->setOnPropertyValue(function ($cell, $obj, $value) {
+        $this->appendCell(new Cell\Text('placementTypes'))->addOnPropertyValue(function ($cell, $obj, $value) {
             /* @var $obj \Ca\Db\Assessment */
             $list = $obj->getPlacementTypes();
             $value = '';
@@ -52,6 +52,7 @@ class Assessment extends \Uni\TableIface
         });
         $this->appendCell(new Cell\ArrayObject('placementStatus'));
         $this->appendCell(new Cell\Text('assessorGroup'));
+        $this->appendCell(new Cell\Boolean('enableReminder'));
         //$this->appendCell(new Cell\Boolean('multiple'));
         //$this->appendCell(new Cell\Boolean('includeZero'));
         //$this->appendCell(new Cell\Date('publishResult'));

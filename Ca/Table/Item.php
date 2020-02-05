@@ -32,7 +32,7 @@ class Item extends \Uni\TableIface
 
         $this->appendCell(new Cell\OrderBy('orderBy'))->setIconOnly();
         $this->appendCell(new Cell\Checkbox('id'));
-        $this->appendCell(new Cell\Text('#'))->setOnPropertyValue(function ($cell, $obj, $value) {
+        $this->appendCell(new Cell\Text('#'))->addOnPropertyValue(function ($cell, $obj, $value) {
             /* @var $cell Cell\Text */
             /* @var $obj \Ca\Db\Item */
             $value = $cell->getRow()->getRowId()+1;
@@ -41,7 +41,7 @@ class Item extends \Uni\TableIface
         //$this->appendCell(new Cell\Text('uid'));
         //$this->appendCell(new Cell\Text('assessmentId'));
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl())
-            ->setOnPropertyValue(function ($cell, $obj, $value) {
+            ->addOnPropertyValue(function ($cell, $obj, $value) {
                 /* @var $cell Cell\Text */
                 /* @var $obj \Ca\Db\Item */
                 if (!$value) {
@@ -56,7 +56,7 @@ class Item extends \Uni\TableIface
                 }
                 return $value;
             })
-            ->setOnCellHtml(function ($cell, $obj, $html) {
+            ->addOnCellHtml(function ($cell, $obj, $html) {
                 /* @var $cell Cell\Text */
                 /* @var $obj \Ca\Db\Item */
                 $list = \Ca\Db\CompetencyMap::create()->findFiltered(array('itemId' => $obj->getId()));
@@ -76,7 +76,7 @@ class Item extends \Uni\TableIface
                 return $html . $listHtml;
             });
 
-        $this->appendCell(new Cell\Text('domainId'))->setOnPropertyValue(function ($cell, $obj, $value) {
+        $this->appendCell(new Cell\Text('domainId'))->addOnPropertyValue(function ($cell, $obj, $value) {
             /* @var $cell Cell\Text */
             /* @var $obj \Ca\Db\Item */
             $value = '[Assessment]';
@@ -85,7 +85,7 @@ class Item extends \Uni\TableIface
             return $value;
         });
 
-        $this->appendCell(new Cell\Text('scaleId'))->setOnPropertyValue(function ($cell, $obj, $value) {
+        $this->appendCell(new Cell\Text('scaleId'))->addOnPropertyValue(function ($cell, $obj, $value) {
             /* @var $cell Cell\Text */
             /* @var $obj \Ca\Db\Item */
             $scale = \Ca\Db\ScaleMap::create()->find($obj->getScaleId());

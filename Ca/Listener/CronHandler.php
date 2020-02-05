@@ -48,14 +48,15 @@ class CronHandler implements Subscriber
      */
     protected function sendReminders($console)
     {
-        $console->write(' - Sending Assessment Reminders: ');
+
+        $console->write(' - Sending Assessment Reminders');
 
         // Placement Evaluating reminder after 7 days, then send every 28 days, for max 4 months.
 
-        $console->writeBlue('    - TODO: Send initial assessment reminder');
-        $console->writeBlue('    - TODO: Send any outstanding reminders less than max number of times.');
-        $console->writeBlue('    - TODO: For any reminders on their last send, also email the subject coordinator informing them of the issue.');
-        $console->write(' ');
+//        $console->writeBlue('    - TODO: Send initial assessment reminder');
+//        $console->writeBlue('    - TODO: Send any outstanding reminders less than max number of times.');
+//        $console->writeBlue('    - TODO: For any reminders on their last send, also email the subject coordinator informing them of the issue.');
+//        $console->write(' ');
 
         // Get enabled courses
         $plugin = \Ca\Plugin::getInstance();
@@ -73,11 +74,15 @@ class CronHandler implements Subscriber
             foreach ($subjectList as $subject) {
                 $console->write('      Subject: ' . $subject->getName());
                 foreach ($assessmentList as $assessment) {
+                    if (!$assessment->isEnableReminder()) continue;
+                    $date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
                     $console->writeComment('        Assess: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
+                    $console->writeComment('        Date From: ' . $date->format(\Tk\Date::FORMAT_SHORT_DATE));
+
                     $placementTypeIds = $assessment->getPlacementTypes()->toArray('id');
                     $placementTypeIdSql = \Tk\Db\Mapper::makeMultipleQuery($placementTypeIds, 'a2.placement_type_id');
                     $statusSql = \Tk\Db\Mapper::makeMultipleQuery($assessment->getPlacementStatus(), 'a2.status');
-                    $maxReminder = 5; // initial + $assessment_repeat_cycles
+                    $maxReminder = $assessment->getReminderRepeatCycles()+1;
 
                     $sql = sprintf("SELECT *
 FROM (
@@ -108,9 +113,16 @@ WHERE a.id = b.placement_id
       AND a.subject_id = e.id AND e.course_id = f.course_id AND f.id = %s
 ORDER BY a.date_end DESC
 ", $assessment->getId(), $assessment->getId(), $assessment->getId(), $placementTypeIdSql, $subject->getId(), $statusSql, $maxReminder, $assessment->getId());
-                    vd($sql);
                     $res = $this->getConfig()->getDb()->query($sql);
-                    $console->writeComment('        Rows: ' . $res->rowCount());
+                    $console->writeComment('        Reminders: ' . $res->rowCount());
+
+
+                    // TODO: Use the email template log system to message users about their entry reminders
+                    // TODO: also consider using the internal user notification system for internal messages as well as emails.
+
+
+
+
 
                 }
             }

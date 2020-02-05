@@ -35,7 +35,7 @@ class Scale extends \Uni\TableIface
 //        $this->appendCell(new Cell\Text('institutionId'));
         $url = $this->getEditUrl();
         $this->appendCell(new Cell\Text('name'))->addCss('key')->setUrl($url)
-            ->setOnPropertyValue(function ($cell, $obj, $value) use ($url) {
+            ->addOnPropertyValue(function ($cell, $obj, $value) use ($url) {
                 /** @var $cell Cell\Text */
                 /** @var $obj \Ca\Db\Scale */
                 if ($obj->getType() != \Ca\Db\Scale::TYPE_CHOICE)

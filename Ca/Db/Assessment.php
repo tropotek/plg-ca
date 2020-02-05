@@ -65,6 +65,26 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public $enableCheckbox = false;
 
     /**
+     * @var bool
+     */
+    public $enableReminder = false;
+
+    /**
+     * @var int
+     */
+    public $reminderInitialDays = 7;
+
+    /**
+     * @var int
+     */
+    public $reminderRepeatDays = 28;
+
+    /**
+     * @var int
+     */
+    public $reminderRepeatCycles = 4;
+
+    /**
      * @var string
      */
     public $description = '';
@@ -189,16 +209,18 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @param string $sep (optional)
      * @return string
      * @throws \Exception
      */
-    public function getPlacementTypeName()
+    public function getPlacementTypeName($sep = ', ')
     {
         $list = $this->getPlacementTypes();
         $str = '';
         foreach ($list as $placementType) {
-            $str .= $placementType->getName();
+            $str .= $sep . $placementType->getName();
         }
+        $str = trim($str, $sep);
         return $str;
     }
 
@@ -253,6 +275,78 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function setEnableCheckbox($enableCheckbox): Assessment
     {
         $this->enableCheckbox = $enableCheckbox;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnableReminder(): bool
+    {
+        return $this->enableReminder;
+    }
+
+    /**
+     * @param bool $enableReminder
+     * @return Assessment
+     */
+    public function setEnableReminder(bool $enableReminder): Assessment
+    {
+        $this->enableReminder = $enableReminder;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReminderInitialDays(): int
+    {
+        return $this->reminderInitialDays;
+    }
+
+    /**
+     * @param int $reminderInitialDays
+     * @return Assessment
+     */
+    public function setReminderInitialDays(int $reminderInitialDays): Assessment
+    {
+        $this->reminderInitialDays = $reminderInitialDays;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReminderRepeatDays(): int
+    {
+        return $this->reminderRepeatDays;
+    }
+
+    /**
+     * @param int $reminderRepeatDays
+     * @return Assessment
+     */
+    public function setReminderRepeatDays(int $reminderRepeatDays): Assessment
+    {
+        $this->reminderRepeatDays = $reminderRepeatDays;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReminderRepeatCycles(): int
+    {
+        return $this->reminderRepeatCycles;
+    }
+
+    /**
+     * @param int $reminderRepeatCycles
+     * @return Assessment
+     */
+    public function setReminderRepeatCycles(int $reminderRepeatCycles): Assessment
+    {
+        $this->reminderRepeatCycles = $reminderRepeatCycles;
         return $this;
     }
 
@@ -483,6 +577,18 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
         if (!$this->getAssessorGroup()) {
             $errors['assessorGroup'] = 'Invalid value: assessorGroup';
+        }
+
+        if ($this->isEnableReminder()) {
+            if (!$this->getReminderInitialDays()) {
+                $errors['reminderInitialDays'] = 'Please set the number of days after placement completion that the first reminder is sent. (Default: 7)';
+            }
+            if (!$this->getReminderRepeatDays()) {
+                $errors['reminderRepeatDays'] = 'Please set the number of days after the first reminder is sent before sending subsequent reminders. (Default: 28)';
+            }
+            if (!$this->getReminderRepeatCycles()) {
+                $errors['reminderRepeatCycles'] = 'Please set the number of time that a reminder message is sent after the initial reminder. (Default: 4)';
+            }
         }
 
         return $errors;

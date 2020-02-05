@@ -36,6 +36,10 @@ class AssessmentMap extends Mapper
             $this->dbMap->addPropertyMap(new Db\Text('assessorGroup', 'assessor_group'));
             $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
             $this->dbMap->addPropertyMap(new Db\Boolean('enableCheckbox', 'enable_checkbox'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('enableReminder', 'enable_reminder'));
+            $this->dbMap->addPropertyMap(new Db\Integer('reminderInitialDays', 'reminder_initial_days'));
+            $this->dbMap->addPropertyMap(new Db\Integer('reminderRepeatDays', 'reminder_repeat_days'));
+            $this->dbMap->addPropertyMap(new Db\Integer('reminderRepeatCycles', 'reminder_repeat_cycles'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
@@ -61,6 +65,10 @@ class AssessmentMap extends Mapper
             $this->formMap->addPropertyMap(new Form\Text('assessorGroup'));
             $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
             $this->formMap->addPropertyMap(new Form\Boolean('enableCheckbox'));
+            $this->formMap->addPropertyMap(new Form\Boolean('enableReminder'));
+            $this->formMap->addPropertyMap(new Form\Integer('reminderInitialDays'));
+            $this->formMap->addPropertyMap(new Form\Integer('reminderRepeatDays'));
+            $this->formMap->addPropertyMap(new Form\Integer('reminderRepeatCycles'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Text('notes'));
             $this->formMap->addPropertyMap(new Form\Date('modified'));
@@ -137,6 +145,9 @@ class AssessmentMap extends Mapper
         }
         if (!empty($filter['enableCheckbox'])) {
             $filter->appendWhere('a.enable_checkbox = %s AND ', (int)$filter['enableCheckbox']);
+        }
+        if (!empty($filter['enableReminder'])) {
+            $filter->appendWhere('a.enable_reminder = %s AND ', (int)$filter['enableReminder']);
         }
 
         if (!empty($filter['placementTypeId'])) {

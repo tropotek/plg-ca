@@ -73,38 +73,11 @@ class CronHandler implements Subscriber
             foreach ($subjectList as $subject) {
                 $console->write('      Subject: ' . $subject->getName());
                 foreach ($assessmentList as $assessment) {
-                    $console->writeComment('        Assess: ' . $assessment->getName() . ' [' . $assessment->getId() . ']');
+                    $console->writeComment('        Assess: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
                     $placementTypeIds = $assessment->getPlacementTypes()->toArray('id');
-                    $placementTypeIdSql = \Tk\Db\Mapper::makeMultipleQuery($placementTypeIds, 'a1.placement_type_id');
-                    $statusSql = \Tk\Db\Mapper::makeMultipleQuery($assessment->getPlacementStatus(), 'a1.status');
+                    $placementTypeIdSql = \Tk\Db\Mapper::makeMultipleQuery($placementTypeIds, 'a2.placement_type_id');
+                    $statusSql = \Tk\Db\Mapper::makeMultipleQuery($assessment->getPlacementStatus(), 'a2.status');
                     $maxReminder = 5; // initial + $assessment_repeat_cycles
-
-                    $sql = sprintf("
-SELECT *
-FROM (
-SELECT DISTINCT a1.*
-    FROM placement a1
-    LEFT JOIN ca_entry ce ON (a1.id = ce.placement_id AND ce.assessment_id = {$assessment->getId()})
-WHERE
-    ($placementTypeIdSql)
-    AND a1.subject_id = {$subject->getId()}
-    AND ($statusSql)
-    AND ce.id IS NULL
-    AND DATE(a1.date_end) > '2020-01-01' -- So older placements are not included
-    AND DATE(DATE_ADD(a1.date_end, INTERVAL 7 DAY)) <= DATE(NOW())
-ORDER BY a1.date_end DESC
-) a, subject b, ca_assessment c, (
-  SELECT assessment_id, placement_id, SUM(date) as 'reminder_count'
-    FROM ca_reminder
-    GROUP BY assessment_id, placement_id
-) d
-
-WHERE a.subject_id = b.id AND b.course_id = c.course_id AND c.id = {$assessment->getId()}
-    AND a.id = d.placement_id AND c.id = d.assessment_id
-ORDER BY a.date_end DESC
-");
-
-
 
                     $sql = sprintf("SELECT *
 FROM (
@@ -122,17 +95,19 @@ FROM (
     ) a,
     (
          SELECT a2.id as 'placement_id', %s as 'assessment_id', IFNULL(COUNT(b2.date), 0) as 'reminder_count', MAX(b2.date) as 'last_sent'
-         FROM placement a2 LEFT JOIN ca_reminder b2 ON (a2.id = b2.placement_id AND b2.assessment_id = 3)
-         WHERE a2.placement_type_id = '9' AND a2.subject_id = 57
-           AND (a2.status = 'assessing' OR a2.status = 'completed' OR a2.status = 'evaluating' OR a2.status = 'failed')
+         FROM placement a2 LEFT JOIN ca_reminder b2 ON (a2.id = b2.placement_id AND b2.assessment_id = %s)
+         WHERE 
+           (%s) AND 
+           a2.subject_id = %s AND
+           (%s)
          GROUP BY a2.id
     ) b
     , subject e, ca_assessment f
 WHERE a.id = b.placement_id
-      AND b.reminder_count < 5
-      AND a.subject_id = e.id AND e.course_id = f.course_id AND f.id = 3
+      AND b.reminder_count < %s
+      AND a.subject_id = e.id AND e.course_id = f.course_id AND f.id = %s
 ORDER BY a.date_end DESC
-", $assessment->getId(), $assessment->getId(),  );
+", $assessment->getId(), $assessment->getId(), $assessment->getId(), $placementTypeIdSql, $subject->getId(), $statusSql, $maxReminder, $assessment->getId());
                     vd($sql);
                     $res = $this->getConfig()->getDb()->query($sql);
                     $console->writeComment('        Rows: ' . $res->rowCount());

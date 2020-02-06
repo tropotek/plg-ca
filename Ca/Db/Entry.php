@@ -125,6 +125,37 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @param \App\Db\Placement $placement
+     * @param \Ca\Db\Assessment $assessment
+     * @return Entry
+     */
+    public static function create($placement, $assessment)
+    {
+        $entry = new \Ca\Db\Entry();
+        $entry->setAssessmentId($assessment->getId());
+        $entry->setSubjectId($placement->getSubjectId());
+        $entry->setStudentId($placement->getUserId());
+        $entry->setAssessorId($placement->getSupervisorId());
+        $entry->setPlacementId($placement->getId());
+        switch($assessment->getAssessorGroup()) {
+            case \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY:
+                if ($entry->getAssessor()) {
+                    $entry->setAssessorName($entry->getAssessor()->getName());
+                    $entry->setAssessorEmail($entry->getAssessor()->getEmail());
+                }
+                break;
+            case \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT:
+                if ($entry->getStudent()) {
+                    $entry->setAssessorName($entry->getStudent()->getName());
+                    $entry->setAssessorEmail($entry->getStudent()->getEmail());
+                }
+                break;
+        }
+
+        return $entry;
+    }
+
+    /**
      * @param int $studentId
      * @return Entry
      */

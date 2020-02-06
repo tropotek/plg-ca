@@ -59,7 +59,8 @@ VALUES
   ('status.ca.entry.pending', 'Assessment Entry - Pending', ''),
   ('status.ca.entry.approved', 'Assessment Entry - Approved', ''),
   ('status.ca.entry.amend', 'Assessment Entry - Amend', ''),
-  ('status.ca.entry.not approved', 'Assessment Entry - Not Approved', '')
+  ('status.ca.entry.not approved', 'Assessment Entry - Not Approved', ''),
+  ('message.ca.entry.reminder', 'Assessment Entry - Reminder', '')
 ");
         $stm->execute();
 
@@ -73,11 +74,10 @@ VALUES
      */
     function doDeactivate()
     {
-        // TODO: Implement doDeactivate() method.
         $db = $this->getConfig()->getDb();
 
         // Remove status types
-        $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.ca.entry.%' ");
+        $stm = $db->prepare("DELETE FROM mail_template_type WHERE (event LIKE '%.ca.entry.%') ");
         $stm->execute();
 
 

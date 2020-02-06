@@ -52,15 +52,34 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
      */
     public function formatStatusMessage($status, $message)
     {
-        /** @var Entry $model */
-        $model = $status->getModel();
+        /** @var Entry $entry */
+        $entry = $status->getModel();
+        $assessment = $entry->getAssessment();
+        /** @var MailTemplate $mailTemplate */
+        $mailTemplate = $message->get('_mailTemplate');
 
-        $placement = $model->getPlacement();
+        $placement = $entry->getPlacement();
         if (!$placement->getPlacementType()->isNotifications()) {
             \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->getName() . '] Notifications Disabled');
         }
 
-        $message->setSubject('[#'.$model->getId().'] ' . $model->getAssessment()->getName() . ' Entry ' . ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ');
+        $isReminder = false;
+        if ($status->getEvent() == 'message.ca.entry.reminder')
+            $isReminder = true;
+
+        if ($isReminder && $mailTemplate->getRecipient()) {
+            if ($assessment->getAssessorGroup() == Assessment::ASSESSOR_GROUP_STUDENT &&
+                $mailTemplate->getRecipient() != MailTemplate::RECIPIENT_STUDENT) return;
+            if ($assessment->getAssessorGroup() == Assessment::ASSESSOR_GROUP_COMPANY &&
+                $mailTemplate->getRecipient() != MailTemplate::RECIPIENT_COMPANY) return;
+        }
+
+
+        $msgSubject = $assessment->getName() . ' Entry ' .
+            ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ';
+        // '[#'.$entry->getId().'] '
+
+        $message->setSubject($msgSubject);
         $message->setFrom(\Tk\Mail\Message::joinEmail($status->getCourse()->getEmail(), $status->getSubjectName()));
 
         // Setup the message vars
@@ -70,46 +89,56 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
         \App\Util\StatusMessage::setPlacement($message, $placement);
 
         // A`dd entry details
-        $message->set('assessment::id', $model->getAssessment()->getId());
-        $message->set('assessment::name', $model->getAssessment()->getName());
-        $message->set('assessment::description', $model->getAssessment()->getDescription());
+        $message->set('_assessment', $assessment);
+        $message->set('assessment::id', $assessment->getId());
+        $message->set('assessment::name', $assessment->getName());
+        $message->set('assessment::description', $assessment->getDescription());
+        $message->set('assessment::placementTypes', $assessment->getPlacementTypeName());
 
-        $message->set('entry::id', $model->getId());
-        $message->set('entry::title', $model->getTitle());
-        $message->set('entry::assessor', $model->getAssessorName());
-        $message->set('entry::status', $model->getStatus());
-        $message->set('entry::notes', nl2br($model->getNotes(), true));
+        $message->set('entry::id', $entry->getId());
+        $message->set('entry::title', $entry->getTitle());
+        $message->set('entry::assessor', $entry->getAssessorName());
+        $message->set('entry::status', $entry->getStatus());
+        $message->set('entry::notes', nl2br($entry->getNotes(), true));
 
 
         // Add assessment blocks
         $list = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $placement->getSubject()->getCourseId()));
-        /* @var \Ca\Db\Assessment $assessment */
-        foreach($list as $assessment) {
-            $key = $assessment->getNameKey();
-            if ($model->getAssessmentId() == $assessment->getId()) {
+        /* @var \Ca\Db\Assessment $assess */
+        foreach($list as $assess) {
+            $key = $assess->getNameKey();
+            if ($entry->getAssessmentId() == $assess->getId()) {
                 $message->set($key, true);
             } else {
                 $message->set('not'.$key, true);
             }
         }
 
-        /** @var MailTemplate $mailTemplate */
-        $mailTemplate = $message->get('_mailTemplate');
 
         switch ($mailTemplate->getRecipient()) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
-                if ($placement->getUser()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getUser()->getEmail(), $placement->getUser()->getName()));
+                $student = $placement->getUser();
+                if ($student && $student->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($student->getEmail(), $student->getName()));
+                    $message->set('recipient::email', $student->getEmail());
+                    $message->set('recipient::name', $student->getName());
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_COMPANY:
-                if ($placement->getCompany()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->getEmail(), $placement->getCompany()->getName()));
+                $company = $placement->getCompany();
+                if ($company && $company->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($company->getEmail(), $company->getName()));
+                    $message->set('recipient::email', $company->getEmail());
+                    $message->set('recipient::name', $company->getName());
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_SUPERVISOR:
-                if ($placement->getSupervisor() && $placement->getSupervisor()->getEmail())
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getSupervisor()->getEmail(), $placement->getSupervisor()->getName()));
+                $supervisor = $placement->getSupervisor();
+                if ($supervisor && $supervisor->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($supervisor->getEmail(), $supervisor->getName()));
+                    $message->set('recipient::email', $supervisor->getEmail());
+                    $message->set('recipient::name', $supervisor->getName());
+                }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
                 $staffList = $status->getSubject()->getCourse()->getUsers();
@@ -121,6 +150,28 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
                     $message->addTo(\Tk\Mail\Message::joinEmail($status->getSubject()->getCourse()->getEmail(), $status->getSubjectName()));
                     $message->set('recipient::email', $status->getSubject()->getCourse()->getEmail());
                     $message->set('recipient::name', $status->getSubjectName());
+                }
+                break;
+        }
+
+        // This is for all recipients only
+        if (!$isReminder || $mailTemplate->getRecipient()) return;
+
+        switch ($assessment->getAssessorGroup()) {
+            case Assessment::ASSESSOR_GROUP_STUDENT:
+                $student = $placement->getUser();
+                if ($student && $student->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($student->getEmail(), $student->getName()));
+                    $message->set('recipient::email', $student->getEmail());
+                    $message->set('recipient::name', $student->getName());
+                }
+                break;
+            case Assessment::ASSESSOR_GROUP_COMPANY:
+                $company = $placement->getCompany();
+                if ($company && $company->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($company->getEmail(), $company->getName()));
+                    $message->set('recipient::email', $company->getEmail());
+                    $message->set('recipient::name', $company->getName());
                 }
                 break;
         }

@@ -42,5 +42,7 @@ CREATE TABLE IF NOT EXISTS ca_reminder (
 ) ENGINE = InnoDB;
 
 
-
+INSERT INTO mail_template_type (name, event) VALUES
+    ('Assessment Entry - Reminder', 'message.ca.entry.reminder')
+;
 

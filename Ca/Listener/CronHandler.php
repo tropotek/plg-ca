@@ -66,7 +66,7 @@ class CronHandler implements Subscriber
             /** @var \Uni\Db\CourseIface $course */
             $course = $this->getConfig()->getCourseMapper()->find($courseData->zone_id);
             if (!$course) continue;
-            $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $courseData->zone_id));
+            $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $courseData->zone_id, 'enableReminder' => true));
             if (!$assessmentList->countAll()) continue;
 
             $console->write('    Course: ' . $course->getName());
@@ -74,9 +74,8 @@ class CronHandler implements Subscriber
             foreach ($subjectList as $subject) {
                 $console->write('      Subject: ' . $subject->getName());
                 foreach ($assessmentList as $assessment) {
-                    if (!$assessment->isEnableReminder()) continue;
                     $date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
-                    $console->writeComment('        Assess: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
+                    $console->writeComment('       Assess: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
                     $console->writeComment('        Date From: ' . $date->format(\Tk\Date::FORMAT_SHORT_DATE));
 
                     $placementTypeIds = $assessment->getPlacementTypes()->toArray('id');
@@ -107,67 +106,55 @@ FROM (
            (%s)
          GROUP BY a2.id
     ) b
-    , subject e, ca_assessment f
+--    , subject e, ca_assessment f
 WHERE a.id = b.placement_id
-      AND b.reminder_count < %s
-      AND a.subject_id = e.id AND e.course_id = f.course_id AND f.id = %s
+      AND b.reminder_count <= %s
+--       AND a.subject_id = e.id AND e.course_id = f.course_id AND f.id = %s
 ORDER BY a.date_end DESC
 ", $assessment->getId(), $assessment->getId(), $assessment->getId(), $placementTypeIdSql, $subject->getId(), $statusSql, $maxReminder, $assessment->getId());
                     $res = $this->getConfig()->getDb()->query($sql);
                     $console->writeComment('        Reminders: ' . $res->rowCount());
+                    $sentCnt = 0;;
+                    foreach($res as $i => $row) {
+                        /** @var \App\Db\Placement $placement */
+                        $placement = \App\Db\PlacementMap::create()->find($row->id);
+                        if (!$placement) continue;
+                        $reminderCount = $row->reminder_count;
+                        $lastSent = null;
+                        if ($row->last_sent)
+                            $lastSent = \Tk\Date::floor(\Tk\Date::create($row->last_sent));
+                        $days = $assessment->getReminderInitialDays() + ($assessment->getReminderRepeatDays() * $reminderCount);
+                        $nextReminderDate = \Tk\Date::floor($placement->getDateEnd()->add(new \DateInterval('P'.$days.'D')));
+                        $now = \Tk\Date::floor();
 
+                        //vd($reminderCount, $now, $nextReminderDate);
+                        // compare dates, last date and number of reminders sent to see what should be sent and what should not.
+                        if (!$lastSent || $now >= $nextReminderDate ) {
+                            $entry = \Ca\Db\Entry::create($placement, $assessment);      // Do not save() this status and entry..
+                            $entry->setStatus('reminder');
 
-                    // TODO: Use the email template log system to message users about their entry reminders
-                    // TODO: also consider using the internal user notification system for internal messages as well as emails.
+                            $status = \Uni\Db\Status::create($entry, 'Assessment Reminder');
+                            $status->setEvent('message.ca.entry.reminder');
 
+                            $e = new \Uni\Event\StatusEvent($status);
+                            $this->getConfig()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_CHANGE, $e);
+                            $this->getConfig()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_SEND_MESSAGES, $e);
 
-
-
+                            // Mark reminder sent
+                            $sentCnt++;
+                            $stmt = $this->getDb()->prepare('INSERT INTO ca_reminder (assessment_id, placement_id, date) VALUES (?, ?, NOW())');
+                            $stmt->execute(array(
+                                $assessment->getId(),
+                                $placement->getId()
+                            ));
+                        }
+                    }
+                    $console->writeComment('             Sent: ' . $sentCnt);
 
                 }
             }
 
         }
-
-
-
-
-
-
-
-// Sample SQL query??
-// ---------------------
-
-//    ;
-
-
-// Placement reminder code for example only...
-// -----------------------------------------------------------
-//
-//        $this->write(' - Sending Placement Reminders.');
-//        $filter = array(
-//            'historic' => false,
-//            'institutionId' => $institution->getId(),
-//            'reminder' => true,
-//            'status' => array(\App\Db\Placement::STATUS_APPROVED)
-//        );
-//
-//        $list = \App\Db\PlacementMap::create()->findFiltered($filter);
-//        foreach($list as $i => $placement) {
-//            $status = \Uni\Db\Status::create($placement, 'Reminder');
-//            $status->setEvent('message.app.placement.company.reminder');
-//
-//            $e = new \Uni\Event\StatusEvent($status);
-//            \App\Config::getInstance()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_CHANGE, $e);
-//            \App\Config::getInstance()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_SEND_MESSAGES, $e);
-//            // Mark placement as reminder sent
-//            $placement->setReminder(\Tk\Date::create());
-//            $placement->save();
-//            $this->write('   + [' .$placement->getId() . '] ' . $placement->getTitle(true));
-//        }
-//        $this->write('   Processed: ' . $list->count());
-
-
 
     }
 

@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.0.52 [2020-02-10]:
+-------------------------------
+  - Merge branch 'master' of ssh://github.com/tropotek/plg-ca
+
+
 Ver 3.0.50 [2020-01-29]:
 -------------------------------
 

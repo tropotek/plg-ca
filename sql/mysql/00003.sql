@@ -22,7 +22,7 @@
 # ORDER BY a.date_end DESC
 # ;
 
-alter table ca_assessment add enable_reminder BOOL default 1 not null after enable_checkbox;
+alter table ca_assessment add enable_reminder BOOL default 0 not null after enable_checkbox;
 alter table ca_assessment add reminder_initial_days INT default 7 not null after enable_reminder;
 alter table ca_assessment add reminder_repeat_days INT default 28 not null after reminder_initial_days;
 alter table ca_assessment add reminder_repeat_cycles INT default 4 not null after reminder_repeat_days;
@@ -46,3 +46,8 @@ INSERT INTO mail_template_type (name, event) VALUES
     ('Assessment Entry - Reminder', 'message.ca.entry.reminder')
 ;
 
+INSERT INTO mail_template (course_id, event, recipient, template, active, modified, created) VALUES (2, 'message.ca.entry.reminder', 0, '<p>To {recipient::name}</p>
+<p>This is a reminder that the {assessment::linkHtml} for the placement {placement::title} is still outstanding.</p>
+<p>You can submit the assessment via the following link:</p>
+<p>{assessment::linkText}</p>
+<p>&nbsp;</p>', 1, NOW(), NOW());

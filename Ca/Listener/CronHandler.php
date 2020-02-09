@@ -74,6 +74,7 @@ class CronHandler implements Subscriber
             foreach ($subjectList as $subject) {
                 $console->write('      Subject: ' . $subject->getName());
                 foreach ($assessmentList as $assessment) {
+                    if (!$assessment->isEnableReminder() || !$assessment->isActive($subject->getId())) continue;
                     $date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
                     $console->writeComment('       Assess: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
                     $console->writeComment('        Date From: ' . $date->format(\Tk\Date::FORMAT_SHORT_DATE));

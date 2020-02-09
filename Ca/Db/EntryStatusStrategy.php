@@ -168,6 +168,7 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
                 break;
             case Assessment::ASSESSOR_GROUP_COMPANY:
                 $company = $placement->getCompany();
+                // TODO: We could also send one to the placement supervisor directly
                 if ($company && $company->getEmail()) {
                     $message->addTo(\Tk\Mail\Message::joinEmail($company->getEmail(), $company->getName()));
                     $message->set('recipient::email', $company->getEmail());

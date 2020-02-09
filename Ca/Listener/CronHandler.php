@@ -93,7 +93,7 @@ FROM (
     --      AND a1.subject_id = 57
     --      AND (a1.status = 'assessing' OR a1.status = 'completed' OR a1.status = 'evaluating' OR a1.status = 'failed')
           ce.id IS NULL
-          AND DATE(a1.date_end) > '2020-01-01' -- So older placements are not included
+          AND DATE(a1.date_start) > '2020-01-01' -- So older placements are not included
           AND DATE(DATE_ADD(a1.date_end, INTERVAL 7 DAY)) <= DATE(NOW())
         ORDER BY a1.date_end DESC
     ) a,

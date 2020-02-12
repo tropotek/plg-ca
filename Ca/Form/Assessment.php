@@ -46,8 +46,8 @@ class Assessment extends \Uni\FormIface
         $this->appendField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))
             ->setTabGroup($tab)->addCss('iconpicker')->setNotes('Select an identifying icon for this assessment');
 
-        $this->appendField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
-            ->setCheckboxLabel('When calculating the score should 0 value results be included.');
+//        $this->appendField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
+//            ->setCheckboxLabel('When calculating the score should 0 value results be included.');
         $this->appendField(new Field\Checkbox('enableCheckbox'))->setLabel('Subject Assessment Table')->setTabGroup($tab)
             ->setCheckboxLabel('Display a checkbox on the Subject student assessment table when Entry marked approved');
 

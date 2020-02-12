@@ -38,7 +38,7 @@ class Item extends \Uni\FormIface
         //$this->appendField(new Field\Select('assessmentId', array()))->prependOption('-- Select --', '');
         $item = $this->getItem();
         $this->appendField(new Field\Input('name'))->setLabel('Question')->setNotes('(Optional) This value is optional and the first competency will be used if this is blank.')
-            ->setOnShow(function ($template, $field) use ($item) {
+            ->addOnShow(function ($template, $field) use ($item) {
             /* @var $field Field\Input */
             if (!$item->getName()) {
                 /** @var \Ca\Db\Competency $comptetency */
@@ -48,7 +48,7 @@ class Item extends \Uni\FormIface
                     $field->setAttr('placeholder', $comptetency->getName());
             }
         });
-        $this->appendField(new Field\Checkbox('gradable'));
+        //$this->appendField(new Field\Checkbox('gradable'));
         $this->appendField(new Field\Checkbox('required'));
         $list = \Ca\Db\ScaleMap::create()->findFiltered(array('institutionId' => $this->getConfig()->getInstitutionId()));
         $this->appendField(new Field\Select('scaleId', $list))->prependOption('-- Select --', '');

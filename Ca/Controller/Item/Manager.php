@@ -36,7 +36,7 @@ class Manager extends AdminManagerIface
         $this->getTable()->init();
 
         $filter = array(
-            'assessmentId' => $this->getRequest()->get('assessmentId')
+            'assessmentId' => $request->get('assessmentId')
         );
         $this->getTable()->setList($this->getTable()->findList($filter));
     }
@@ -47,7 +47,7 @@ class Manager extends AdminManagerIface
     public function initActionPanel()
     {
         $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Item',
-            $this->getTable()->getEditUrl(), 'fa fa-book fa-add-action'));
+            $this->getTable()->getEditUrl()->set('assessmentId', $this->getRequest()->get('assessmentId')), 'fa fa-book fa-add-action'));
     }
 
     /**

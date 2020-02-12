@@ -31,6 +31,11 @@ class Edit extends AdminEditIface
     protected $table = null;
 
     /**
+     * @var null|AjaxSelect
+     */
+    protected $competencyDialog = null;
+
+    /**
      * Iface constructor.
      */
     public function __construct()
@@ -45,6 +50,7 @@ class Edit extends AdminEditIface
     public function doDefault(Request $request)
     {
         $this->item = new \Ca\Db\Item();
+        $this->item->setAssessmentId($request->get('assessmentId'));
         if ($request->get('itemId')) {
             $this->item = \Ca\Db\ItemMap::create()->find($request->get('itemId'));
         }
@@ -56,8 +62,8 @@ class Edit extends AdminEditIface
         if ($this->item->getId()) {
             $this->competencyDialog = AjaxSelect::create('Select Competency');
             $this->competencyDialog->setNotes('Select the competencies for this Assessment Item.');
-            $this->competencyDialog->setOnSelect(array($this, 'onSelect'));
-            $this->competencyDialog->setOnAjax(array($this, 'onAjax'));
+            $this->competencyDialog->addOnSelect(array($this, 'onSelect'));
+            $this->competencyDialog->addOnAjax(array($this, 'onAjax'));
             $this->competencyDialog->execute();
 
             $this->table = \Ca\Table\Competency::create();
@@ -75,13 +81,13 @@ class Edit extends AdminEditIface
     }
 
     /**
-     * @param Request $request
+     * @param AjaxSelect $dialog
      * @return Uri
      * @throws \Exception
      */
-    public function onSelect(Request $request)
+    public function onSelect(AjaxSelect $dialog)
     {
-        $selectedCompetency = \Ca\Db\CompetencyMap::create()->find($request->get('selectedId'));
+        $selectedCompetency = \Ca\Db\CompetencyMap::create()->find($dialog->getRequest()->get('selectedId'));
         if ($selectedCompetency) {
             try {
                 \Ca\Db\ItemMap::create()->addCompetency($selectedCompetency->getId(), $this->item->getId());
@@ -94,16 +100,16 @@ class Edit extends AdminEditIface
     }
 
     /**
-     * @param Request $request
+     * @param AjaxSelect $dialog
      * @return array
      * @throws \Exception
      */
-    public function onAjax(Request $request)
+    public function onAjax(AjaxSelect $dialog)
     {
         $filter = array(
             'institutionId' => $this->getConfig()->getInstitutionId()
         );
-        $filter['keywords'] = $request->get('keywords');
+        $filter['keywords'] = $dialog->getRequest()->get('keywords');
         $list = \Ca\Db\CompetencyMap::create()->findFiltered($filter);
         return $list->toArray();
     }

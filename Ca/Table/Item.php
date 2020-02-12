@@ -65,7 +65,7 @@ class Item extends \Uni\TableIface
                     $listHtml = '<ul>';
                     foreach ($list as $comp) {
                         if ($cell->getUrl()) {
-                            $listHtml .= sprintf('<li><a href="%s">%s</a></li>', $cell->getCellUrl($obj), $comp->getName());
+                            $listHtml .= sprintf('<li><a href="%s">%s</a></li>', htmlspecialchars($cell->getCellUrl($obj)), $comp->getName());
                         } else {
                             $listHtml .= sprintf('<li>%s</li>', $comp->getName());
                         }
@@ -73,6 +73,7 @@ class Item extends \Uni\TableIface
                     $listHtml .= '</ul>';
                     if (!$obj->getName()) return $listHtml;
                 }
+                vd($html . $listHtml);
                 return $html . $listHtml;
             });
 

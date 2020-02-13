@@ -129,7 +129,7 @@ ORDER BY a.date_end DESC
                     $res = $this->getConfig()->getDb()->query($sql);
                     $console->writeComment('        Reminders: ' . $res->rowCount());
                     $sentCnt = 0;;
-                    foreach($res as $i => $row) {
+                    foreach($res as $row) {
                         /** @var \App\Db\Placement $placement */
                         $placement = \App\Db\PlacementMap::create()->find($row->id);
                         if (!$placement) continue;
@@ -167,12 +167,9 @@ ORDER BY a.date_end DESC
                         }
                     }
                     $console->writeComment('             Sent: ' . $sentCnt);
-
                 }
             }
-
         }
-
     }
 
 

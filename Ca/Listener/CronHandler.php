@@ -81,19 +81,32 @@ class CronHandler implements Subscriber
                 continue;
             }
 
-            $console->write('    Course: ' . $course->getName());
+
+            $courseFound = false;
             $subjectList = $this->getConfig()->getSubjectMapper()->findFiltered(array('courseId' => $course->getId(), 'active' => true), \Tk\Db\Tool::create('id DESC'));
             foreach ($subjectList as $subject) {
                 if (!\Ca\Db\AssessmentMap::create()->hasSubject($subject->getId())) continue;
-                $console->write('      Subject: ' . $subject->getName());
+                if (!$courseFound) {
+                    $console->write('    Course: ' . $course->getName());
+                    $courseFound = true;
+                }
+
+                $subjectFound = false;
                 foreach ($assessmentList as $i => $assessment) {
                     if (!$assessment->isEnableReminder() || !$assessment->isActive($subject->getId())) continue;
+                    // Get a list of placements with no assessments
+                    $res = \Ca\Db\EntryMap::create()->findReminders($assessment, $subject);
+                    if (!$res->rowCount()) continue;
+
+                    if (!$subjectFound && $res->rowCount()) {
+                        $console->write('      Subject: ' . $subject->getName());
+                        $subjectFound = true;
+                    }
+
                     $date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
                     $console->writeComment('       Assessment: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
                     $console->writeComment('        Date From: ' . $date->format(\Tk\Date::FORMAT_SHORT_DATE));
 
-                    // Get a list of placements with no assessments
-                    $res = \Ca\Db\EntryMap::create()->findReminders($assessment, $subject);
 
                     $console->writeComment('        Empty Entries: ' . $res->rowCount());
                     $sentCnt = 0;;

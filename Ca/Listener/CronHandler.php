@@ -89,59 +89,33 @@ class CronHandler implements Subscriber
                 foreach ($assessmentList as $i => $assessment) {
                     if (!$assessment->isEnableReminder() || !$assessment->isActive($subject->getId())) continue;
                     $date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
-                    $console->writeComment('       Assess: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
+                    $console->writeComment('       Assessment: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
                     $console->writeComment('        Date From: ' . $date->format(\Tk\Date::FORMAT_SHORT_DATE));
 
-                    $placementTypeIds = $assessment->getPlacementTypes()->toArray('id');
-                    $placementTypeIdSql = \Tk\Db\Mapper::makeMultipleQuery($placementTypeIds, 'a2.placement_type_id');
-                    $statusSql = \Tk\Db\Mapper::makeMultipleQuery($assessment->getPlacementStatus(), 'a2.status');
-                    $maxReminder = $assessment->getReminderRepeatCycles()+1;
+                    // Get a list of placements with no assessments
+                    $res = \Ca\Db\EntryMap::create()->findReminders($assessment, $subject);
 
-                    $sql = sprintf("SELECT *
-FROM (
-        SELECT DISTINCT a1.*
-        FROM placement a1
-        LEFT JOIN ca_entry ce ON (a1.id = ce.placement_id AND ce.assessment_id = %s)
-        WHERE
-    --      (a1.placement_type_id = '9')
-    --      AND a1.subject_id = 57
-    --      AND (a1.status = 'assessing' OR a1.status = 'completed' OR a1.status = 'evaluating' OR a1.status = 'failed')
-          ce.id IS NULL
-          AND DATE(a1.date_start) > '2020-01-01' -- So older placements are not included
-          AND DATE(DATE_ADD(a1.date_end, INTERVAL 7 DAY)) <= DATE(NOW())
-        ORDER BY a1.date_end DESC
-    ) a,
-    (
-         SELECT a2.id as 'placement_id', %s as 'assessment_id', IFNULL(COUNT(b2.date), 0) as 'reminder_count', MAX(b2.date) as 'last_sent'
-         FROM placement a2 LEFT JOIN ca_reminder b2 ON (a2.id = b2.placement_id AND b2.assessment_id = %s)
-         WHERE 
-           (%s) AND 
-           a2.subject_id = %s AND
-           (%s)
-         GROUP BY a2.id
-    ) b
---    , subject e, ca_assessment f
-WHERE a.id = b.placement_id
-      AND b.reminder_count <= %s
---       AND a.subject_id = e.id AND e.course_id = f.course_id AND f.id = %s
-ORDER BY a.date_end DESC
-", $assessment->getId(), $assessment->getId(), $assessment->getId(), $placementTypeIdSql, $subject->getId(), $statusSql, $maxReminder, $assessment->getId());
-                    $res = $this->getConfig()->getDb()->query($sql);
-                    $console->writeComment('        Reminders: ' . $res->rowCount());
+                    $console->writeComment('        Empty Entries: ' . $res->rowCount());
                     $sentCnt = 0;;
                     foreach($res as $row) {
                         /** @var \App\Db\Placement $placement */
                         $placement = \App\Db\PlacementMap::create()->find($row->id);
                         if (!$placement) continue;
+
                         $reminderCount = $row->reminder_count;
+                        //$days = $assessment->getReminderInitialDays() + ($assessment->getReminderRepeatDays() * $reminderCount);
+                        $nextReminderDate = \Tk\Date::floor($placement->getDateEnd()->add(new \DateInterval('P'.$assessment->getReminderInitialDays().'D')));
+
                         $lastSent = null;
-                        if ($row->last_sent)
+                        $lastSentStr = '';
+                        if ($row->last_sent) {
                             $lastSent = \Tk\Date::floor(\Tk\Date::create($row->last_sent));
-                        $days = $assessment->getReminderInitialDays() + ($assessment->getReminderRepeatDays() * $reminderCount);
-                        $nextReminderDate = \Tk\Date::floor($placement->getDateEnd()->add(new \DateInterval('P'.$days.'D')));
+                            $lastSentStr = $lastSent->format(\Tk\Date::$formFormat);
+                            $nextReminderDate = \Tk\Date::floor($lastSent->add(new \DateInterval('P' . $assessment->getReminderRepeatDays() . 'D')));
+                        }
                         $now = \Tk\Date::floor();
 
-                        //vd($reminderCount, $now, $nextReminderDate);
+                        vd($reminderCount, $lastSentStr, $nextReminderDate->format(\Tk\Date::$formFormat));
                         // compare dates, last date and number of reminders sent to see what should be sent and what should not.
                         if (!$lastSent || $now >= $nextReminderDate ) {
                             $entry = \Ca\Db\Entry::create($placement, $assessment);      // Do not save() this status and entry..
@@ -158,15 +132,11 @@ ORDER BY a.date_end DESC
                             // Mark reminder sent
                             $sentCnt += $e->get('sent', 0);
                             if ($e->get('sent', 0)) {
-                                $stmt = $this->getDb()->prepare('INSERT INTO ca_reminder (assessment_id, placement_id, date) VALUES (?, ?, NOW())');
-                                $stmt->execute(array(
-                                    $assessment->getId(),
-                                    $placement->getId()
-                                ));
+                                \Ca\Db\EntryMap::create()->addReminderLog($assessment->getId(), $placement->getId());
                             }
                         }
                     }
-                    $console->writeComment('             Sent: ' . $sentCnt);
+                    $console->writeComment('        Reminders Sent: ' . $sentCnt);
                 }
             }
         }

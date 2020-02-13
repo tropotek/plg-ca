@@ -175,8 +175,6 @@ class AssessmentMap extends Mapper
     }
 
 
-
-
     // Link to placement types
 
     /**

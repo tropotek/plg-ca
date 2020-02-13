@@ -235,6 +235,78 @@ class EntryMap extends Mapper
     }
 
 
+    /**
+     * Get a list of placements with no assessments
+     *
+     * @param Assessment $assessment
+     * @param \Uni\Db\SubjectIface $subject
+     * @return false|\PDOStatement|\Tk\Db\PDOStatement
+     * @throws \Tk\Db\Exception
+     */
+    public function findReminders(Assessment $assessment, \Uni\Db\SubjectIface $subject)
+    {
+        $placementTypeIds = $assessment->getPlacementTypes()->toArray('id');
+        $placementTypeIdSql = \Tk\Db\Mapper::makeMultipleQuery($placementTypeIds, 'a2.placement_type_id');
+        $statusSql = \Tk\Db\Mapper::makeMultipleQuery($assessment->getPlacementStatus(), 'a2.status');
+        $maxReminder = $assessment->getReminderRepeatCycles()+1;
 
+        $sql = sprintf("SELECT *
+FROM (
+        SELECT DISTINCT a1.*
+        FROM placement a1
+        LEFT JOIN ca_entry ce ON (a1.id = ce.placement_id AND ce.assessment_id = %s)
+        WHERE
+    --      (a1.placement_type_id = '9')
+    --      AND a1.subject_id = 57
+    --      AND (a1.status = 'assessing' OR a1.status = 'completed' OR a1.status = 'evaluating' OR a1.status = 'failed')
+          ce.id IS NULL
+          AND DATE(a1.date_start) > '2020-01-01' -- So older placements are not included
+          AND DATE(DATE_ADD(a1.date_end, INTERVAL 7 DAY)) <= DATE(NOW())
+        ORDER BY a1.date_end DESC
+    ) a,
+    (
+         SELECT a2.id as 'placement_id', %s as 'assessment_id', IFNULL(COUNT(b2.date), 0) as 'reminder_count', MAX(b2.date) as 'last_sent'
+         FROM placement a2 LEFT JOIN ca_reminder b2 ON (a2.id = b2.placement_id AND b2.assessment_id = %s)
+         WHERE 
+           (%s) AND 
+           a2.subject_id = %s AND
+           (%s)
+         GROUP BY a2.id
+    ) b
+--    , subject e, ca_assessment f
+WHERE a.id = b.placement_id
+      AND b.reminder_count <= %s
+--       AND a.subject_id = e.id AND e.course_id = f.course_id AND f.id = %s
+ORDER BY a.date_end DESC
+", $assessment->getId(), $assessment->getId(), $assessment->getId(), $placementTypeIdSql, $subject->getId(), $statusSql, $maxReminder, $assessment->getId());
 
+        return $this->getConfig()->getDb()->query($sql);
+    }
+
+    /**
+     * @param int $assessmentId
+     * @param int $placementId
+     * @return bool
+     * @throws \Exception
+     */
+    public function addReminderLog($assessmentId, $placementId)
+    {
+        $stmt = $this->getDb()->prepare('INSERT INTO ca_reminder (assessment_id, placement_id, date) VALUES (?, ?, NOW())');
+        return $stmt->execute(array($assessmentId, $placementId));
+    }
+
+    /**
+     * return the reminder logs, the first one in the array is the latest log
+     *
+     * @param int $assessmentId
+     * @param int $placementId
+     * @return array
+     * @throws \Exception
+     */
+    public function getReminderLog($assessmentId, $placementId)
+    {
+        $stmt = $this->getDb()->prepare('SELECT * FROM ca_reminder WHERE assessment_id = ? AND placement_id = * ORDER BY date DESC');
+        $stmt->execute(array($assessmentId, $placementId));
+        return $stmt->fetchAll();
+    }
 }

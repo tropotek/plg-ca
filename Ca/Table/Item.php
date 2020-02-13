@@ -73,7 +73,6 @@ class Item extends \Uni\TableIface
                     $listHtml .= '</ul>';
                     if (!$obj->getName()) return $listHtml;
                 }
-                vd($html . $listHtml);
                 return $html . $listHtml;
             });
 

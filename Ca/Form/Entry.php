@@ -48,7 +48,7 @@ class Entry extends \Uni\FormIface
         if ($this->getAuthUser() && $this->getAuthUser()->isStaff() && !$this->isPublic()) {
             $this->appendField(new Field\Input('title'))->setFieldset($fieldset);
         } else {
-            $this->appendField(new Field\Html('title'))->setFieldset($fieldset);
+            $this->appendField(new Field\Html('title'))->setFieldset($fieldset)->setEscapeText(true);
         }
 //        if (!$this->isPublic()) {
 //            $avg = $this->getEntry()->getAverage();

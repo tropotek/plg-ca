@@ -77,7 +77,7 @@ class CronHandler implements Subscriber
                 'event' => 'message.ca.entry.reminder'
             ));
             if (!$mailTemplateList->countAll()) {
-                \Tk\Log::warning('No Assessment Reminder template found for course: ' . $course->getName());
+                \Tk\Log::warning('`Assessment Reminder Template` not found for course: ' . $course->getName());
                 continue;
             }
 

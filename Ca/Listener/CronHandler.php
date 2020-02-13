@@ -73,10 +73,12 @@ class CronHandler implements Subscriber
             // TODO: be sure this only affects the reminder emails
             $mailTemplateList = \App\Db\MailTemplateMap::create()->findFiltered(array(
                 'active' => true,
+                'courseId' => $course->getId(),
                 'event' => 'message.ca.entry.reminder'
             ));
             if (!$mailTemplateList->countAll()) {
-                \Tk\Log::warning('No template found for ');
+                \Tk\Log::warning('No Assessment Reminder template found for course: ' . $course->getName());
+                continue;
             }
 
             $console->write('    Course: ' . $course->getName());

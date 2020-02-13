@@ -252,19 +252,33 @@ class AssessmentMap extends Mapper
     // Link to subjects
 
     /**
-     * @param int $subjectId
-     * @param int $assessmentId
+     * @param int|null $subjectId
+     * @param int|null $assessmentId
      * @return boolean
      */
-    public function hasSubject($subjectId, $assessmentId)
+    public function hasSubject($subjectId = null, $assessmentId = null)
     {
         try {
-            $stm = $this->getDb()->prepare('SELECT * FROM ca_assessment_subject WHERE subject_id = ? AND assessment_id = ?');
-            $stm->bindParam(1, $subjectId);
-            $stm->bindParam(2, $assessmentId);
-            $stm->execute();
-            return ($stm->rowCount() > 0);
-        } catch (Exception $e) {}
+            if (!$subjectId) {
+                $stm = $this->getDb()->prepare('SELECT * FROM ca_assessment_subject WHERE assessment_id = ?');
+                $stm->bindParam(1, $assessmentId);
+                $stm->execute();
+                return ($stm->rowCount() > 0);
+            } else if (!$assessmentId) {
+                $stm = $this->getDb()->prepare('SELECT * FROM ca_assessment_subject WHERE subject_id = ?');
+                $stm->bindParam(1, $subjectId);
+                $stm->execute();
+                return ($stm->rowCount() > 0);
+            } else if ($assessmentId && $subjectId) {
+                $stm = $this->getDb()->prepare('SELECT * FROM ca_assessment_subject WHERE subject_id = ? AND assessment_id = ?');
+                $stm->bindParam(1, $subjectId);
+                $stm->bindParam(2, $assessmentId);
+                $stm->execute();
+                return ($stm->rowCount() > 0);
+            } else {
+                throw new \Tk\Exception('Invalid arguments');
+            }
+        } catch (\Exception $e) { \Tk\Log::warning($e->getMessage());}
         return false;
     }
 
@@ -302,6 +316,8 @@ class AssessmentMap extends Mapper
     }
 
     /**
+     * If the record exists and the publish_student is set then this assessment is active for the subject
+     *
      * @param int $subjectId
      * @param int $assessmentId
      * @param \DateTime $publishStudent
@@ -319,6 +335,10 @@ class AssessmentMap extends Mapper
     }
 
     /**
+     * If the record exists and the publish_student is set then this assessment is active for the subject
+     *
+     * Get the published date
+     *
      * @param int $subjectId
      * @param int $assessmentId
      * @return \DateTime|null

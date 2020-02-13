@@ -58,10 +58,11 @@ class CronHandler implements Subscriber
 //        $console->writeBlue('    - TODO: For any reminders on their last send, also email the subject coordinator informing them of the issue.');
 //        $console->write(' ');
 
+
         // Get enabled courses
         $plugin = \Ca\Plugin::getInstance();
         $courseList = $plugin->getPluginFactory()->getPluginZoneIdList($plugin->getName(), \App\Plugin\Iface::ZONE_COURSE);
-
+        //$courseList = array_reverse($courseList);
         foreach ($courseList as $courseData) {
             /** @var \Uni\Db\CourseIface $course */
             $course = $this->getConfig()->getCourseMapper()->find($courseData->zone_id);
@@ -69,11 +70,21 @@ class CronHandler implements Subscriber
             $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $courseData->zone_id, 'enableReminder' => true));
             if (!$assessmentList->countAll()) continue;
 
+            // TODO: be sure this only affects the reminder emails
+            $mailTemplateList = \App\Db\MailTemplateMap::create()->findFiltered(array(
+                'active' => true,
+                'event' => 'message.ca.entry.reminder'
+            ));
+            if (!$mailTemplateList->countAll()) {
+                \Tk\Log::warning('No template found for ');
+            }
+
             $console->write('    Course: ' . $course->getName());
-            $subjectList = $this->getConfig()->getSubjectMapper()->findFiltered(array('courseId' => $course->getId(), 'active' => true));
+            $subjectList = $this->getConfig()->getSubjectMapper()->findFiltered(array('courseId' => $course->getId(), 'active' => true), \Tk\Db\Tool::create('id DESC'));
             foreach ($subjectList as $subject) {
+                if (!\Ca\Db\AssessmentMap::create()->hasSubject($subject->getId())) continue;
                 $console->write('      Subject: ' . $subject->getName());
-                foreach ($assessmentList as $assessment) {
+                foreach ($assessmentList as $i => $assessment) {
                     if (!$assessment->isEnableReminder() || !$assessment->isActive($subject->getId())) continue;
                     $date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
                     $console->writeComment('       Assess: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
@@ -140,14 +151,17 @@ ORDER BY a.date_end DESC
                             $e = new \Uni\Event\StatusEvent($status);
                             $this->getConfig()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_CHANGE, $e);
                             $this->getConfig()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_SEND_MESSAGES, $e);
+                            if ($e->isPropagationStopped()) continue;
 
                             // Mark reminder sent
-                            $sentCnt++;
-                            $stmt = $this->getDb()->prepare('INSERT INTO ca_reminder (assessment_id, placement_id, date) VALUES (?, ?, NOW())');
-                            $stmt->execute(array(
-                                $assessment->getId(),
-                                $placement->getId()
-                            ));
+                            $sentCnt += $e->get('sent', 0);
+                            if ($e->get('sent', 0)) {
+                                $stmt = $this->getDb()->prepare('INSERT INTO ca_reminder (assessment_id, placement_id, date) VALUES (?, ?, NOW())');
+                                $stmt->execute(array(
+                                    $assessment->getId(),
+                                    $placement->getId()
+                                ));
+                            }
                         }
                     }
                     $console->writeComment('             Sent: ' . $sentCnt);

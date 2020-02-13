@@ -23,8 +23,12 @@ class StatusMailHandler implements Subscriber
 
         /** @var \Tk\Mail\CurlyMessage $message */
         foreach ($event->getMessageList() as $message) {
-            /** @var \App\Db\MailTemplate $mailTemplate */
-            $mailTemplate = $message->get('_mailTemplate');
+//            /** @var \App\Db\MailTemplate $mailTemplate */
+//            $mailTemplate = $message->get('_mailTemplate');
+//            if (!$mailTemplate) {
+//                \Tk\Log::warning('No template Available for event: ' . $event->getStatus()->getName());
+//                return;
+//            }
 
             if ($message->get('placement::id')) {
                 /** @var \App\Db\Placement $placement */

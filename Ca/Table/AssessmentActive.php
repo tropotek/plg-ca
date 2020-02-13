@@ -31,6 +31,7 @@ class AssessmentActive extends \Uni\TableIface
     {
         $this->appendCell(new Cell\Checkbox('id'));
         $this->appendCell(new Cell\Text('icon'))->addOnCellHtml(function ($cell, $obj, $html) {
+                /* @var $obj \Ca\Db\Assessment */
             $ico = 'fa fa-file-o';
             if ($obj->getIcon())
                 $ico = $obj->getIcon();
@@ -130,6 +131,7 @@ JS;
         if ($request->get('change')) {
             $assessmentId = (int)$request->get('assessmentId');
             if ($request->get('active')) {
+                //\Ca\Db\AssessmentMap::create()->addSubject($this->getConfig()->getSubjectId(), $assessmentId);
                 \Ca\Db\AssessmentMap::create()->setPublishStudent($this->getConfig()->getSubjectId(), $assessmentId,
                     \Tk\Date::createFormDate($request->get('publish')));
             } else {

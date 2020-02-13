@@ -77,8 +77,6 @@ class Assessment extends \Uni\FormIface
         $this->appendField(new Field\Input('reminderRepeatCycles'))->setTabGroup($tab)
             ->setNotes('The number of times to send subsequent reminders');
 
-
-
         $tab = 'Instructions';
 
         $this->appendField(new Field\Textarea('description'))->setLabel('Instructions')->setTabGroup($tab)

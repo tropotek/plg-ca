@@ -351,27 +351,6 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param $subjectId
-     * @param null|\DateTime $publishResult
-     * @return Assessment
-     */
-    public function setPublishResult($subjectId, $publishResult) : Assessment
-    {
-        AssessmentMap::create()->setPublishStudent($subjectId, $this->getId(), $publishResult);
-        return $this;
-    }
-
-    /**
-     * return null|\DateTime
-     * @param int $subjectId
-     * @return null|\DateTime
-     */
-    public function getPublishResult($subjectId) : ?\DateTime
-    {
-        return AssessmentMap::create()->getPublishStudent($subjectId, $this->getId());
-    }
-
-    /**
      * @param string $description
      * @return Assessment
      */

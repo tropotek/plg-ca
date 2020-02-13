@@ -57,6 +57,9 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
         $assessment = $entry->getAssessment();
         /** @var MailTemplate $mailTemplate */
         $mailTemplate = $message->get('_mailTemplate');
+        if (!$mailTemplate) {
+            \Tk\Log::warning('Message has no template: Assessment');
+        }
 
         $placement = $entry->getPlacement();
         if (!$placement->getPlacementType()->isNotifications()) {
@@ -155,7 +158,7 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
         }
 
         // This is for all recipients only
-        if (!$isReminder || $mailTemplate->getRecipient()) return;
+        if (!$isReminder || $mailTemplate->getRecipient()) { vd(); return; }
 
         switch ($assessment->getAssessorGroup()) {
             case Assessment::ASSESSOR_GROUP_STUDENT:

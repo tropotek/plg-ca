@@ -48,7 +48,6 @@ class CronHandler implements Subscriber
      */
     protected function sendReminders($console)
     {
-
         $console->write(' - Sending Assessment Reminders');
 
         // Placement Evaluating reminder after 7 days, then send every 28 days, for max 4 months.
@@ -62,6 +61,7 @@ class CronHandler implements Subscriber
         // Get enabled courses
         $plugin = \Ca\Plugin::getInstance();
         $courseList = $plugin->getPluginFactory()->getPluginZoneIdList($plugin->getName(), \App\Plugin\Iface::ZONE_COURSE);
+        $now = \Tk\Date::floor();
         //$courseList = array_reverse($courseList);
         foreach ($courseList as $courseData) {
             /** @var \Uni\Db\CourseIface $course */
@@ -102,22 +102,15 @@ class CronHandler implements Subscriber
                         $placement = \App\Db\PlacementMap::create()->find($row->id);
                         if (!$placement) continue;
 
-                        $reminderCount = $row->reminder_count;
-                        //$days = $assessment->getReminderInitialDays() + ($assessment->getReminderRepeatDays() * $reminderCount);
+                        // Calculate the next due reminder date for this placememt/Assessment
                         $nextReminderDate = \Tk\Date::floor($placement->getDateEnd()->add(new \DateInterval('P'.$assessment->getReminderInitialDays().'D')));
-
-                        $lastSent = null;
-                        $lastSentStr = '';
                         if ($row->last_sent) {
                             $lastSent = \Tk\Date::floor(\Tk\Date::create($row->last_sent));
-                            $lastSentStr = $lastSent->format(\Tk\Date::$formFormat);
                             $nextReminderDate = \Tk\Date::floor($lastSent->add(new \DateInterval('P' . $assessment->getReminderRepeatDays() . 'D')));
                         }
-                        $now = \Tk\Date::floor();
 
-                        //vd($reminderCount, $lastSentStr, $nextReminderDate->format(\Tk\Date::$formFormat));
                         // compare dates, last date and number of reminders sent to see what should be sent and what should not.
-                        if (!$lastSent || $now >= $nextReminderDate ) {
+                        if (!$row->last_sent || $now >= $nextReminderDate ) {
                             $entry = \Ca\Db\Entry::create($placement, $assessment);      // Do not save() this status and entry..
                             $entry->setStatus('reminder');
 

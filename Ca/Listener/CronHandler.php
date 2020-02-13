@@ -115,7 +115,7 @@ class CronHandler implements Subscriber
                         }
                         $now = \Tk\Date::floor();
 
-                        vd($reminderCount, $lastSentStr, $nextReminderDate->format(\Tk\Date::$formFormat));
+                        //vd($reminderCount, $lastSentStr, $nextReminderDate->format(\Tk\Date::$formFormat));
                         // compare dates, last date and number of reminders sent to see what should be sent and what should not.
                         if (!$lastSent || $now >= $nextReminderDate ) {
                             $entry = \Ca\Db\Entry::create($placement, $assessment);      // Do not save() this status and entry..

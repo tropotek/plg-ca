@@ -142,7 +142,7 @@ class CronHandler implements Subscriber
                             }
                         }
                     }
-                    $console->writeComment('        Reminders Sent: ' . $sentCnt);
+                    $console->writeComment('        Reminders: ' . $sentCnt);
                 }
             }
         }

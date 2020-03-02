@@ -44,7 +44,7 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        if ($this->getAuthUser()->hasPermission(\Uni\Db\Permission::IS_COORDINATOR)) {
+        if ($this->getAuthUser()->isCoordinator()) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Assessment',
                 $this->getTable()->getEditUrl()->set('courseId', $this->getCourseId()), 'fa fa-book fa-add-action'));
 

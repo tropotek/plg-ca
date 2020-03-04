@@ -58,7 +58,19 @@ class View extends AdminEditIface
      */
     public function doDefault(Request $request)
     {
-        $this->entry = \Ca\Db\EntryMap::create()->find($request->get('entryId'));
+        if ($request->get('placementId') && $request->get('assessmentId'))
+            $this->entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                'placementId' => $request->get('placementId'),
+                'assessmentId' => $request->get('assessmentId')
+            ))->current();
+
+        if ($request->get('entryId'))
+            $this->entry = \Ca\Db\EntryMap::create()->find($request->get('entryId'));
+
+        if (!$this->entry) {
+            throw new \Tk\Exception('No valid entry found!');
+        }
+
 
         $this->setPageTitle('View ' . $this->getEntry()->getAssessment()->getName());
 
@@ -82,7 +94,8 @@ class View extends AdminEditIface
     }
 
     /**
-     * @return \Dom\Template
+     * @return Template
+     * @throws \Exception
      */
     public function show()
     {

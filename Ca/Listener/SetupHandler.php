@@ -69,12 +69,12 @@ class SetupHandler implements Subscriber
 //            \Tk\Log::debug($plugin->getName() . ': Sample init subject plugin stuff: ' . $subject->name);
 //            $dispatcher->addSubscriber(new \Ca\Listener\ExampleHandler(Plugin::ZONE_SUBJECT, $subject->getId()));
         }
+        $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler($subject));
 
         $course = \App\Config::getInstance()->getCourse();
         if ($course && $plugin->isZonePluginEnabled(Plugin::ZONE_COURSE, $course->getId())) {
             $subject = \Uni\Config::getInstance()->getSubject();
             if ($subject) {
-                $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementReportHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementEditHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementViewHandler());

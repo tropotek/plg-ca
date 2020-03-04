@@ -1,7 +1,9 @@
 <?php
 namespace Ca\Listener;
 
+use Uni\Db\Permission;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Tk\ConfigTrait;
 use Tk\Event\Subscriber;
 
 /**
@@ -12,12 +14,8 @@ use Tk\Event\Subscriber;
  */
 class PlacementManagerHandler implements Subscriber
 {
+    use ConfigTrait;
 
-
-    /**
-     * @var \App\Db\Subject|\Uni\Db\SubjectIface
-     */
-    private $subject = null;
 
     /**
      * @var null|\App\Controller\Placement\Manager
@@ -27,15 +25,13 @@ class PlacementManagerHandler implements Subscriber
 
     /**
      * PlacementManagerHandler constructor.
-     * @param \App\Db\Subject|\Uni\Db\SubjectIface $subject
      */
-    public function __construct($subject)
+    public function __construct()
     {
-        $this->subject = $subject;
     }
 
     /**
-     * @param \Symfony\Component\HttpKernel\Event\ControllerEvent $event
+     * @param \Symfony\Component\HttpKernel\Event\FilterControllerEvent $event
      */
     public function onControllerInit($event)
     {
@@ -55,82 +51,92 @@ class PlacementManagerHandler implements Subscriber
      */
     public function addActions(\Tk\Event\TableEvent $event)
     {
-        if ($this->controller) {
-            $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
-                'subjectId' => $this->subject->getId()
-            ));
+        if (!$event->getTable() instanceof \App\Table\Placement) return;
+        $subjectId = $event->getTable()->get('subjectId');
+        if (!$subjectId) return;
+        $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
+            'subjectId' => $subjectId
+        ));
 
-            /** @var \Tk\Table\Cell\ButtonCollection $actionsCell */
-            $actionsCell = $event->getTable()->findCell('actions');
+        /** @var \Tk\Table\Cell\ButtonCollection $actionsCell */
+        $actionsCell = $event->getTable()->findCell('actions');
+        $spec = '/ca/entryEdit.html';
+        if (!$this->getAuthUser()->isLearner())
+            $spec = '/ca/entryView.html';
 
-            /** @var \Ca\Db\Assessment $assessment */
-            foreach ($assessmentList as $assessment) {
-                $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $assessment->getId());
+        /** @var \Ca\Db\Assessment $assessment */
+        foreach ($assessmentList as $assessment) {
+            $url = \Uni\Uri::createSubjectUrl($spec)->set('assessmentId', $assessment->getId());
+            $cell = $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
+                ->addOnShow(function ($cell, $obj, $btn) use ($assessment, $spec) {
+                    /* @var $obj \App\Db\Placement */
+                    /* @var $btn \Tk\Table\Cell\ActionButton */
+                    $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
+                        array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
+                    )->current();
+                    if (!$placementAssessment) $placementAssessment = $assessment;
 
-                $cell = $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
-                    ->addOnShow(function ($cell, $obj, $btn) use ($assessment) {
-                        /* @var $obj \App\Db\Placement */
-                        /* @var $btn \Tk\Table\Cell\ActionButton */
-                        $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
-                            array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
-                        )->current();
-                        if (!$placementAssessment) $placementAssessment = $assessment;
+                    if (basename($spec) == 'entryEdit.html')
+                        $btn->setUrl(\Uni\Uri::createSubjectUrl($spec, $obj->getSubject())
+                            ->set('assessmentId', $placementAssessment->getId())->set('placementId', $obj->getId()));
+                    else
+                        $btn->setUrl(\Uni\Uri::createSubjectUrl($spec, $obj->getSubject())
+                            ->set('assessmentId', $placementAssessment->getId())->set('placementId', $obj->getId()));
 
-                        $btn->setUrl(\Uni\Uri::createSubjectUrl('/ca/entryEdit.html', $obj->getSubject())
-                            ->set('assessmentId', $placementAssessment->getId()));
-                        $btn->getUrl()->set('placementId', $obj->getId());
-                        if (!$placementAssessment->isAvailable($obj)) {
-                            $btn->setVisible(false);
-                            return;
+                    if (!$placementAssessment->isAvailable($obj)) {
+                        $btn->setVisible(false);
+                        return;
+                    }
+
+                    $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                        'assessmentId' => $placementAssessment->getId(),
+                        'placementId' => $obj->getId())
+                    )->current();
+
+                    if ($entry) {
+                        $btn->addCss('btn-default');
+                        $btn->setText('Edit ' . $placementAssessment->getName());
+                    } else {
+                        if ($placementAssessment->getConfig()->getAuthUser()->isLearner()) {
+                            $btn->addCss('btn-success');
+                            $btn->setText('Create ' . $placementAssessment->getName());
                         }
+                    }
+                });
+            if ($assessment->isSelfAssessment()) {
+                $cell->setGroup('feedback');
+            } else {
+                $cell->setGroup('ca');
+            }
+            // Add Entry Columns for csv exports
+            $aName = 'assessment_'.$assessment->getId();
+            $aLabel = $assessment->getName();
+            if ($assessment->getPlacementTypes()->count() == 1)
+                $aLabel .= ' ['.$assessment->getPlacementTypeName().']';
+            $cell = $event->getTable()->appendCell(new \Tk\Table\Cell\Text($aName), 'placementReportId')->setLabel($aLabel)->setOrderProperty('')
+                ->addOnPropertyValue(function ($cell, $obj, $value) use ($assessment) {
+                    /** @var $obj \App\Db\Placement */
+                    $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
+                        array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
+                    )->current();
+                    if (!$placementAssessment) $placementAssessment = $assessment;
 
+                    if ($placementAssessment->isAvailable($obj)) {
                         $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
                             'assessmentId' => $placementAssessment->getId(),
                             'placementId' => $obj->getId())
                         )->current();
-
                         if ($entry) {
-                            $btn->addCss('btn-default');
-                            $btn->setText('Edit ' . $placementAssessment->getName());
-                        } else {
-                            $btn->addCss('btn-success');
-                            $btn->setText('Create ' . $placementAssessment->getName());
+                            return 'Yes';
                         }
-                    });
-                if ($assessment->isSelfAssessment()) {
-                    $cell->setGroup('feedback');
-                } else {
-                    $cell->setGroup('ca');
-                }
-                // Add Entry Columns for csv exports
-                $aName = 'assessment_'.$assessment->getId();
-                $aLabel = $assessment->getName();
-                if ($assessment->getPlacementTypes()->count() == 1)
-                    $aLabel .= ' ['.$assessment->getPlacementTypeName().']';
-                $cell = $event->getTable()->appendCell(new \Tk\Table\Cell\Text($aName), 'placementReportId')->setLabel($aLabel)->setOrderProperty('')
-                    ->addOnPropertyValue(function ($cell, $obj, $value) use ($assessment) {
-                        /** @var $obj \App\Db\Placement */
-                        $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
-                            array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
-                        )->current();
-                        if (!$placementAssessment) $placementAssessment = $assessment;
-
-                        if ($placementAssessment->isAvailable($obj)) {
-                            $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
-                                'assessmentId' => $placementAssessment->getId(),
-                                'placementId' => $obj->getId())
-                            )->current();
-                            if ($entry) {
-                                return 'Yes';
-                            }
-                        }
-                        return 'No';
-                    });
-                /** @var \Tk\Table\Action\ColumnSelect $columns */
-                $columns = $event->getTable()->findAction('columns');
-                $columns->addUnselected($aName);
-            }
+                    }
+                    return 'No';
+                });
+            /** @var \Tk\Table\Action\ColumnSelect $columns */
+            $columns = $event->getTable()->findAction('columns');
+            $columns->addUnselected($aName);
         }
+
     }
 
     /**
@@ -141,39 +147,42 @@ class PlacementManagerHandler implements Subscriber
      */
     public function addEntryCell(\Tk\Event\TableEvent $event)
     {
-        if ($this->controller) {
-            $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
-                'subjectId' => $this->subject->getId(),
-                'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY
-            ));
-            $table = $event->getTable();
-            $table->appendCell(\Tk\Table\Cell\Link::create('assessmentLinks'))
-                ->setLabel('Assessment Links')
-                ->addOnPropertyValue(function ($cell, $obj, $value) use ($assessmentList) {
-                    /** @var \App\Db\Placement $obj */
-                    $value = '';
-                    /** @var \Ca\Db\Assessment $assessment */
-                    foreach ($assessmentList as $assessment) {
-                        if ($assessment->isAvailable($obj)) {
-                            $value .= $assessment->getPublicUrl($obj->getHash())->toString();
-                        }
+        if (!$event->getTable() instanceof \App\Table\Placement || !$this->getAuthUser()->isLearner()) return;
+        $subjectId = $event->getTable()->get('subjectId');
+        if (!$subjectId) return;
+
+        $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
+            'subjectId' => $subjectId,
+            'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY
+        ));
+        $table = $event->getTable();
+        $table->appendCell(\Tk\Table\Cell\Link::create('assessmentLinks'))
+            ->setLabel('Assessment Links')
+            ->addOnPropertyValue(function ($cell, $obj, $value) use ($assessmentList) {
+                /** @var \App\Db\Placement $obj */
+                $value = '';
+                /** @var \Ca\Db\Assessment $assessment */
+                foreach ($assessmentList as $assessment) {
+                    if ($assessment->isAvailable($obj)) {
+                        $value .= $assessment->getPublicUrl($obj->getHash())->toString();
                     }
-                    return $value;
-                })
-                ->addOnCellHtml(function ($cell, $obj, $html) use ($assessmentList) {
-                    /** @var \Tk\Table\Cell\Link $cell */
-                    /** @var \App\Db\Placement $obj */
-                    $html = '';
-                    /** @var \Ca\Db\Assessment $assessment */
-                    foreach ($assessmentList as $assessment) {
-                        if ($assessment->isAvailable($obj)) {
-                            $html .= sprintf('<a href="%s" class="btn btn-xs btn-default" title="%s" target="_blank"><i class="%s"></i></a>',
-                                htmlentities($assessment->getPublicUrl($obj->getHash())), $assessment->getName(), $assessment->getIcon());
-                        }
+                }
+                return $value;
+            })
+            ->addOnCellHtml(function ($cell, $obj, $html) use ($assessmentList) {
+                /** @var \Tk\Table\Cell\Link $cell */
+                /** @var \App\Db\Placement $obj */
+                $html = '';
+                /** @var \Ca\Db\Assessment $assessment */
+                foreach ($assessmentList as $assessment) {
+                    if ($assessment->isAvailable($obj)) {
+                        $html .= sprintf('<a href="%s" class="btn btn-xs btn-default" title="%s" target="_blank"><i class="%s"></i></a>',
+                            htmlentities($assessment->getPublicUrl($obj->getHash())), $assessment->getName(), $assessment->getIcon());
                     }
-                    return '<div class="btn-toolbar" role="toolbar">'.$html.'</div>';
-                });
-        }
+                }
+                return '<div class="btn-toolbar" role="toolbar">'.$html.'</div>';
+            });
+
     }
 
     /**

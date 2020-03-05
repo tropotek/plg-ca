@@ -69,7 +69,8 @@ class SetupHandler implements Subscriber
 //            \Tk\Log::debug($plugin->getName() . ': Sample init subject plugin stuff: ' . $subject->name);
 //            $dispatcher->addSubscriber(new \Ca\Listener\ExampleHandler(Plugin::ZONE_SUBJECT, $subject->getId()));
         }
-        $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler($subject));
+        $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler());
+        $dispatcher->addSubscriber(new \Ca\Listener\StudentAssessmentHandler());
 
         $course = \App\Config::getInstance()->getCourse();
         if ($course && $plugin->isZonePluginEnabled(Plugin::ZONE_COURSE, $course->getId())) {
@@ -78,11 +79,7 @@ class SetupHandler implements Subscriber
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementReportHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementEditHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\PlacementViewHandler());
-                //$dispatcher->addSubscriber(new \Ca\Listener\CompanyManagerHandler($subject));
-                //$dispatcher->addSubscriber(new \Ca\Listener\StudentManagerButtonHandler($subject));
                 $dispatcher->addSubscriber(new \Ca\Listener\SubjectDashboardHandler($subject));
-                //$dispatcher->addSubscriber(new \Ca\Listener\SidebarHandler($subject));
-                $dispatcher->addSubscriber(new \Ca\Listener\StudentAssessmentHandler());
             }
             $dispatcher->addSubscriber(new \Ca\Listener\CourseEditHandler());
         }

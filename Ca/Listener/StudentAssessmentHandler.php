@@ -1,6 +1,7 @@
 <?php
 namespace Ca\Listener;
 
+use Ca\Plugin;
 use Tk\Event\Subscriber;
 
 /**
@@ -19,6 +20,9 @@ class StudentAssessmentHandler implements Subscriber
     {
         /** @var \App\Ui\StudentAssessment $studentAssessment */
         $studentAssessment = $event->get('studentAssessment');
+        if (!Plugin::getInstance()->isZonePluginEnabled(Plugin::ZONE_COURSE, $studentAssessment->getSubject()->getCourseId())) {
+            return;
+        }
         $subject = $studentAssessment->getSubject();
 
         /** @var \App\Db\Placement $placement */

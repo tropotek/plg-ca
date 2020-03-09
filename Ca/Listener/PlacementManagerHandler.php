@@ -61,7 +61,7 @@ class PlacementManagerHandler implements Subscriber
         /** @var \Tk\Table\Cell\ButtonCollection $actionsCell */
         $actionsCell = $event->getTable()->findCell('actions');
         $spec = '/ca/entryEdit.html';
-        if (!$this->getAuthUser()->isLearner())
+        if ($event->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())
             $spec = '/ca/entryView.html';
 
         /** @var \Ca\Db\Assessment $assessment */
@@ -69,6 +69,7 @@ class PlacementManagerHandler implements Subscriber
             $url = \Uni\Uri::createSubjectUrl($spec)->set('assessmentId', $assessment->getId());
             $cell = $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
                 ->addOnShow(function ($cell, $obj, $btn) use ($assessment, $spec) {
+                    /* @var $cell \Tk\Table\Cell\Iface */
                     /* @var $obj \App\Db\Placement */
                     /* @var $btn \Tk\Table\Cell\ActionButton */
                     $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
@@ -76,14 +77,10 @@ class PlacementManagerHandler implements Subscriber
                     )->current();
                     if (!$placementAssessment) $placementAssessment = $assessment;
 
-                    if (basename($spec) == 'entryEdit.html')
-                        $btn->setUrl(\Uni\Uri::createSubjectUrl($spec, $obj->getSubject())
-                            ->set('assessmentId', $placementAssessment->getId())->set('placementId', $obj->getId()));
-                    else
-                        $btn->setUrl(\Uni\Uri::createSubjectUrl($spec, $obj->getSubject())
-                            ->set('assessmentId', $placementAssessment->getId())->set('placementId', $obj->getId()));
+                    $btn->setUrl(\Uni\Uri::createSubjectUrl($spec, $obj->getSubject())
+                        ->set('assessmentId', $placementAssessment->getId())->set('placementId', $obj->getId()));
 
-                    if (!$placementAssessment->isAvailable($obj)) {
+                    if (!$placementAssessment->isAvailable($obj) || ($cell->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())) {
                         $btn->setVisible(false);
                         return;
                     }
@@ -97,7 +94,7 @@ class PlacementManagerHandler implements Subscriber
                         $btn->addCss('btn-default');
                         $btn->setText('Edit ' . $placementAssessment->getName());
                     } else {
-                        if ($placementAssessment->getConfig()->getAuthUser()->isLearner()) {
+                        if (!$cell->getTable()->get('isMentorView', false) && $placementAssessment->getAuthUser()->isLearner()) {
                             $btn->addCss('btn-success');
                             $btn->setText('Create ' . $placementAssessment->getName());
                         }
@@ -147,7 +144,9 @@ class PlacementManagerHandler implements Subscriber
      */
     public function addEntryCell(\Tk\Event\TableEvent $event)
     {
-        if (!$event->getTable() instanceof \App\Table\Placement || !$this->getAuthUser()->isLearner()) return;
+        if (!$event->getTable() instanceof \App\Table\Placement ||
+            ($event->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())
+        ) return;
         $subjectId = $event->getTable()->get('subjectId');
         if (!$subjectId) return;
 

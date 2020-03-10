@@ -175,6 +175,7 @@ JS;
         if (!$this->isPublic() && $form->getField('status') instanceof \Uni\Form\Field\StatusSelect) {
             \Uni\Db\Status::createFromStatusSelect($this->getEntry(), $form->getField('status'));
         } else {
+
             \Uni\Db\Status::createFromTrait($this->getEntry());
         }
 

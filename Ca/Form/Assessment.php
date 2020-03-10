@@ -4,6 +4,7 @@ namespace Ca\Form;
 use Tk\Form;
 use Tk\Form\Event;
 use Tk\Form\Field;
+use Tk\Str;
 
 /**
  * Example:
@@ -120,6 +121,11 @@ class Assessment extends \Uni\FormIface
         if ($form->hasErrors()) {
             return;
         }
+
+
+
+        vd(Str::stripStyles($this->getAssessment()->getDescription()));
+        //$this->getAssessment()->setDescription(Str::stripStyles($this->getAssessment()->getDescription()));
 
         $isNew = (bool)$this->getAssessment()->getId();
         $this->getAssessment()->save();

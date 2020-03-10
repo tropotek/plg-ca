@@ -4,6 +4,7 @@ namespace Ca\Controller\Entry;
 use App\Controller\AdminEditIface;
 use Dom\Template;
 use Tk\Request;
+use Tk\Str;
 
 /**
  *
@@ -115,7 +116,7 @@ class View extends AdminEditIface
         }
 
         if ($this->getEntry()->getAssessment()->getDescription()) {
-            $template->insertHtml('instructions', $this->getEntry()->getAssessment()->getDescription());
+            $template->insertHtml('instructions', Str::stripStyles($this->getEntry()->getAssessment()->getDescription()) );
             $template->setVisible('instructions');
         }
 

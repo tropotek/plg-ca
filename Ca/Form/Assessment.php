@@ -122,10 +122,7 @@ class Assessment extends \Uni\FormIface
             return;
         }
 
-
-
-        vd(Str::stripStyles($this->getAssessment()->getDescription()));
-        //$this->getAssessment()->setDescription(Str::stripStyles($this->getAssessment()->getDescription()));
+        $this->getAssessment()->setDescription(Str::stripStyles($this->getAssessment()->getDescription()));
 
         $isNew = (bool)$this->getAssessment()->getId();
         $this->getAssessment()->save();

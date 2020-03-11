@@ -273,7 +273,8 @@ FROM (
          GROUP BY a2.id
     ) b
 --    , subject e, ca_assessment f
-WHERE a.id = b.placement_id
+WHERE a.id = b.placement_id 
+      AND (a.status = 'assessing' OR a.status = 'evaluating')       -- TODO: these should be from the assessment `placementStatus` list
       AND b.reminder_count <= %s
 --       AND a.subject_id = e.id AND e.course_id = f.course_id AND f.id = %s
 ORDER BY a.date_end DESC

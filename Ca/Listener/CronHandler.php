@@ -94,7 +94,7 @@ class CronHandler implements Subscriber
                 $subjectFound = false;
                 foreach ($assessmentList as $i => $assessment) {
                     if (!$assessment->isEnableReminder() || !$assessment->isActive($subject->getId())) continue;
-                    // Get a list of placements with no assessments
+                    // Get a list of placements with no assessments, only for assessing or evaluating status of placements
                     $res = \Ca\Db\EntryMap::create()->findReminders($assessment, $subject);
                     if (!$res->rowCount()) continue;
 
@@ -106,8 +106,6 @@ class CronHandler implements Subscriber
                     $date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
                     $console->writeComment('       Assessment: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
                     $console->writeComment('        Date From: ' . $date->format(\Tk\Date::FORMAT_SHORT_DATE));
-
-
                     $console->writeComment('        Empty Entries: ' . $res->rowCount());
                     $sentCnt = 0;;
                     foreach($res as $row) {

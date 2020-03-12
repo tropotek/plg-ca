@@ -44,7 +44,7 @@ class SubjectDashboardHandler implements Subscriber
         /** @var \App\Controller\Staff\SubjectDashboard $controller */
         $this->controller = $event->get('controller');
         $subject = $this->controller->getConfig()->getSubject();
-vd();
+
         // STUDENT Subject Dashboard
         if ($this->controller instanceof \App\Controller\Student\SubjectDashboard) {
             $placementList = $this->controller->getPlacementList();

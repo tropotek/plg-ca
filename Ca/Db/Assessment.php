@@ -111,9 +111,18 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function __construct()
     {
         $this->_TimestampTrait();
-
     }
-    
+
+    /**
+     * save to DB
+     */
+    public function save()
+    {
+        if (!$this->getUid())
+            $this->setUid($this->getVolatileId());
+        parent::save();
+    }
+
     /**
      * @param string $uid
      * @return Assessment

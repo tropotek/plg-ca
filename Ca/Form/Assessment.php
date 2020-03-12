@@ -53,9 +53,11 @@ class Assessment extends \Uni\FormIface
             ->setCheckboxLabel('Display a checkbox on the Subject student assessment table when Entry marked approved');
 
         // TODO: Hide this when assessor group is 'student'
-        $this->appendField(new Field\Select('placementStatus[]', \App\Db\Placement::getStatusList()))
+        //$list = \App\Db\Placement::getStatusList();
+        $list = array('Approved' => 'approved', 'Assessing' => 'assessing', 'Evaluating' => 'evaluating');
+        $this->appendField(new Field\Select('placementStatus[]', $list))
             ->addCss('tk-dual-select')->setTabGroup($tab)
-            ->setNotes('Select the placement status values when assessments become available and can be submitted.');
+            ->setNotes('Select the placement status values when assessments become available and can be submitted by users.');
 
         $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('courseId' => $this->getAssessment()->getCourseId()));
 

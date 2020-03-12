@@ -61,7 +61,8 @@ class CronHandler implements Subscriber
         // Get enabled courses
         $plugin = \Ca\Plugin::getInstance();
         $courseList = $plugin->getPluginFactory()->getPluginZoneIdList($plugin->getName(), \App\Plugin\Iface::ZONE_COURSE);
-        $now = \Tk\Date::floor();
+        $now = $console->getNow();
+
         //$courseList = array_reverse($courseList);
         foreach ($courseList as $courseData) {
             /** @var \Uni\Db\CourseIface $course */
@@ -95,7 +96,7 @@ class CronHandler implements Subscriber
                 foreach ($assessmentList as $i => $assessment) {
                     if (!$assessment->isEnableReminder() || !$assessment->isActive($subject->getId())) continue;
                     // Get a list of placements with no assessments, only for assessing or evaluating status of placements
-                    $res = \Ca\Db\EntryMap::create()->findReminders($assessment, $subject);
+                    $res = \Ca\Db\EntryMap::create()->findReminders($assessment, $subject, $now);
                     if (!$res->rowCount()) continue;
 
                     if (!$subjectFound && $res->rowCount()) {
@@ -136,12 +137,13 @@ class CronHandler implements Subscriber
                             $e = new \Uni\Event\StatusEvent($status);
                             $this->getConfig()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_CHANGE, $e);
                             $this->getConfig()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_SEND_MESSAGES, $e);
+                        \Tk\Log::warning($placement->getTitle() . ': ' . $placement->getStatus());
                             if ($e->isPropagationStopped()) continue;
 
                             // Mark reminder sent
                             $sentCnt += $e->get('sent', 0);
                             if ($e->get('sent', 0)) {
-                                \Ca\Db\EntryMap::create()->addReminderLog($assessment->getId(), $placement->getId());
+                                \Ca\Db\EntryMap::create()->addReminderLog($assessment->getId(), $placement->getId(), $now);
                             }
                         }
                     }

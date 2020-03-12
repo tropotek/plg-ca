@@ -147,30 +147,7 @@ class Edit extends AdminEditIface
                 if ($e) $this->entry = $e;
             }
         }
-            // TODO: Do not think this is needed, at any rate use the placement subjectId if needed!!!
-//            if (!$this->getEntry()->getSubjectId() && $this->getSubject()) {
-//                $this->getEntry()->setSubjectId($this->getSubject()->getId());
-//            }
 
-
-        // Staff view student self assessment
-//        if ($request->get('assessmentId') && $request->get('studentId') && $this->getUser()->isStaff()) {
-//            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
-//                    'assessmentId' => $request->get('assessmentId'),
-//                    'studentId' => $request->get('studentId'))
-//            )->current();
-//            if ($e) $this->entry = $e;
-//        }
-
-        // Assumed to be student self assessment form
-//        if (!$request->has('studentId') && !$request->has('subjectId') && $this->getUser() && $this->getUser()->isStudent()) {
-//            $e = \Ca\Db\EntryMap::create()->findFiltered(array(
-//                    'assessmentId' => $this->getEntry()->getAssessmentId(),
-//                    'subjectId' => $this->getEntry()->getSubjectId(),
-//                    'studentId' => $this->getEntry()->getStudentId())
-//            )->current();
-//            if ($e) $this->entry = $e;
-//        }
 
         if ($this->isPublic()) {
             if ($this->getEntry()->hasStatus(array(\Ca\Db\Entry::STATUS_APPROVED, \Ca\Db\Entry::STATUS_NOT_APPROVED))) {

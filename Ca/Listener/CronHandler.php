@@ -103,7 +103,10 @@ class CronHandler implements Subscriber
                         $subjectFound = true;
                     }
 
-                    $date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
+                    //$date =  new \DateTime('today -'.$assessment->getReminderInitialDays().' days');
+                    $date = clone $now;
+                    $date = $date->add(new \DateInterval('P'.$assessment->getReminderInitialDays().'D'));
+
                     $console->writeComment('       Assessment: ' . $assessment->getName() . ' - ' . $assessment->getPlacementTypeName() . ' [' . $assessment->getId() . ']');
                     $console->writeComment('        Date From: ' . $date->format(\Tk\Date::FORMAT_SHORT_DATE));
                     $console->writeComment('        Empty Entries: ' . $res->rowCount());
@@ -114,10 +117,12 @@ class CronHandler implements Subscriber
                         if (!$placement) continue;
 
                         // Calculate the next due reminder date for this placememt/Assessment
-                        $nextReminderDate = \Tk\Date::floor($placement->getDateEnd()->add(new \DateInterval('P'.$assessment->getReminderInitialDays().'D')));
+                        $nextReminderDate = \Tk\Date::floor($placement->getDateEnd()
+                            ->add(new \DateInterval('P'.$assessment->getReminderInitialDays().'D')));
                         if ($row->last_sent) {
                             $lastSent = \Tk\Date::floor(\Tk\Date::create($row->last_sent));
-                            $nextReminderDate = \Tk\Date::floor($lastSent->add(new \DateInterval('P' . $assessment->getReminderRepeatDays() . 'D')));
+                            $nextReminderDate = \Tk\Date::floor($lastSent
+                                ->add(new \DateInterval('P' . $assessment->getReminderRepeatDays() . 'D')));
                         }
 
                         // compare dates, last date and number of reminders sent to see what should be sent and what should not.

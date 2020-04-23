@@ -108,7 +108,6 @@ class PlacementEditHandler implements Subscriber
 
             $this->list = \Ca\Db\AssessmentMap::create()->findFiltered(array(
                 'subjectId' => $this->subject->getId(),
-                //'placementStatus' => $placement->status,
                 'placementTypeId' => $placement->placementTypeId
             ));
 

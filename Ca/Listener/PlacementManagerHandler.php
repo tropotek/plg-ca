@@ -72,7 +72,7 @@ class PlacementManagerHandler implements Subscriber
                 ->addOnShow(function ($cell, $obj, $btn) use ($assessment, $spec) {
                     /* @var $cell \Tk\Table\Cell\Iface */
                     /* @var $obj \App\Db\Placement */
-                    /* @var $btn \Tk\Table\Cell\ActionButton */
+                    /* @var $btn \Tk\Table\Ui\ActionButton */
                     $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
                         array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
                     )->current();

@@ -55,7 +55,8 @@ class PlacementManagerHandler implements Subscriber
         $subjectId = $event->getTable()->get('subjectId');
         if (!$subjectId) return;
         $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
-            'subjectId' => $subjectId
+            'subjectId' => $subjectId,
+            'publish' => true
         ));
 
         /** @var \Tk\Table\Cell\ButtonCollection $actionsCell */
@@ -79,7 +80,7 @@ class PlacementManagerHandler implements Subscriber
 
                     $btn->setUrl(\Uni\Uri::createSubjectUrl($spec, $obj->getSubject())
                         ->set('assessmentId', $placementAssessment->getId())->set('placementId', $obj->getId()));
-                    if (!$placementAssessment->isAvailable($obj) || ($cell->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())) {
+                    if (!$placementAssessment->isAvailable($obj, true) || ($cell->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())) {
                         $btn->setVisible(false);
                         return;
                     }

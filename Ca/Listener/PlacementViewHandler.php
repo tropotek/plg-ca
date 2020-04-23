@@ -34,10 +34,10 @@ class PlacementViewHandler implements Subscriber
             $placement = $this->controller->getPlacement();
 
             $list = \Ca\Db\AssessmentMap::create()->findFiltered(
-                array('subjectId' => $placement->subjectId, 'publish' => true)
+                array('subjectId' => $placement->getSubjectId(), 'publish' => true)
             );
             foreach ($list as $assessment) {
-                if (!$placement->getPlacementType() || !$placement->getPlacementType()->enableReport) continue;
+                if (!$placement->getPlacementType() || !$placement->getPlacementType()->isEnableReport()) continue;
                 if (!$assessment->isAvailable($placement)) continue;
 
                 $btn = null;

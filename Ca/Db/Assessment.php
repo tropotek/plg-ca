@@ -1,6 +1,7 @@
 <?php
 namespace Ca\Db;
 
+use App\Db\Placement;
 use Bs\Db\Traits\TimestampTrait;
 use Uni\Db\Traits\CourseTrait;
 
@@ -396,7 +397,19 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * When an assessment is active for a subject staff and companies can access entries
+     * Check if this assessment is open with the given placement status
+     *
+     * @param string|array $status
+     * @return bool
+     */
+    public function hasStatus($status)
+    {
+        if (!is_array($status)) $status = array($status);
+        return in_array($this->getPlacementStatus(), $status);
+    }
+
+    /**
+     * Is an assessment is active for a subject
      *
      * @param int $subjectId
      * @return bool
@@ -408,30 +421,23 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * When an assessment is published, students can submit self-assessments
-     * and also view any assessment entries that have been completed/approved including self-assessments.
-     *
-     * @param $subjectId
-     * @return bool
-     */
-    public function isPublished($subjectId)
-    {
-        if ($subjectId instanceof \Uni\Db\SubjectIface) $subjectId = $subjectId->getId();
-        return AssessmentMap::create()->hasSubject($subjectId, $this->getId());
-    }
-
-    /**
-     * Use this to test if the public user or student can submit/view an entry
+     * Use this to test if the assessment:
+     *  - Assessment is saved
+     *  - if has placement:
+     *     - Assessment is enabled for that placement type
+     *     - Assessment is active in that placement subject
      *
      * @param \App\Db\Placement $placement (optional)
      * @return bool
      */
     public function isAvailable($placement = null)
     {
-        if (!$this->getId() || !$this->isActive($placement->getSubjectId())) return false;
+        if (!$this->getId()) return false;
         $b = true;
         if ($placement) {
-            $b &= in_array($placement->getStatus(), $this->getPlacementStatus());
+            if ($placement->hasStatus(array(Placement::STATUS_DRAFT, Placement::STATUS_CANCELLED, Placement::STATUS_NOT_APPROVED, Placement::STATUS_PENDING, Placement::STATUS_AMEND)))
+                return false;
+            $b &= $this->isActive($placement->getSubjectId());
             $b &= AssessmentMap::create()->hasPlacementType($this->getId(), $placement->getPlacementTypeId());
         }
         return $b;
@@ -443,14 +449,11 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      * @return bool
      * @throws \Exception
      */
-    public function canReadEntry($placement, $user=null)
+    public function canReadEntry($placement, $user = null)
     {
         if (!$this->getId() || !$this->isActive($placement->getSubjectId()) || !$this->isAvailable($placement)) return false;
-        // TODO: I think this need a bit more checks
-        if ($user) {        // Only users can read entries at this stage
-            if ($user->isStaff()) {
-                return true;
-            } else {    // Student
+        if ($user) {        // Only logged in users can read entries at this stage
+            if ($user->isStaff() || $user->isStudent()) {
                 return true;
             }
         }
@@ -470,13 +473,16 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             if ($user->isStaff()) {
                 true;
             } else {    // Student
+                if (!$this->hasStatus($placement->getStatus())) {
+                    return false;
+                }
                 $entry = $this->findEntry($placement);
                 if ($entry && $entry->hasStatus(array(\Ca\Db\Entry::STATUS_PENDING, \Ca\Db\Entry::STATUS_AMEND))) {
                     return true;
                 }
             }
         } else {
-            if ($this->getAssessorGroup() == self::ASSESSOR_GROUP_COMPANY) {
+            if ($this->getAssessorGroup() == self::ASSESSOR_GROUP_COMPANY && $this->hasStatus($placement->getStatus())) {
                 return true;
             }
         }
@@ -582,4 +588,16 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         return $errors;
     }
 
+
+    /**
+     * @param $subjectId
+     * @return bool
+     * @deprecated Use isActive($subjectId)
+     */
+    public function isPublished($subjectId)
+    {
+        return $this->isActive($subjectId);
+//        if ($subjectId instanceof \Uni\Db\SubjectIface) $subjectId = $subjectId->getId();
+//        return AssessmentMap::create()->hasSubject($subjectId, $this->getId());
+    }
 }

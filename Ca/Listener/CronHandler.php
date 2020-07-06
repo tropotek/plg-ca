@@ -117,7 +117,7 @@ class CronHandler implements Subscriber
                         $placement = \App\Db\PlacementMap::create()->find($row->id);
                         if (!$placement) continue;
 
-                        // Calculate the next due reminder date for this placememt/Assessment
+                        // Calculate the next due reminder date for this placememnt/Assessment
                         $nextReminderDate = \Tk\Date::floor($placement->getDateEnd()
                             ->add(new \DateInterval('P'.$assessment->getReminderInitialDays().'D')));
                         if ($row->last_sent) {

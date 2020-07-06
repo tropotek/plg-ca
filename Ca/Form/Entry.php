@@ -175,19 +175,24 @@ JS;
         if (!$this->isPublic() && $form->getField('status') instanceof \Uni\Form\Field\StatusSelect) {
             \Uni\Db\Status::createFromStatusSelect($this->getEntry(), $form->getField('status'));
         } else {
-
             \Uni\Db\Status::createFromTrait($this->getEntry());
         }
 
-        \Tk\Alert::addSuccess('Record saved!');
 
         $event->setRedirect($this->getBackUrl());
         if ($form->getTriggeredEvent()->getName() == 'save') {
+            \Tk\Alert::addSuccess('Record saved!');
             $event->setRedirect(\Tk\Uri::create()->set('entryId', $this->getEntry()->getId()));
-        }
-        if ($form->getTriggeredEvent()->getName() == 'update' && $this->getAuthUser()->isStaff()) {
+        } else if ($form->getTriggeredEvent()->getName() == 'update' && $this->getAuthUser()->isStaff()) {
+            \Tk\Alert::addSuccess('Record saved!');
             $url = \Uni\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacementId());
             $event->setRedirect($url);
+        }
+        
+        if (!$this->getAuthUser() || $this->getAuthUser()->isGuest()) {
+            // 'submit'
+            \Tk\Alert::addSuccess('Thank you! Student placement feedback submitted successfully.');
+            $event->setRedirect(\Tk\Uri::create('/index.html'));
         }
 
     }

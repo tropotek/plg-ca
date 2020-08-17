@@ -188,7 +188,7 @@ JS;
             $url = \Uni\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacementId());
             $event->setRedirect($url);
         }
-        
+
         if (!$this->getAuthUser() || $this->getAuthUser()->isGuest()) {
             // 'submit'
             \Tk\Alert::addSuccess('Thank you! Student placement feedback submitted successfully.');

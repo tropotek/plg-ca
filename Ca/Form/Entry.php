@@ -172,14 +172,6 @@ JS;
             \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, $val);
         }
 
-//        // Create status if changed and trigger notifications
-//        if (!$this->isPublic() && $form->getField('status') instanceof \Uni\Form\Field\StatusSelect) {
-//            \Uni\Db\Status::createFromStatusSelect($this->getEntry(), $form->getField('status'));
-//        } else {
-//            \Uni\Db\Status::createFromTrait($this->getEntry());
-//        }
-
-
         $event->setRedirect($this->getBackUrl());
         if ($form->getTriggeredEvent()->getName() == 'save') {
             \Tk\Alert::addSuccess('Record saved!');

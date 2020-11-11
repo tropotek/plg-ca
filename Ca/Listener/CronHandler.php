@@ -131,7 +131,7 @@ class CronHandler implements Subscriber
                             $entry = \Ca\Db\Entry::create($placement, $assessment);      // Do not save() this status and entry..
                             $entry->setStatus('reminder');
 
-                            $status = \Uni\Db\Status::create($entry);
+                            $status = $this->getConfig()->createStatus($entry);
                             $status->setName('Assessment Reminder');
                             $status->setEvent('message.ca.entry.reminder');
 

@@ -174,7 +174,7 @@ class StatusMailHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            \Uni\StatusEvents::STATUS_SEND_MESSAGES => array('onSendAllStatusMessages', 10),
+            \Bs\StatusEvents::STATUS_SEND_MESSAGES => array('onSendAllStatusMessages', 10),
             \App\AppEvents::MAIL_TEMPLATE_TAG_LIST => array('onTagList', 10)
         );
     }

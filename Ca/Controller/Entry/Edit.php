@@ -23,7 +23,7 @@ class Edit extends AdminEditIface
     protected $entry = null;
 
     /**
-     * @var \Uni\Table\Status
+     * @var \Bs\Table\Status
      */
     protected $statusTable = null;
 
@@ -207,7 +207,7 @@ class Edit extends AdminEditIface
         $this->getForm()->execute();
 
         if ($this->getAuthUser() && $this->getAuthUser()->isStaff() && $this->getEntry()->getId()) {
-            $this->statusTable = \Uni\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')->init();
+            $this->statusTable = \Bs\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')->init();
             $filter = array(
                 'model' => $this->getEntry(),
                 'subjectId' => $this->getEntry()->getSubjectId()

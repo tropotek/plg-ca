@@ -134,9 +134,9 @@ class CronHandler implements Subscriber
                             $status = \Uni\Db\Status::create($entry, 'Assessment Reminder');
                             $status->setEvent('message.ca.entry.reminder');
 
-                            $e = new \Uni\Event\StatusEvent($status);
-                            $this->getConfig()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_CHANGE, $e);
-                            $this->getConfig()->getEventDispatcher()->dispatch(\Uni\StatusEvents::STATUS_SEND_MESSAGES, $e);
+                            $e = new \Bs\Event\StatusEvent($status);
+                            $this->getConfig()->getEventDispatcher()->dispatch(\Bs\StatusEvents::STATUS_CHANGE, $e);
+                            $this->getConfig()->getEventDispatcher()->dispatch(\Bs\StatusEvents::STATUS_SEND_MESSAGES, $e);
                         \Tk\Log::warning($placement->getTitle() . ': ' . $placement->getStatus());
                             if ($e->isPropagationStopped()) continue;
 

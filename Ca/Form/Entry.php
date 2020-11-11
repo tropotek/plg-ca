@@ -161,7 +161,8 @@ JS;
         $isNew = (bool)$this->getEntry()->getId();
 
         if ($this->getAuthUser() && $this->getAuthUser()->isStudent() && $this->getEntry()->getAssessment()->isSelfAssessment() && $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_AMEND)
-            $this->getEntry()->status = \Ca\Db\Entry::STATUS_PENDING;
+            $this->getEntry()->setStatus(\Ca\Db\Entry::STATUS_PENDING);
+        $this->getEntry()->setStatusNotify(true);
         $this->getEntry()->save();
 
         // Save Item values
@@ -171,12 +172,12 @@ JS;
             \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, $val);
         }
 
-        // Create status if changed and trigger notifications
-        if (!$this->isPublic() && $form->getField('status') instanceof \Uni\Form\Field\StatusSelect) {
-            \Uni\Db\Status::createFromStatusSelect($this->getEntry(), $form->getField('status'));
-        } else {
-            \Uni\Db\Status::createFromTrait($this->getEntry());
-        }
+//        // Create status if changed and trigger notifications
+//        if (!$this->isPublic() && $form->getField('status') instanceof \Uni\Form\Field\StatusSelect) {
+//            \Uni\Db\Status::createFromStatusSelect($this->getEntry(), $form->getField('status'));
+//        } else {
+//            \Uni\Db\Status::createFromTrait($this->getEntry());
+//        }
 
 
         $event->setRedirect($this->getBackUrl());

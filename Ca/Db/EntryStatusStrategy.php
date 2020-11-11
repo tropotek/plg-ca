@@ -84,7 +84,7 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
         // '[#'.$entry->getId().'] '
 
         $message->setSubject($msgSubject);
-        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getCourse()->getEmail(), $status->getSubjectName()));
+        $message->setFrom(\Tk\Mail\Message::joinEmail(\Uni\Db\Status::getCourse($status)->getEmail(), \Uni\Db\Status::getSubjectName($status)));
 
         // Setup the message vars
         \App\Util\StatusMessage::setStudent($message, $placement->getUser());
@@ -145,15 +145,16 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
-                $staffList = $status->getSubject()->getCourse()->getUsers();
+                $subject = \Uni\Db\Status::getSubject($status);
+                $staffList = $subject->getCourse()->getUsers();
                 if (count($staffList)) {
                     /** @var \App\Db\User $s */
                     foreach ($staffList as $s) {
                         $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));
                     }
-                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getSubject()->getCourse()->getEmail(), $status->getSubjectName()));
-                    $message->set('recipient::email', $status->getSubject()->getCourse()->getEmail());
-                    $message->set('recipient::name', $status->getSubjectName());
+                    $message->addTo(\Tk\Mail\Message::joinEmail($subject->getCourse()->getEmail(), \Uni\Db\Status::getSubjectName($status)));
+                    $message->set('recipient::email', $subject->getCourse()->getEmail());
+                    $message->set('recipient::name', \Uni\Db\Status::getSubjectName($status));
                 }
                 break;
         }

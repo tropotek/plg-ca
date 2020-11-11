@@ -1,9 +1,13 @@
 <?php
 namespace Ca\Db;
 
+use App\Db\MailTemplate;
 use App\Db\Traits\PlacementTrait;
+use Bs\Db\Status;
 use Bs\Db\Traits\TimestampTrait;
 use Ca\Db\Traits\AssessmentTrait;
+use Dom\Template;
+use Tk\Mail\CurlyMessage;
 use Uni\Config;
 use Bs\Db\Traits\StatusTrait;
 use Uni\Db\Traits\SubjectTrait;
@@ -371,5 +375,228 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
         return $errors;
     }
+
+
+
+    /**
+     * Must be Called after the status object is saved.
+     * Should return true if the status has changed and the statusChange event should be triggered
+     *
+     * @param Status $status
+     * @return boolean
+     * @throws \Exception
+     */
+    public function hasStatusChanged(Status $status)
+    {
+        $prevStatusName = $status->getPreviousName();
+        switch($status->name) {
+            case Entry::STATUS_PENDING:
+                if (!$prevStatusName)
+                    return true;
+                break;
+            case Entry::STATUS_APPROVED:
+                if (!$prevStatusName || Entry::STATUS_PENDING == $prevStatusName)
+                    return true;
+                break;
+            case Entry::STATUS_AMEND:
+                if ($prevStatusName) {
+                    return true;
+                }
+                break;
+            case Entry::STATUS_NOT_APPROVED:
+                if (Entry::STATUS_PENDING == $prevStatusName)
+                    return true;
+                break;
+        }
+        return false;
+    }
+
+    /**
+     * @param \Uni\Db\Status $status
+     * @param CurlyMessage $message
+     * @throws \Exception
+     */
+    public function formatStatusMessage($status, $message)
+    {
+        $entry = $this;
+        $assessment = $entry->getAssessment();
+        /** @var MailTemplate $mailTemplate */
+        $mailTemplate = $message->get('_mailTemplate');
+        if (!$mailTemplate) {
+            \Tk\Log::warning('Message has no template: Assessment');
+        }
+
+        $placement = $entry->getPlacement();
+        if (!$placement->getPlacementType()->isNotifications()) {
+            \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->getName() . '] Notifications Disabled');
+        }
+
+        $isReminder = false;
+        if ($status->getEvent() == 'message.ca.entry.reminder')
+            $isReminder = true;
+
+        if ($isReminder && $mailTemplate->getRecipient()) {
+            if ($assessment->getAssessorGroup() == Assessment::ASSESSOR_GROUP_STUDENT &&
+                $mailTemplate->getRecipient() != MailTemplate::RECIPIENT_STUDENT) return;
+            if ($assessment->getAssessorGroup() == Assessment::ASSESSOR_GROUP_COMPANY &&
+                $mailTemplate->getRecipient() != MailTemplate::RECIPIENT_COMPANY) return;
+        }
+
+
+        $msgSubject = $assessment->getName() . ' Entry ' .
+            ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ';
+        // '[#'.$entry->getId().'] '
+
+        $message->setSubject($msgSubject);
+        $message->setFrom(\Tk\Mail\Message::joinEmail(\Uni\Db\Status::getCourse($status)->getEmail(), \Uni\Db\Status::getSubjectName($status)));
+
+        // Setup the message vars
+        \App\Util\StatusMessage::setStudent($message, $placement->getUser());
+        \App\Util\StatusMessage::setSupervisor($message, $placement->getSupervisor());
+        \App\Util\StatusMessage::setCompany($message, $placement->getCompany());
+        \App\Util\StatusMessage::setPlacement($message, $placement);
+
+        // A`dd entry details
+        $message->set('_assessment', $assessment);
+        $message->set('assessment::id', $assessment->getId());
+        $message->set('assessment::name', $assessment->getName());
+        $message->set('assessment::description', $assessment->getDescription());
+        $message->set('assessment::placementTypes', $assessment->getPlacementTypeName());
+
+        $message->set('entry::id', $entry->getId());
+        $message->set('entry::title', $entry->getTitle());
+        $message->set('entry::assessor', $entry->getAssessorName());
+        $message->set('entry::status', $entry->getStatus());
+        $message->set('entry::notes', nl2br($entry->getNotes(), true));
+
+        // Add assessment blocks
+        $list = \Ca\Db\AssessmentMap::create()->findFiltered(array('courseId' => $placement->getSubject()->getCourseId()));
+        /* @var \Ca\Db\Assessment $assess */
+        foreach($list as $assess) {
+            $key = $assess->getNameKey();
+            if ($entry->getAssessmentId() == $assess->getId()) {
+                $message->set($key, true);
+            } else {
+                $message->set('not'.$key, true);
+            }
+        }
+
+        switch ($mailTemplate->getRecipient()) {
+            case \App\Db\MailTemplate::RECIPIENT_STUDENT:
+                $student = $placement->getUser();
+                if ($student && $student->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($student->getEmail(), $student->getName()));
+                    $message->set('recipient::email', $student->getEmail());
+                    $message->set('recipient::name', $student->getName());
+                }
+                break;
+            case \App\Db\MailTemplate::RECIPIENT_COMPANY:
+                $company = $placement->getCompany();
+                if ($company && $company->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($company->getEmail(), $company->getName()));
+                    $message->set('recipient::email', $company->getEmail());
+                    $message->set('recipient::name', $company->getName());
+                }
+                break;
+            case \App\Db\MailTemplate::RECIPIENT_SUPERVISOR:
+                $supervisor = $placement->getSupervisor();
+                if ($supervisor && $supervisor->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($supervisor->getEmail(), $supervisor->getName()));
+                    $message->set('recipient::email', $supervisor->getEmail());
+                    $message->set('recipient::name', $supervisor->getName());
+                }
+                break;
+            case \App\Db\MailTemplate::RECIPIENT_STAFF:
+                $subject = \Uni\Db\Status::getSubject($status);
+                $staffList = $subject->getCourse()->getUsers();
+                if (count($staffList)) {
+                    /** @var \App\Db\User $s */
+                    foreach ($staffList as $s) {
+                        $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));
+                    }
+                    $message->addTo(\Tk\Mail\Message::joinEmail($subject->getCourse()->getEmail(), \Uni\Db\Status::getSubjectName($status)));
+                    $message->set('recipient::email', $subject->getCourse()->getEmail());
+                    $message->set('recipient::name', \Uni\Db\Status::getSubjectName($status));
+                }
+                break;
+        }
+
+        // This is for all recipients only
+        if (!$isReminder || $mailTemplate->getRecipient()) { vd(); return; }
+
+        switch ($assessment->getAssessorGroup()) {
+            case Assessment::ASSESSOR_GROUP_STUDENT:
+                $student = $placement->getUser();
+                if ($student && $student->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($student->getEmail(), $student->getName()));
+                    $message->set('recipient::email', $student->getEmail());
+                    $message->set('recipient::name', $student->getName());
+                }
+                break;
+            case Assessment::ASSESSOR_GROUP_COMPANY:
+                $company = $placement->getCompany();
+                // TODO: We could also send one to the placement supervisor directly
+                if ($company && $company->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($company->getEmail(), $company->getName()));
+                    $message->set('recipient::email', $company->getEmail());
+                    $message->set('recipient::name', $company->getName());
+                }
+                break;
+        }
+    }
+
+    /**
+     * @return string|Template
+     */
+    public function getPendingIcon()
+    {
+        $editUrl = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('entryId', $this->getId());
+        if (!$this->getId()) {
+            $editUrl = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('assessmentId', $this->getAssessmentId())->
+            set('studentId', $this->getStudentId())->set('placementId', $this->getPlacementId());
+        }
+        return sprintf('<a href="%s"><div class="status-icon bg-secondary"><i class="'.$this->getAssessment()->getIcon().'"></i></div></a>', htmlentities($editUrl));
+    }
+
+    /**
+     * @return string|Template
+     * @throws \Exception
+     */
+    public function getPendingHtml()
+    {
+        $editUrl = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')->set('entryId', $this->getId());
+        $from = '';
+
+        $userName = $this->getPlacement()->getUser()->getName();
+        if ($this->getPlacement()) {
+            $from = 'from <em>' . htmlentities($this->getPlacement()->getCompany()->getName()) . '</em>';
+        }
+
+        $html = sprintf('<div class="status-placement"><div><em>%s</em> %s submitted a %s Assessment Entry for <em>%s</em></div>
+  <div class="status-actions">
+    <a href="%s" class="edit"><i class="fa fa-pencil"></i> Edit</a>
+   <!--  |
+    <a href="#" class="view"><i class="fa fa-eye"></i> View</a> |
+    <a href="#" class="approve"><i class="fa fa-check"></i> Approve</a> |
+    <a href="#" class="reject"><i class="fa fa-times"></i> Reject</a> |
+    <a href="#" class="email"><i class="fa fa-envelope"></i> Email</a>
+    -->
+  </div>
+</div>',
+            htmlentities($this->getAssessorName()), $from, htmlentities($this->getAssessment()->getName()), htmlentities($userName), htmlentities($editUrl));
+
+        return $html;
+    }
+
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function getLabel()
+    {
+        return $this->getAssessment()->getName() . ' ' . \Tk\ObjectUtil::basename($this->getCurrentStatus()->getFkey());
+    }
+
 
 }

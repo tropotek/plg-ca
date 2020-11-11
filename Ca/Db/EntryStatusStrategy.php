@@ -118,7 +118,6 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
             }
         }
 
-
         switch ($mailTemplate->getRecipient()) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
                 $student = $placement->getUser();

@@ -167,7 +167,7 @@ class Edit extends AdminEditIface
                             \Uni\Uri::createSubjectUrl('/index.html')->redirect();
                         }
                         if ($this->getEntry()->getId()) {
-                            \Uni\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->getEntry()->getId())->redirect();
+                            \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId())->redirect();
                         }
                     }
                 }

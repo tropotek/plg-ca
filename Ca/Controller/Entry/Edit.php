@@ -128,8 +128,8 @@ class Edit extends AdminEditIface
                     $this->entry = $e;
                 } else {
                     $this->getEntry()->setPlacementId($placement->getId());
-                    $this->getEntry()->setStudentId($this->getEntry()->getPlacement()->getUnits());
-                    $this->getEntry()->setSubjectId($this->getEntry()->getPlacement()->getSubjectId());
+                    $this->getEntry()->setStudentId($placement->getUserId());
+                    $this->getEntry()->setSubjectId($placement->getSubjectId());
                     if (!$this->getEntry()->getAssessment()) {
                         $this->errors[] = 'Invalid Assessment Found! Please contact the subject coordinator.';
                         return;

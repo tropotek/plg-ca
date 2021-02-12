@@ -71,6 +71,11 @@ class View extends AdminEditIface
         if (!$this->entry) {
             throw new \Tk\Exception('No valid entry found!');
         }
+        vd($this->entry->getPlacement()->getUserId(), $this->entry->getStudentId(), $this->getAuthUser()->getId());
+        if ($this->getAuthUser()->isStudent() && $this->entry->getPlacement()->getUserId() != $this->getAuthUser()->getId()) {
+            \Tk\Alert::addError('You are not authorised to access this entry. PLease try another.');
+            $this->getBackUrl()->redirect();
+        }
 
 
         $this->setPageTitle('View ' . $this->getEntry()->getAssessment()->getName());

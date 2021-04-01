@@ -59,6 +59,10 @@ class StatusMailHandler implements Subscriber
                         $message->set('assessment::linkHtml', $linkHtml);
                         $message->set('assessment::linkText', $linkText);
                         $message->set('assessment::name', $assessment->getName());
+
+                        // TODO: These should be deprecated where possible
+                        $message->set('ca::linkHtml', $linkHtml);
+                        $message->set('ca::linkText', $linkText);
                     } else {    // This would be used for placement emails sent where there is no entry in the status
 
                         $caLinkHtml = '';
@@ -70,6 +74,7 @@ class StatusMailHandler implements Subscriber
                             'placementTypeId' => $placement->placementTypeId
                         );
                         $list = \Ca\Db\AssessmentMap::create()->findFiltered($filter);
+                        vd($filter, $list->count());
                         /** @var \Ca\Db\Assessment $assessment */
                         foreach ($list as $assessment) {
                             $key = $assessment->getNameKey();
@@ -102,11 +107,12 @@ class StatusMailHandler implements Subscriber
                             $caLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url),
                                 htmlentities($assessment->getName()) . $avail, htmlentities($assessment->getName()) . $avail);
                             $caLinkText .= sprintf('%s: %s | ', htmlentities($assessment->getName()) . $avail, htmlentities($url));
+                            vd($caLinkHtml, $caLinkText);
                         }
 
                         $message->set('assessment::linkHtml', rtrim($caLinkHtml, ' | '));
                         $message->set('assessment::linkText', rtrim($caLinkText, ' | '));
-
+vd($caLinkHtml, $caLinkText);
                         // TODO: These should be deprecated where possible
                         $message->set('ca::linkHtml', rtrim($caLinkHtml, ' | '));
                         $message->set('ca::linkText', rtrim($caLinkText, ' | '));

@@ -1,9 +1,12 @@
 <?php
 namespace Ca\Listener;
 
+use Bs\DbEvents;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Tk\ConfigTrait;
 use Tk\Event\Event;
 use Tk\Event\Subscriber;
+use Uni\Db\Subject;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -12,6 +15,7 @@ use Tk\Event\Subscriber;
  */
 class SubjectEditHandler implements Subscriber
 {
+    use ConfigTrait;
 
     /**
      * @var \App\Controller\Subject\Edit
@@ -20,7 +24,7 @@ class SubjectEditHandler implements Subscriber
 
 
     /**
-     * @param \Symfony\Component\HttpKernel\Event\ControllerEvent $event
+     * @param \Symfony\Component\HttpKernel\Event\FilterControllerEvent $event
      */
     public function onKernelController($event)
     {
@@ -49,30 +53,58 @@ class SubjectEditHandler implements Subscriber
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * @var null|Subject
+     */
+    protected $currSubject = null;
+
+    /**
+     * @param \Bs\Event\DbEvent $event
+     * @throws \Exception
+     */
+    public function onModelInsert(\Bs\Event\DbEvent $event)
+    {
+        if (!$event->getModel() instanceof Subject) {
+            return;
+        }
+        $this->currSubject = $this->getConfig()->getCourse()->getCurrentSubject();
+
+    }
+
+
+    /**
+     * @param \Bs\Event\DbEvent $event
+     * @throws \Exception
+     */
+    public function onModelInsertPost(\Bs\Event\DbEvent $event)
+    {
+        if (!$event->getModel() instanceof Subject) {
+            return;
+        }
+        if ($this->currSubject) {
+            /** @var Subject $subject */
+            $subject = $event->getModel();
+            // Copy Active CA Assessments
+            $filter = array('subjectId' => $this->currSubject->getId());
+            $list = \Ca\Db\AssessmentMap::create()->findFiltered($filter);
+            foreach ($list as $assessment) {
+                if ($assessment->isActive($this->currSubject->getId()))
+                    \Ca\Db\AssessmentMap::create()->addSubject($subject->getId(), $assessment->getId());
+            }
+
+        }
+    }
+
+
+    /**
+     * @return array
      */
     public static function getSubscribedEvents()
     {
         return array(
             KernelEvents::CONTROLLER => array('onKernelController', 0),
-            \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0)
+            \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
+            DbEvents::MODEL_INSERT => 'onModelInsert',
+            DbEvents::MODEL_INSERT_POST => 'onModelInsertPost'
         );
     }
     

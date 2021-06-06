@@ -107,7 +107,6 @@ class StatusMailHandler implements Subscriber
                             $caLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url),
                                 htmlentities($assessment->getName()) . $avail, htmlentities($assessment->getName()) . $avail);
                             $caLinkText .= sprintf('%s: %s | ', htmlentities($assessment->getName()) . $avail, htmlentities($url));
-                            vd($caLinkHtml, $caLinkText);
                         }
 
                         $message->set('assessment::linkHtml', rtrim($caLinkHtml, ' | '));

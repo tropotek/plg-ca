@@ -27,7 +27,6 @@ class StatusMailHandler implements Subscriber
         }
         $subject = \Uni\Util\Status::getSubject($event->getStatus());
 
-
         /** @var \Tk\Mail\CurlyMessage $message */
         foreach ($event->getMessageList() as $message) {
 
@@ -107,12 +106,10 @@ class StatusMailHandler implements Subscriber
                             $caLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url),
                                 htmlentities($assessment->getName()) . $avail, htmlentities($assessment->getName()) . $avail);
                             $caLinkText .= sprintf('%s: %s | ', htmlentities($assessment->getName()) . $avail, htmlentities($url));
-                            vd($caLinkHtml, $caLinkText);
                         }
 
                         $message->set('assessment::linkHtml', rtrim($caLinkHtml, ' | '));
                         $message->set('assessment::linkText', rtrim($caLinkText, ' | '));
-vd($caLinkHtml, $caLinkText);
                         // TODO: These should be deprecated where possible
                         $message->set('ca::linkHtml', rtrim($caLinkHtml, ' | '));
                         $message->set('ca::linkText', rtrim($caLinkText, ' | '));

@@ -3,8 +3,10 @@ namespace Ca\Controller\Entry;
 
 use App\Controller\AdminEditIface;
 use Dom\Template;
+use Tk\Crumbs;
 use Tk\Request;
 use Tk\Str;
+use Tk\Ui\ButtonDropdown;
 
 /**
  *
@@ -194,6 +196,10 @@ class Edit extends AdminEditIface
 
         // ---------------------- End Entry Setup -------------------
 
+        if ($request->has('p')) {
+            return $this->doPdf($request);
+        }
+
         $this->setPageTitle($this->getEntry()->getAssessment()->getName());
 
         $this->setForm(\Ca\Form\Entry::create($this->isPublic())->setModel($this->getEntry()));
@@ -217,6 +223,21 @@ class Edit extends AdminEditIface
     }
 
     /**
+     * @param Request $request
+     * @return \Dom\Renderer\Renderer|Template|null|void
+     * @throws \Exception
+     */
+    public function doPdf(Request $request)
+    {
+        $watermark = '';
+        $ren = \Ca\Util\Pdf\Entry::create($this->entry, $watermark);
+        //$ren->download();
+        if (!$request->has('isHtml'))
+            $ren->output();     // comment this to see html version
+        return $ren->show();
+    }
+
+    /**
      *
      */
     public function initActionPanel()
@@ -228,6 +249,11 @@ class Edit extends AdminEditIface
 //            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
 //                \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $this->getEntry()->getId())->set('p', 'p'), 'fa fa-file-pdf-o')
 //                ->setAttr('target', '_blank'));
+            $links = [
+                \Tk\Ui\Link::create('PDF View', \Uni\Uri::create()->set('p')->set('entryId', $this->getEntry()->getId())->set(Crumbs::CRUMB_IGNORE), 'fa fa-file-pdf-o')->setAttr('target', '_blank')->setAttr('title', 'Download/View Entry Details'),
+                \Tk\Ui\Link::create('HTML View', \Uni\Uri::create()->set('p')->set('entryId', $this->getEntry()->getId())->set('isHtml')->set(Crumbs::CRUMB_IGNORE), 'fa fa-eye')->setAttr('target', '_blank')->setAttr('title', 'Download/View Entry Details')
+            ];
+            $this->getActionPanel()->append(ButtonDropdown::createButtonDropdown('Print View', 'fa fa-print', $links))->setAttr('title', 'Download/View Case Details');
         }
     }
 

@@ -212,6 +212,15 @@ class Scale extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @return Option[]|\Tk\Db\Map\ArrayObject
+     * @throws \Exception
+     */
+    public function getOptions()
+    {
+        return OptionMap::create()->findFiltered(['scaleId' => $this->getVolatileId()]);
+    }
+
+    /**
      * @return array
      */
     public function validate()

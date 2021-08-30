@@ -34,14 +34,15 @@ class StatusMailHandler implements Subscriber
                 /** @var \App\Db\Placement $placement */
                 $placement = \App\Db\PlacementMap::create()->find($message->get('placement::id'));
                 if ($placement) {
-
+                    /** @var MailTemplate $mailTemplate */
+                    $mailTemplate = $message->get('_mailTemplate');
                     /** @var \Ca\Db\Assessment $assessment */
                     $assessment = $message->get('_assessment');
                     if ($assessment) {      // when a specific entry message or reminder is sent then go in here
                         $url = '';
                         switch($assessment->getAssessorGroup()) {
                             case \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT:     // Student URL
-                                $url = \Uni\Uri::createSubjectUrl('/ca/editEntry.html', $placement->getSubject(), '/student')
+                                $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html', $placement->getSubject(), '/student')
                                     ->set('placementId', $placement->getId())
                                     ->set('assessmentId', $assessment->getId())->toString();
                                 break;
@@ -50,6 +51,11 @@ class StatusMailHandler implements Subscriber
                                     ->set('h', $placement->getHash())
                                     ->set('assessmentId', $assessment->getId())->toString();
                                 break;
+                        }
+                        if($mailTemplate->getRecipient() == MailTemplate::RECIPIENT_MENTOR) {
+                            $url = \Uni\Uri::createSubjectUrl('/ca/entryView.html', $placement->getSubject(), '/staff')
+                                ->set('placementId', $placement->getId())
+                                ->set('assessmentId', $assessment->getId())->toString();
                         }
                         $linkHtml = sprintf('<a href="%s" title="%s">%s</a>', htmlentities($url),
                             htmlentities($assessment->getName()), htmlentities($assessment->getName()));
@@ -85,7 +91,7 @@ class StatusMailHandler implements Subscriber
 
                             switch($assessment->getAssessorGroup()) {
                                 case \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT:     // Student URL
-                                    $url = \Uni\Uri::createSubjectUrl('/ca/editEntry.html', $placement->getSubject(), '/student')
+                                    $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html', $placement->getSubject(), '/student')
                                         ->set('placementId', $placement->getId())
                                         ->set('assessmentId', $assessment->getId())->toString();
                                     break;
@@ -95,6 +101,13 @@ class StatusMailHandler implements Subscriber
                                         ->set('assessmentId', $assessment->getId())->toString();
                                     break;
                             }
+                            if($mailTemplate->getRecipient() == MailTemplate::RECIPIENT_MENTOR) {
+                                $url = \Uni\Uri::createSubjectUrl('/ca/entryView.html', $placement->getSubject(), '/staff')
+                                    ->set('placementId', $placement->getId())
+                                    ->set('assessmentId', $assessment->getId())->toString();
+                            }
+
+
                             $asLinkHtml = sprintf('<a href="%s" title="%s">%s</a>', htmlentities($url),
                                 htmlentities($assessment->getName()) . $avail, htmlentities($assessment->getName()) . $avail);
                             $asLinkText = sprintf('%s: %s', htmlentities($assessment->getName()) . $avail, htmlentities($url));
@@ -135,6 +148,7 @@ class StatusMailHandler implements Subscriber
         $list['{entry::assessor}'] = 'Assessor Name';
         $list['{entry::status}'] = 'approved';
         $list['{entry::notes}'] = 'Notes Text';
+        $list['{entry::attachPdf}'] = 'Attach Entry PDF to email';
 
         $list['{assessment::id}'] = 1;
         $list['{assessment::name}'] = 'Assessment Name';

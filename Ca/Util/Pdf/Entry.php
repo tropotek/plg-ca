@@ -1,6 +1,7 @@
 <?php
 namespace Ca\Util\Pdf;
 
+use Ca\Db\Scale;
 use Dom\Renderer\Renderer;
 use Dom\Template;
 use Tk\ConfigTrait;
@@ -228,7 +229,10 @@ h1 {
 .tag {
   font-size: 0.7em;
 }
-
+pre {
+  display: block;
+  font-size: 0.8em;
+}
 CSS;
         $template->appendCss($css);
 
@@ -248,9 +252,6 @@ CSS;
         $domainId = 0;
         /** @var null|\Dom\Repeat $catRepeat */
         $catRepeat = null;
-        $scaleList = \Ca\Db\ScaleMap::create()->findFiltered([
-            'assessmentId' => $this->getEntry()->getAssessmentId()
-        ])->toArray('name');
         foreach ($items as $i => $item) {
             if ($item->getDomainId() != $domainId) {
                 if ($catRepeat) $catRepeat->appendRepeat();
@@ -265,16 +266,31 @@ CSS;
                 $value = $itemVal->value;
 
             $repeat = $catRepeat->getRepeat('item');
-            vd($item->getDescription());
-            $repeat->insertHtml('label', $item->getName());
-            if ($item->getScale()->isMultiple()) {
-                $tot = $item->getScale()->getOptions()->count();
+
+            $cHtml = '';
+            if ($item->getName())
+                $cHtml .= $item->getName() . "<br/>\n";
+            $compList = $item->getCompetencyList();
+            if ($compList->count()) {
+                foreach ($compList as $competency) {
+                    $cHtml .= $competency->getName() . "<br/>\n";
+                }
+            }
+
+            if ($item->getScale()->getType() == Scale::TYPE_CHOICE) {
+                $scaleList = $item->getScale()->getOptions()->toArray('name');
+                $tot = $item->getScale()->getOptions()->count()-1;
                 $repeat->insertHtml('data', $value . '/' . $tot);       // TODO: see if this is correct.
-                //$repeat->insertHtml('data', $value . '/' . ($item->getAssessment()->getScaleCount()));
                 $repeat->insertHtml('tag', $scaleList[$value]);
+            } else if ($item->getScale()->getType() === Scale::TYPE_TEXT) {
+                $cHtml .= sprintf("<br/><p><pre>%s</pre></p>\n", $value);
             } else {
                 $repeat->insertHtml('data', $value);
             }
+
+            $repeat->insertHtml('label', $cHtml);
+            $repeat->insertHtml('id', $i+1);
+
             $repeat->appendRepeat();
         }
         if ($catRepeat) $catRepeat->appendRepeat();
@@ -332,6 +348,7 @@ CSS;
       <table class="items" cellspacing="0">
         <tbody>
           <tr var="item" repeat="item">
+            <td class="t-id" var="id"></td>
             <td class="t-label" var="label"></td>
             <td class="t-data"><div var="data"></div><div class="tag" var="tag"></div></td>
           </tr>

@@ -3,6 +3,8 @@ namespace Ca\Db;
 
 use App\Db\MailTemplate;
 use App\Db\Traits\PlacementTrait;
+use App\Db\User;
+use App\Util\StatusMessage;
 use Bs\Db\Status;
 use Bs\Db\Traits\TimestampTrait;
 use Ca\Db\Traits\AssessmentTrait;
@@ -442,7 +444,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 $mailTemplate->getRecipient() != MailTemplate::RECIPIENT_COMPANY) return;
         }
 
-
         $msgSubject = $assessment->getName() . ' Entry ' .
             ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ';
         // '[#'.$entry->getId().'] '
@@ -451,11 +452,19 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $message->setFrom(\Tk\Mail\Message::joinEmail(\Uni\Util\Status::getCourse($status)->getEmail(),
             \Uni\Util\Status::getSubjectName($status)));
 
+        $student = $this->getPlacement()->getUser();
+        $mentorList = $this->getConfig()->getUserMapper()->findFiltered(['id' => $this->getConfig()->getUserMapper()->findMentor($student->getId())]);
+        /** @var User $mentor */
+        $mentor = $mentorList->current();
+
+
         // Setup the message vars
-        \App\Util\StatusMessage::setStudent($message, $placement->getUser());
-        \App\Util\StatusMessage::setSupervisor($message, $placement->getSupervisor());
-        \App\Util\StatusMessage::setCompany($message, $placement->getCompany());
-        \App\Util\StatusMessage::setPlacement($message, $placement);
+        StatusMessage::setStudent($message, $placement->getUser());
+        StatusMessage::setSupervisor($message, $placement->getSupervisor());
+        StatusMessage::setCompany($message, $placement->getCompany());
+        StatusMessage::setPlacement($message, $placement);
+        if ($mentor)
+            StatusMessage::setMentor($message, $mentor);
 
         // A`dd entry details
         $message->set('_assessment', $assessment);
@@ -482,6 +491,13 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             }
         }
 
+        // Attach PDF
+        if (strstr($mailTemplate->getTemplate(), '{entry::attachPdf}') !== false) {
+            $watermark = '';
+            $pdf = \Ca\Util\Pdf\Entry::create($entry, $watermark);
+            $message->addStringAttachment($pdf->getPdfAttachment(), $pdf->getFilename());
+        }
+        
         switch ($mailTemplate->getRecipient()) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
                 $student = $placement->getUser();
@@ -518,6 +534,17 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                     $message->addTo(\Tk\Mail\Message::joinEmail($subject->getCourse()->getEmail(), \Uni\Util\Status::getSubjectName($status)));
                     $message->set('recipient::email', $subject->getCourse()->getEmail());
                     $message->set('recipient::name', \Uni\Util\Status::getSubjectName($status));
+                }
+                break;
+            case MailTemplate::RECIPIENT_MENTOR:
+                if (count($mentorList)) {
+                    /** @var User $s */
+                    foreach ($mentorList as $s) {
+                        $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));
+                    }
+                    $message->addTo(\Tk\Mail\Message::joinEmail($mentor->getEmail(), $mentor->getName()));
+                    $message->set('recipient::email', $mentor->getEmail());
+                    $message->set('recipient::name', $mentor->getName());
                 }
                 break;
         }

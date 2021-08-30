@@ -33,13 +33,14 @@ class PlacementViewHandler implements Subscriber
             $template = $this->controller->getTemplate();
             $placement = $this->controller->getPlacement();
 
-            $list = \Ca\Db\AssessmentMap::create()->findFiltered(
-                array('subjectId' => $placement->getSubjectId(), 'publish' => true)
-            );
+            $list = \Ca\Db\AssessmentMap::create()->findFiltered([
+                //'subjectId' => $placement->getSubjectId(),
+                'courseId' => $placement->getSubject()->getCourseId(),
+                'publish' => true
+            ]);
             foreach ($list as $assessment) {
                 if (!$placement->getPlacementType() || !$placement->getPlacementType()->isEnableReport()) continue;
                 if (!$assessment->isAvailable($placement)) continue;
-
                 $btn = null;
                 if ($assessment->isSelfAssessment()) {
                     /** @var \Ca\Db\Entry $entry */

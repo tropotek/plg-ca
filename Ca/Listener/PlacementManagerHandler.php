@@ -51,7 +51,7 @@ class PlacementManagerHandler implements Subscriber
      */
     public function addActions(\Tk\Event\TableEvent $event)
     {
-        if (!$event->getTable() instanceof \App\Table\Placement) return;
+        if (!$event->getTable() instanceof \App\Table\Placement || !$this->controller) return;
         $subjectId = $event->getTable()->get('subjectId');
         if (!$subjectId) return;
         $assessmentList = \Ca\Db\AssessmentMap::create()->findFiltered(array(
@@ -86,8 +86,8 @@ class PlacementManagerHandler implements Subscriber
                     }
 
                     $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
-                        'assessmentId' => $placementAssessment->getId(),
-                        'placementId' => $obj->getId())
+                            'assessmentId' => $placementAssessment->getId(),
+                            'placementId' => $obj->getId())
                     )->current();
 
                     if ($entry) {
@@ -144,6 +144,8 @@ class PlacementManagerHandler implements Subscriber
      */
     public function addEntryCell(\Tk\Event\TableEvent $event)
     {
+        if (!$this->controller) return;
+
         if (!$event->getTable() instanceof \App\Table\Placement ||
             ($event->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())
         ) return;

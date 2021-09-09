@@ -537,7 +537,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 }
                 break;
             case MailTemplate::RECIPIENT_MENTOR:
-                if (count($mentorList)) {
+                if (count($mentorList) && $assessment->getAssessorGroup() != Assessment::ASSESSOR_GROUP_STUDENT) {
                     /** @var User $s */
                     foreach ($mentorList as $s) {
                         $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));
@@ -550,7 +550,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         }
 
         // This is for all recipients only
-        if (!$isReminder || $mailTemplate->getRecipient()) { vd(); return; }
+        if (!$isReminder || $mailTemplate->getRecipient()) { return; }
 
         switch ($assessment->getAssessorGroup()) {
             case Assessment::ASSESSOR_GROUP_STUDENT:

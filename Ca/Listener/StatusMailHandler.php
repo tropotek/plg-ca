@@ -68,7 +68,7 @@ class StatusMailHandler implements Subscriber
                         // TODO: These should be deprecated where possible
                         $message->set('ca::linkHtml', $linkHtml);
                         $message->set('ca::linkText', $linkText);
-                    } else {    // This would be used for placement emails sent where there is no entry in the status
+                    } else {    // This would be used ??????
 
                         $caLinkHtml = '';
                         $caLinkText = '';

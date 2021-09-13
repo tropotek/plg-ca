@@ -539,6 +539,8 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             case MailTemplate::RECIPIENT_MENTOR:
                 //if (count($mentorList) && $assessment->getAssessorGroup() != Assessment::ASSESSOR_GROUP_STUDENT) {
                 if (count($mentorList)) {
+                    $message->set('sig', '');
+                    $message->setFrom($placement->getSubject()->getInstitution()->getData()->get('mentor.coordinator.email', $placement->getSubject()->getInstitution()->getEmail()));
                     /** @var User $s */
                     foreach ($mentorList as $s) {
                         $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));

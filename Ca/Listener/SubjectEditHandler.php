@@ -1,12 +1,11 @@
 <?php
 namespace Ca\Listener;
 
-use Bs\DbEvents;
+use App\Event\SubjectEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Tk\ConfigTrait;
 use Tk\Event\Event;
 use Tk\Event\Subscriber;
-use Uni\Db\Subject;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -53,44 +52,16 @@ class SubjectEditHandler implements Subscriber
     }
 
     /**
-     * @var null|Subject
-     */
-    protected $currSubject = null;
-
-    /**
-     * @param \Bs\Event\DbEvent $event
+     * @param SubjectEvent $event
      * @throws \Exception
      */
-    public function onModelInsert(\Bs\Event\DbEvent $event)
+    public function onSubjectPostClone(SubjectEvent $event)
     {
-        if (!$event->getModel() instanceof Subject) {
-            return;
-        }
-        $this->currSubject = $this->getConfig()->getCourse()->getCurrentSubject();
-
-    }
-
-
-    /**
-     * @param \Bs\Event\DbEvent $event
-     * @throws \Exception
-     */
-    public function onModelInsertPost(\Bs\Event\DbEvent $event)
-    {
-        if (!$event->getModel() instanceof Subject) {
-            return;
-        }
-        if ($this->currSubject) {
-            /** @var Subject $subject */
-            $subject = $event->getModel();
-            // Copy Active CA Assessments
-            $filter = array('subjectId' => $this->currSubject->getId());
-            $list = \Ca\Db\AssessmentMap::create()->findFiltered($filter);
-            foreach ($list as $assessment) {
-                if ($assessment->isActive($this->currSubject->getId()))
-                    \Ca\Db\AssessmentMap::create()->addSubject($subject->getId(), $assessment->getId());
-            }
-
+        // Copy current subject Active CA Assessments
+        $list = \Ca\Db\AssessmentMap::create()->findFiltered(['subjectId' => $event->getSubject()->getId()]);
+        foreach ($list as $assessment) {
+            if ($assessment->isActive($event->getSubject()->getId()))
+                \Ca\Db\AssessmentMap::create()->addSubject($event->getClone()->getId(), $assessment->getId());
         }
     }
 
@@ -103,8 +74,7 @@ class SubjectEditHandler implements Subscriber
         return array(
             KernelEvents::CONTROLLER => array('onKernelController', 0),
             \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
-            DbEvents::MODEL_INSERT => 'onModelInsert',
-            DbEvents::MODEL_INSERT_POST => 'onModelInsertPost'
+            \App\AppEvents::SUBJECT_POST_CLONE => 'onSubjectPostClone'
         );
     }
     

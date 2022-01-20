@@ -170,6 +170,8 @@ JS;
         foreach ($form->getValues('/^item\-/') as $name => $val) {
             $id = (int)substr($name, strrpos($name, '-') + 1);
             \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, $val);
+            // TODO: look for the species scale and add this to the placement record...
+
         }
 
         $event->setRedirect($this->getBackUrl());

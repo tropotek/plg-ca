@@ -473,7 +473,7 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         }
         if ($user) {
             if ($user->isStaff()) {
-                true;
+                return true;
             } else {    // Student
                 $entry = $this->findEntry($placement);
                 if ($entry && $entry->hasStatus(array(\Ca\Db\Entry::STATUS_PENDING, \Ca\Db\Entry::STATUS_AMEND))) {

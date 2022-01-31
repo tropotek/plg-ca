@@ -468,17 +468,19 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function canWriteEntry($placement, $user=null)
     {
-        if (!$this->getId() || !$this->isActive($placement->getSubjectId()) || !$this->isAvailable($placement)) return false;
+        if (!$this->getId() || !$this->isActive($placement->getSubjectId()) || !$this->isAvailable($placement)) {
+            return false;
+        }
         if ($user) {
             if ($user->isStaff()) {
                 true;
             } else {    // Student
-                if (!$this->hasStatus($placement->getStatus())) {
-                    return false;
-                }
                 $entry = $this->findEntry($placement);
                 if ($entry && $entry->hasStatus(array(\Ca\Db\Entry::STATUS_PENDING, \Ca\Db\Entry::STATUS_AMEND))) {
                     return true;
+                }
+                if (!$this->hasStatus($placement->getStatus())) {
+                    return false;
                 }
             }
         } else {

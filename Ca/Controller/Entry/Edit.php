@@ -164,6 +164,7 @@ class Edit extends AdminEditIface
             if ($this->getAuthUser()->isStudent()) {
                 if ($this->getEntry()->getId() && $this->getEntry()->getPlacement()) {
                     if (!$this->getEntry()->getAssessment()->canWriteEntry($this->getEntry()->getPlacement(), $this->getAuthUser())) {
+
                         if (!$this->getEntry()->getAssessment()->canReadEntry($this->getEntry()->getPlacement(), $this->getAuthUser())) {
                             \Tk\Alert::addError('You do not have access to this file, please contact your coordinator.');
                             \Uni\Uri::createSubjectUrl('/index.html')->redirect();

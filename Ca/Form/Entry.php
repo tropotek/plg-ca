@@ -149,6 +149,7 @@ JS;
         // Do Custom Validations
         $form->addFieldErrors($this->getEntry()->validate());
         if ($form->hasErrors()) {
+            vd($form->getAllErrors());
             return;
         }
 
@@ -160,14 +161,17 @@ JS;
 
         $isNew = (bool)$this->getEntry()->getId();
 
-        if ($this->getAuthUser() && $this->getAuthUser()->isStudent() && $this->getEntry()->getAssessment()->isSelfAssessment() && $this->getEntry()->getStatus() == \Ca\Db\Entry::STATUS_AMEND)
+        if ($this->getAuthUser() && $this->getAuthUser()->isStudent() &&
+            $this->getEntry()->getAssessment()->isSelfAssessment() && $this->getEntry()->hasStatus(\Ca\Db\Entry::STATUS_AMEND)) {
             $this->getEntry()->setStatus(\Ca\Db\Entry::STATUS_PENDING);
+        }
         $this->getEntry()->setStatusNotify(true);
         $this->getEntry()->save();
 
         // Save Item values
         \Ca\Db\EntryMap::create()->removeValue($this->getEntry()->getVolatileId());
         foreach ($form->getValues('/^item\-/') as $name => $val) {
+            vd($name, $val);
             $id = (int)substr($name, strrpos($name, '-') + 1);
             \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, $val);
             // TODO: look for the species scale and add this to the placement record...

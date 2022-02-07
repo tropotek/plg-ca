@@ -149,13 +149,11 @@ JS;
         // Do Custom Validations
         $form->addFieldErrors($this->getEntry()->validate());
         if ($form->hasErrors()) {
-            //vd($form->getAllErrors());
             return;
         }
 
         if ($this->getEntry()->getId() < 0) {
             \Tk\Alert::addInfo('This form was successfully submitted and validated.<br/>However no data was saved as this is only a preview form. ;-)');
-            //$event->setRedirect(\Tk\Uri::create());
             return;
         }
 
@@ -171,11 +169,8 @@ JS;
         // Save Item values
         \Ca\Db\EntryMap::create()->removeValue($this->getEntry()->getVolatileId());
         foreach ($form->getValues('/^item\-/') as $name => $val) {
-            vd($name, $val);
             $id = (int)substr($name, strrpos($name, '-') + 1);
             \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, $val);
-            // TODO: look for the species scale and add this to the placement record...
-
         }
 
         $event->setRedirect($this->getBackUrl());
@@ -189,7 +184,6 @@ JS;
         }
 
         if (!$this->getAuthUser() || $this->getAuthUser()->isGuest()) {
-            // 'submit'
             \Tk\Alert::addSuccess('Thank you! Student placement feedback submitted successfully.');
             $event->setRedirect(\Tk\Uri::create('/index.html'));
         }

@@ -149,7 +149,7 @@ JS;
         // Do Custom Validations
         $form->addFieldErrors($this->getEntry()->validate());
         if ($form->hasErrors()) {
-            vd($form->getAllErrors());
+            //vd($form->getAllErrors());
             return;
         }
 

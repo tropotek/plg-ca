@@ -189,7 +189,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 $item = \Ca\Db\ItemMap::create()->findFiltered(['assessmentId' => $entry->getAssessmentId(), 'scaleId' => 7])->current();
                 if ($item) {
                     $val = \Ca\Db\EntryMap::create()->findValue($entry->getId(), $item->getId());
-                    if ($val && $arr[$rule->getLabel()] != $val->value) {
+                    if ($val && !empty($arr[$rule->getLabel()]) && $arr[$rule->getLabel()] != $val->value) {
                         return false;
                     }
                 }

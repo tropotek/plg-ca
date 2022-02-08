@@ -73,7 +73,7 @@ class PlacementManagerHandler implements Subscriber
             if (!Entry::isPlacementClassEqualAssessmentClass($placement)) {
                 // TODO: Need to make this nicer sometime in the future...
                 $cell->getRow()->addCss('class-mismatch');
-                $cell->getRow()->setAttr('style', 'background-color: #FFEFEF;cursor: help;');
+                $cell->getRow()->setAttr('style', 'background-color: #FFDFDF;cursor: help;');
                 $cell->getRow()->setAttr('title', 'Warning: Supervisor assessment category does not match placement category.');
             }
         });

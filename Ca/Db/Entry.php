@@ -2,6 +2,7 @@
 namespace Ca\Db;
 
 use App\Db\MailTemplate;
+use App\Db\Placement;
 use App\Db\Traits\PlacementTrait;
 use App\Db\User;
 use App\Util\StatusMessage;
@@ -157,6 +158,44 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         }
 
         return $entry;
+    }
+
+    /**
+     * @param Placement $placement
+     * @return bool
+     * @throws \Exception
+     */
+    public static function isPlacementClassEqualAssessmentClass($placement)
+    {
+        // Check to see if the Placement rule credit matches the supervisor assessment (may move it to a method)
+        // TODO: This should also be an option that can be enabled/disabled in the course/subject settings
+        if (class_exists('\\Rs\\Calculator')) {
+            $arr = ['small' => 1, 'prod' => 2, 'equine' => 3, 'other' => 4];
+            /** @var \Rs\Db\Rule $rule */
+            $rule = \Rs\Calculator::findPlacementRuleList($placement)->current();
+            $assessments = \Ca\Db\AssessmentMap::create()->findFiltered(array(
+                'subjectId' => $placement->getSubjectId(),
+                'placementTypeId' => $placement->getPlacementTypeId(),
+                'enableCheckbox' => true,
+                'assessorGroup' => Assessment::ASSESSOR_GROUP_COMPANY
+            ))->toArray('id');
+            /** @var \Ca\Db\Entry $entry */
+            $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+                'assessmentId' => $assessments,
+                'placementId' => $placement->getId(),
+                'status' => array(\Ca\Db\Entry::STATUS_APPROVED)
+            ))->current();
+            if ($entry) {
+                $item = \Ca\Db\ItemMap::create()->findFiltered(['assessmentId' => $entry->getAssessmentId(), 'scaleId' => 7])->current();
+                if ($item) {
+                    $val = \Ca\Db\EntryMap::create()->findValue($entry->getId(), $item->getId());
+                    if ($val && $arr[$rule->getLabel()] != $val->value) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**

@@ -1,6 +1,9 @@
 <?php
 namespace Ca\Listener;
 
+use App\Db\Placement;
+use Ca\Db\Entry;
+use Dom\Template;
 use Uni\Db\Permission;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Tk\ConfigTrait;
@@ -64,6 +67,16 @@ class PlacementManagerHandler implements Subscriber
         $spec = '/ca/entryEdit.html';
         if ($event->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())
             $spec = '/ca/entryView.html';
+
+        $actionsCell->addOnCellHtml(function (\Tk\Table\Cell\Iface $cell, Placement $placement, $html) {
+            if (!$placement->getSubject()->getCourse()->getData()->get('placementCheck', '') || $this->getConfig()->getAuthUser()->isStudent()) return;
+            if (!Entry::isPlacementClassEqualAssessmentClass($placement)) {
+                // TODO: Need to make this nicer sometime in the future...
+                $cell->getRow()->addCss('class-mismatch');
+                $cell->getRow()->setAttr('style', 'background-color: #FFEFEF;cursor: help;');
+                $cell->getRow()->setAttr('title', 'Warning: Supervisor assessment category does not match placement category.');
+            }
+        });
 
         /** @var \Ca\Db\Assessment $assessment */
         foreach ($assessmentList as $assessment) {

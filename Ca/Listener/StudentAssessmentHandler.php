@@ -1,7 +1,12 @@
 <?php
 namespace Ca\Listener;
 
+use App\Db\Placement;
+use Ca\Db\Assessment;
+use Ca\Db\Entry;
 use Ca\Plugin;
+use Dom\Template;
+use Tk\ConfigTrait;
 use Tk\Event\Subscriber;
 
 /**
@@ -11,6 +16,30 @@ use Tk\Event\Subscriber;
  */
 class StudentAssessmentHandler implements Subscriber
 {
+    use ConfigTrait;
+
+    /**
+     * @param \Tk\Event\Event $event
+     * @throws \Exception
+     */
+    public function showRow(\Tk\Event\Event $event)
+    {
+        /** @var \App\Ui\StudentAssessment $studentAssessment */
+        $studentAssessment = $event->get('studentAssessment');
+        if (!Plugin::getInstance()->isZonePluginEnabled(Plugin::ZONE_COURSE, $studentAssessment->getSubject()->getCourseId())) {
+            return;
+        }
+
+        /** @var Placement $placement */
+        $placement = $event->get('placement');
+        if (!$placement->getSubject()->getCourse()->getData()->get('placementCheck', '') || $this->getConfig()->getAuthUser()->isStudent()) return;
+        if (!Entry::isPlacementClassEqualAssessmentClass($placement)) {
+            /** @var Template $row */
+            $row = $event->get('rowTemplate');
+            $row->prependHtml('companyName', ' <i class="fa fa-info-circle text-warning" title="Warning: Supervisor assessment category does not match placement category."></i>');
+        }
+
+    }
 
     /**
      * @param \Tk\Event\Event $event
@@ -63,7 +92,8 @@ class StudentAssessmentHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            \App\UiEvents::STUDENT_ASSESSMENT_INIT => array(array('addCheckColumns', 0))
+            \App\UiEvents::STUDENT_ASSESSMENT_INIT => array(array('addCheckColumns', 0)),
+            \App\UiEvents::STUDENT_ASSESSMENT_SHOW_ROW =>  array(array('showRow', 0)),
         );
     }
 

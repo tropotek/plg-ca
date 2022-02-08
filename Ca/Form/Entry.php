@@ -91,6 +91,16 @@ class Entry extends \Uni\FormIface
             if ($val) {
                 $field->setValue($val->value);
             }
+//            else if (!$this->getEntry()->getId() && $item->getScaleId() == 7) {
+//            //} else if ($item->getScaleId() == 7) {    // Not sure if we should do it every time there is no value
+//                if (class_exists('\\Rs\\Calculator')) {
+//                    $placement = $this->getEntry()->getPlacement();
+//                    $arr = ['small' => 1, 'prod' => 2, 'equine' => 3, 'other' => 4];
+//                    /** @var \Rs\Db\Rule $rule */
+//                    $rule = \Rs\Calculator::findPlacementRuleList($placement)->current();
+//                    $field->setValue($arr[$rule->getLabel()]);
+//                }
+//            }
         }
 
         if ($this->isPublic()) {

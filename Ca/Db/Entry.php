@@ -165,7 +165,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      * @return bool
      * @throws \Exception
      */
-    public static function isPlacementClassEqualAssessmentClass($placement)
+    public static function isPlacementClassEqualAssessmentClass($placement, $assessorGroup = 'company', $scaleId = 7)
     {
         // Check to see if the Placement rule credit matches the supervisor assessment (may move it to a method)
         // TODO: This should also be an option that can be enabled/disabled in the course/subject settings
@@ -177,16 +177,21 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 'subjectId' => $placement->getSubjectId(),
                 'placementTypeId' => $placement->getPlacementTypeId(),
                 'enableCheckbox' => true,
-                'assessorGroup' => Assessment::ASSESSOR_GROUP_COMPANY
+                'assessorGroup' => $assessorGroup
             ))->toArray('id');
+            if (!count($assessments)) return true;   // Cannot calculate so return true by default
+
             /** @var \Ca\Db\Entry $entry */
             $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
                 'assessmentId' => $assessments,
                 'placementId' => $placement->getId(),
-                'status' => array(\Ca\Db\Entry::STATUS_APPROVED)
+                'status' => array(\Ca\Db\Entry::STATUS_APPROVED, \Ca\Db\Entry::STATUS_PENDING)
             ))->current();
             if ($entry) {
-                $item = \Ca\Db\ItemMap::create()->findFiltered(['assessmentId' => $entry->getAssessmentId(), 'scaleId' => 7])->current();
+                $item = \Ca\Db\ItemMap::create()->findFiltered([
+                    'assessmentId' => $entry->getAssessmentId(),
+                    'scaleId' => $scaleId
+                ])->current();
                 if ($item) {
                     $val = \Ca\Db\EntryMap::create()->findValue($entry->getId(), $item->getId());
                     if ($val && !empty($arr[$rule->getLabel()]) && $arr[$rule->getLabel()] != $val->value) {

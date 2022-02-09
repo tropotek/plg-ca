@@ -8,6 +8,7 @@ use Ca\Plugin;
 use Dom\Template;
 use Tk\ConfigTrait;
 use Tk\Event\Subscriber;
+use Tk\Log;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -33,11 +34,27 @@ class StudentAssessmentHandler implements Subscriber
         /** @var Placement $placement */
         $placement = $event->get('placement');
         if (!$placement->getSubject()->getCourse()->getData()->get('placementCheck', '') || $this->getConfig()->getAuthUser()->isStudent()) return;
-        if (!Entry::isPlacementClassEqualAssessmentClass($placement)) {
+
+        if (!Entry::isPlacementClassEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_COMPANY)){
+            Log::info('Placement credit does not match supervisor assessment');
+        }
+        if (!Entry::isPlacementClassEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_STUDENT)){
+            Log::info('Placement credit does not match self assessment');
+        }
+
+
+        if (!Entry::isPlacementClassEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_COMPANY)) {
             /** @var Template $row */
             $row = $event->get('rowTemplate');
             $row->prependHtml('companyName', ' <i class="fa fa-info-circle text-warning" title="Warning: Supervisor assessment category does not match placement category."></i>');
         }
+
+        // Check if Placement Credit == Self assessment species item
+
+
+        // Check if Placement Credit == Supervisor assessment species item
+
+
 
     }
 

@@ -172,7 +172,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         if (class_exists('\\Rs\\Calculator')) {
             $arr = ['small' => 1, 'prod' => 2, 'equine' => 3, 'other' => 4];
             /** @var \Rs\Db\Rule $rule */
-            $rule = \Rs\Calculator::findPlacementRuleList($placement)->current();
+            $rule = \Rs\Calculator::findPlacementRuleList($placement, false)->current();
             $assessments = \Ca\Db\AssessmentMap::create()->findFiltered(array(
                 'subjectId' => $placement->getSubjectId(),
                 'placementTypeId' => $placement->getPlacementTypeId(),

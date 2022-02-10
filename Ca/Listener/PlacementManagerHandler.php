@@ -5,6 +5,7 @@ use App\Db\Placement;
 use Ca\Db\Assessment;
 use Ca\Db\Entry;
 use Dom\Template;
+use Tk\Table\Cell\Text;
 use Uni\Db\Permission;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Tk\ConfigTrait;
@@ -71,43 +72,57 @@ class PlacementManagerHandler implements Subscriber
 
         $actionsCell->addOnCellHtml(function (\Tk\Table\Cell\Iface $cell, Placement $placement, $html) {
             if (!$placement->getSubject()->getCourse()->getData()->get('placementCheck', '') || $this->getConfig()->getAuthUser()->isStudent()) return;
-            if (!Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_COMPANY)) {
+            if (
+                !Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_COMPANY) ||
+                !Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_STUDENT)
+            ) {
                 // TODO: Need to make this nicer sometime in the future...
                 $cell->getRow()->addCss('class-mismatch');
                 $cell->getRow()->setAttr('style', 'background-color: #FFDFDF;cursor: help;');
                 $cell->getRow()->setAttr('title', 'Warning: Supervisor assessment category does not match placement category.');
             }
-            // TODO: add a columns for css reporting showing the values of both company and student assessment values.
+
         });
 
         /** @var \Ca\Db\Assessment $assessment */
         foreach ($assessmentList as $assessment) {
             $url = \Uni\Uri::createSubjectUrl($spec)->set('assessmentId', $assessment->getId());
             $cell = $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($assessment->getName(), $url, $assessment->getIcon()))
-                ->addOnShow(function ($cell, $obj, $btn) use ($assessment, $spec) {
-                    /* @var $cell \Tk\Table\Cell\Iface */
-                    /* @var $obj \App\Db\Placement */
-                    /* @var $btn \Tk\Table\Ui\ActionButton */
+                ->addOnShow(function (\Tk\Table\Cell\Iface $cell, \App\Db\Placement $placement, \Tk\Table\Ui\ActionButton $btn) use ($assessment, $spec) {
                     $placementAssessment = \Ca\Db\AssessmentMap::create()->findFiltered(
-                        array('subjectId' => $obj->getSubjectId(), 'uid' => $assessment->getUid())
+                        array('subjectId' => $placement->getSubjectId(), 'uid' => $assessment->getUid())
                     )->current();
                     if (!$placementAssessment) $placementAssessment = $assessment;
 
-                    $btn->setUrl(\Uni\Uri::createSubjectUrl($spec, $obj->getSubject())
-                        ->set('assessmentId', $placementAssessment->getId())->set('placementId', $obj->getId()));
-                    if (!$placementAssessment->isAvailable($obj) || ($cell->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())) {
+                    $btn->setUrl(\Uni\Uri::createSubjectUrl($spec, $placement->getSubject())
+                        ->set('assessmentId', $placementAssessment->getId())->set('placementId', $placement->getId()));
+                    if (!$placementAssessment->isAvailable($placement) || ($cell->getTable()->get('isMentorView', false) || !$this->getAuthUser()->isLearner())) {
                         $btn->setVisible(false);
                         return;
                     }
 
                     $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
                             'assessmentId' => $placementAssessment->getId(),
-                            'placementId' => $obj->getId())
+                            'placementId' => $placement->getId())
                     )->current();
 
                     if ($entry) {
                         $btn->addCss('btn-default');
                         $btn->setText('Edit ' . $placementAssessment->getName());
+
+                        // Add it here!!!!
+                    $alertHtml = '<i class="fa fa-info-circle text-danger" style="position: absolute;top: -5px;right: -5px;z-index: 9;background: #FFF;border-radius: 50%;"></i>';
+                    if ($placementAssessment->getAssessorGroup() == Assessment::ASSESSOR_GROUP_COMPANY && !Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_COMPANY)) {
+                        $btn->getTemplate()->appendHtml('link', $alertHtml);
+                        $btn->setAttr('title', 'Assessment credit does not match placement credit.');
+                    }
+                        $alertHtml = '<i class="fa fa-info-circle text-warning" style="position: absolute;top: -5px;right: -5px;z-index: 9;background: #FFF;border-radius: 50%;"></i>';
+                    if ($placementAssessment->getAssessorGroup() == Assessment::ASSESSOR_GROUP_STUDENT && !Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_STUDENT)) {
+                        $btn->getTemplate()->appendHtml('link', $alertHtml);
+                        $btn->setAttr('title', 'Self-Assessment credit does not match placement credit.');
+                    }
+
+
                     } else {
                         if (!$cell->getTable()->get('isMentorView', false) && $placementAssessment->getAuthUser()->isLearner()) {
                             $btn->addCss('btn-success');
@@ -172,6 +187,24 @@ class PlacementManagerHandler implements Subscriber
             'assessorGroup' => \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY
         ));
         $table = $event->getTable();
+
+        $table->appendCell(Text::create('supClass'), 'coClass')->setOrderProperty('')
+            ->setAttr('title', 'Supervisor Assessment Category')
+            ->addOnPropertyValue(function (\Tk\Table\Cell\Iface $cell, Placement $obj, $value) {
+                $rule = Entry::getPlacementAssessmentValueRuleObject($obj, \Ca\Db\Assessment::ASSESSOR_GROUP_COMPANY);
+                if ($rule)
+                    $value = $rule->getLabel();
+                return $value;
+            });
+        $table->appendCell(Text::create('stClass'), 'coClass')->setOrderProperty('')
+            ->setAttr('title', 'Self-Assessment Category')
+            ->addOnPropertyValue(function (\Tk\Table\Cell\Iface $cell, Placement $obj, $value) {
+            $rule = Entry::getPlacementAssessmentValueRuleObject($obj, \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT);
+            if ($rule)
+                $value = $rule->getLabel();
+            return $value;
+        });
+
         $table->appendCell(\Tk\Table\Cell\Link::create('assessmentLinks'))
             ->setLabel('Assessment Links')
             ->addOnPropertyValue(function ($cell, $obj, $value) use ($assessmentList) {

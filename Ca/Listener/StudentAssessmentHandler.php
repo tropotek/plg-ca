@@ -35,7 +35,6 @@ class StudentAssessmentHandler implements Subscriber
         $placement = $event->get('placement');
         // see if the placement check function is enabled in the course settings
         if (!$placement->getSubject()->getCourse()->getData()->get('placementCheck', '') || $this->getConfig()->getAuthUser()->isStudent()) return;
-
         if (
             !Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_COMPANY) ||
             !Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_STUDENT)

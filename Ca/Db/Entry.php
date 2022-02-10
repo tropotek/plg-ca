@@ -173,7 +173,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public static function isPlacementCreditEqualAssessmentClass($placement, $assessorGroup = 'company', $scaleId = 7)
     {
         // Check to see if the Placement rule credit matches the supervisor assessment (may move it to a method)
-        if (class_exists('\\Rs\\Calculator')) return true;
+        if (!class_exists('\\Rs\\Calculator')) return true;
         /** @var \Rs\Db\Rule $rule */
         $rule = \Rs\Calculator::findPlacementRuleList($placement, false)->current();
         $assessmentValue = self::getAssessmentScaleValue($placement, $assessorGroup, $scaleId);
@@ -199,12 +199,12 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      * @param Placement $placement
      * @param string $assessorGroup
      * @param int $scaleId
-     * @return bool|void
+     * @return \Rs\Db\Rule|null
      */
     public static function getPlacementAssessmentValueRuleObject($placement, $assessorGroup = 'company', $scaleId = 7)
     {
         $selectedRule = null;
-        if (class_exists('\\Rs\\Calculator')) return $selectedRule;
+        if (!class_exists('\\Rs\\Calculator')) return $selectedRule;
         $assessmentValue = self::getAssessmentScaleValue($placement, $assessorGroup, $scaleId);
         if (!$assessmentValue) return $selectedRule;
         $options = OptionMap::create()->findFiltered(['scaleId' => $scaleId]);
@@ -216,10 +216,9 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 break;
             }
         }
-
-        $rules = \Rs\Calculator::findCompanyRuleList($placement->getCompany(), $placement->getSubject(), false);
+        $rules = \Rs\Calculator::findSubjectRuleList($placement->getSubject(), false);
         foreach ($rules as $r) {
-            if (strtolower($r->getName()) == strtolower($selectedOption))
+            if (strtolower($r->getName()) == strtolower($selectedOption->getName()))
                 return $r;
         }
 

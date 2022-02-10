@@ -21,8 +21,9 @@ class AssessmentUnitsHandler implements Subscriber
      * @param \Tk\Event\Event $event
      * @throws \Exception
      */
-    public function onShow(\Tk\Event\Event $event)
+    public function onInit(\Tk\Event\Event $event)
     {
+
         if (!class_exists('\\Rs\\Calculator')) return;
         /** @var \App\Ui\StudentAssessment $studentAssessment */
         $studentAssessment = $event->get('studentAssessment');// see if the placement check function is enabled in the course settings
@@ -34,45 +35,50 @@ class AssessmentUnitsHandler implements Subscriber
 
         /** @var \App\Db\Placement $placement */
         foreach($studentAssessment->getPlacementList() as $placement) {
-            $html = '';
+            $companyTag = '<div class="cnr-r-red"></div>';
+            $studentTag = '<div class="cnr-l-orange"></div>';
+            $companyARule = null;
+            $studentARule = null;
+
             if (!Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_COMPANY)) {
-                vd(Entry::getAssessmentScaleValue($placement, Assessment::ASSESSOR_GROUP_COMPANY));
+                $companyARule = Entry::getPlacementAssessmentValueRuleObject($placement, Assessment::ASSESSOR_GROUP_COMPANY);
             }
             if (!Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_STUDENT)) {
-                vd(Entry::getAssessmentScaleValue($placement, Assessment::ASSESSOR_GROUP_STUDENT));
+                $studentARule = Entry::getPlacementAssessmentValueRuleObject($placement, Assessment::ASSESSOR_GROUP_STUDENT);
             }
+            $box = '<div class="cnr-box">%s%%s</div>';
+            if ($companyARule && $studentARule) {
+                if ($companyARule->getId() == $studentARule->getId()) {
+                    // Both on the same column
+                    $html = sprintf($box,$companyTag.$studentTag);
+                    $studentAssessment->setUnitColumnHtml($companyARule->getLabel(), $placement->getId(), $html);
+                } else {
+                    $html = sprintf($box, $companyTag);
+                    $studentAssessment->setUnitColumnHtml($companyARule->getLabel(), $placement->getId(), $html);
+                    $html = sprintf($box, $studentTag);
+                    $studentAssessment->setUnitColumnHtml($studentARule->getLabel(), $placement->getId(), $html);
+                }
+            } else {
+                if ($companyARule) {
+                    $html = sprintf($box, $companyTag);
+                    $studentAssessment->setUnitColumnHtml($companyARule->getLabel(), $placement->getId(), $html);
+                }
+                if ($studentARule) {
+                    $html = sprintf($box, $studentTag);
+                    $studentAssessment->setUnitColumnHtml($studentARule->getLabel(), $placement->getId(), $html);
+                }
+            }
+
         }
-        //vd($studentAssessment->getUnitCols());
+
+        $html = <<<HTML
+<p><span class="cnr-box-eg inCompany"><span class="cnr-r-red"></span></span> = Supervisor Assessment value that differs with the placement credit.</p>
+<p><span class="cnr-box-eg inCompany"><span class="cnr-l-orange"></span></span> = Self-Assessment value that differs with the placement credit.</p>
+HTML;
+        $studentAssessment->appendInfoHtml($html);
 
 
-//        $calc = \Rs\Calculator::createFromPlacementList($studentAssessment->getPlacementList());
-//        if (!$calc) return;
-//        $ruleList = $calc->getRuleList();
-//
-//        $label = $calc->getSubject()->getCourseProfile()->getUnitLabel();
-//        $totals = $calc->getRuleTotals();
-//
-//        //vd($ruleList->toArray('name'));
-//
-//        /** @var \Rs\Db\Rule $rule */
-//        foreach ($ruleList as $i => $rule) {
-//            $t = $totals[$rule->getLabel()];
-//            $studentAssessment->addTotal('Total', $rule->getLabel(), $t['total'], $this->getValidCss($t['validTotal']), $t['validMsg']);
-//        }
-//        $studentAssessment->addTotal('Total', $label, $totals['total']['total'],
-//            $this->getValidCss($totals['total']['validTotal']), $totals['total']['validMsg']);
-//
-//        //vd($totals);
-//
-//        $event->stopPropagation();
     }
-
-//    private function getValidCss($validValue)
-//    {
-//        if ($validValue < 0) return 'less';
-//        if ($validValue > 0) return 'grater';
-//        return 'equal';
-//    }
 
     /**
      * getSubscribedEvents
@@ -82,7 +88,7 @@ class AssessmentUnitsHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            \App\UiEvents::STUDENT_ASSESSMENT_SHOW => array('onShow', 10)
+            \App\UiEvents::STUDENT_ASSESSMENT_INIT => array('onInit', -100)
         );
     }
 

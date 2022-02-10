@@ -68,6 +68,7 @@ class SetupHandler implements Subscriber
         }
         $dispatcher->addSubscriber(new \Ca\Listener\PlacementManagerHandler());
         $dispatcher->addSubscriber(new \Ca\Listener\StudentAssessmentHandler());
+        $dispatcher->addSubscriber(new \Ca\Listener\AssessmentUnitsHandler());
 
         $course = \App\Config::getInstance()->getCourse();
         if ($course && $plugin->isZonePluginEnabled(Plugin::ZONE_COURSE, $course->getId())) {

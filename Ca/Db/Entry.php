@@ -161,46 +161,112 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * (requires Rule plugin)
+     * This method will check the placement credit from the rules plugin and see if the rule->name = option->name
+     *    for completed/pending assessments
+     *
+     *
      * @param Placement $placement
      * @return bool
      * @throws \Exception
      */
-    public static function isPlacementClassEqualAssessmentClass($placement, $assessorGroup = 'company', $scaleId = 7)
+    public static function isPlacementCreditEqualAssessmentClass($placement, $assessorGroup = 'company', $scaleId = 7)
     {
         // Check to see if the Placement rule credit matches the supervisor assessment (may move it to a method)
-        // TODO: This should also be an option that can be enabled/disabled in the course/subject settings
-        if (class_exists('\\Rs\\Calculator')) {
-            $arr = ['small' => 1, 'prod' => 2, 'equine' => 3, 'other' => 4];
-            /** @var \Rs\Db\Rule $rule */
-            $rule = \Rs\Calculator::findPlacementRuleList($placement, false)->current();
-            $assessments = \Ca\Db\AssessmentMap::create()->findFiltered(array(
-                'subjectId' => $placement->getSubjectId(),
-                'placementTypeId' => $placement->getPlacementTypeId(),
-                'enableCheckbox' => true,
-                'assessorGroup' => $assessorGroup
-            ))->toArray('id');
-            if (!count($assessments)) return true;   // Cannot calculate so return true by default
-
-            /** @var \Ca\Db\Entry $entry */
-            $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
-                'assessmentId' => $assessments,
-                'placementId' => $placement->getId(),
-                'status' => array(\Ca\Db\Entry::STATUS_APPROVED, \Ca\Db\Entry::STATUS_PENDING)
-            ))->current();
-            if ($entry) {
-                $item = \Ca\Db\ItemMap::create()->findFiltered([
-                    'assessmentId' => $entry->getAssessmentId(),
-                    'scaleId' => $scaleId
-                ])->current();
-                if ($item) {
-                    $val = \Ca\Db\EntryMap::create()->findValue($entry->getId(), $item->getId());
-                    if ($val && !empty($arr[$rule->getLabel()]) && $arr[$rule->getLabel()] != $val->value) {
-                        return false;
-                    }
-                }
+        if (class_exists('\\Rs\\Calculator')) return true;
+        /** @var \Rs\Db\Rule $rule */
+        $rule = \Rs\Calculator::findPlacementRuleList($placement, false)->current();
+        $assessmentValue = self::getAssessmentScaleValue($placement, $assessorGroup, $scaleId);
+        if (!$assessmentValue) return true;
+        $options = OptionMap::create()->findFiltered(['scaleId' => $scaleId]);
+        if (!count($options)) return true;
+        $selectedOption = null;
+        foreach($options as $opt) {
+            if ($opt->getValue() == $assessmentValue) {
+                $selectedOption = $opt;
+                break;
             }
         }
+        if ($selectedOption && (strtolower($rule->getName()) != strtolower($selectedOption->getName()))) {
+            return false;
+        }
         return true;
+    }
+
+    /**
+     * Return the Rule object for a placement by name comparison if found in an assessment and scale/item
+     *
+     * @param Placement $placement
+     * @param string $assessorGroup
+     * @param int $scaleId
+     * @return bool|void
+     */
+    public static function getPlacementAssessmentValueRuleObject($placement, $assessorGroup = 'company', $scaleId = 7)
+    {
+        $selectedRule = null;
+        if (class_exists('\\Rs\\Calculator')) return $selectedRule;
+        $assessmentValue = self::getAssessmentScaleValue($placement, $assessorGroup, $scaleId);
+        if (!$assessmentValue) return $selectedRule;
+        $options = OptionMap::create()->findFiltered(['scaleId' => $scaleId]);
+        if (!count($options)) return $selectedRule;
+        $selectedOption = null;
+        foreach($options as $opt) {
+            if ($opt->getValue() == $assessmentValue) {
+                $selectedOption = $opt;
+                break;
+            }
+        }
+
+        $rules = \Rs\Calculator::findCompanyRuleList($placement->getCompany(), $placement->getSubject(), false);
+        foreach ($rules as $r) {
+            if (strtolower($r->getName()) == strtolower($selectedOption))
+                return $r;
+        }
+
+        return null;
+    }
+
+    /**
+     * This method retrieves an assessment value from an assessment.
+     *
+     * If multiple assessments of the group are found the first one found is used.
+     * If multiple items of the assessment are found the first one found is used.
+     * If multiple entries are found the first one found is used
+     *
+     * @param $placement
+     * @param string $assessorGroup
+     * @param int $scaleId
+     * @param string[] $entryStatus
+     * @return string|int
+     * @throws \Exception
+     */
+    public static function getAssessmentScaleValue($placement, $assessorGroup = 'company', $scaleId = 7, $entryStatus = [\Ca\Db\Entry::STATUS_APPROVED, \Ca\Db\Entry::STATUS_PENDING])
+    {
+        $assessments = \Ca\Db\AssessmentMap::create()->findFiltered(array(
+            'subjectId' => $placement->getSubjectId(),
+            'placementTypeId' => $placement->getPlacementTypeId(),
+            'enableCheckbox' => true,
+            'assessorGroup' => $assessorGroup
+        ))->toArray('id');
+        if (!count($assessments)) return '';
+
+        /** @var \Ca\Db\Entry $entry */
+        $entry = \Ca\Db\EntryMap::create()->findFiltered(array(
+            'assessmentId' => $assessments,
+            'placementId' => $placement->getId(),
+            'status' => $entryStatus
+        ))->current();
+        if ($entry) {
+            $item = \Ca\Db\ItemMap::create()->findFiltered([
+                'assessmentId' => $entry->getAssessmentId(),
+                'scaleId' => $scaleId
+            ])->current();
+            if ($item) {
+                $val = \Ca\Db\EntryMap::create()->findValue($entry->getId(), $item->getId());
+                if ($val) return $val->value;
+            }
+        }
+        return '';
     }
 
     /**

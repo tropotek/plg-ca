@@ -2,6 +2,7 @@
 namespace Ca\Listener;
 
 use App\Db\Placement;
+use Ca\Db\Assessment;
 use Ca\Db\Entry;
 use Dom\Template;
 use Uni\Db\Permission;
@@ -70,12 +71,13 @@ class PlacementManagerHandler implements Subscriber
 
         $actionsCell->addOnCellHtml(function (\Tk\Table\Cell\Iface $cell, Placement $placement, $html) {
             if (!$placement->getSubject()->getCourse()->getData()->get('placementCheck', '') || $this->getConfig()->getAuthUser()->isStudent()) return;
-            if (!Entry::isPlacementClassEqualAssessmentClass($placement)) {
+            if (!Entry::isPlacementCreditEqualAssessmentClass($placement, Assessment::ASSESSOR_GROUP_COMPANY)) {
                 // TODO: Need to make this nicer sometime in the future...
                 $cell->getRow()->addCss('class-mismatch');
                 $cell->getRow()->setAttr('style', 'background-color: #FFDFDF;cursor: help;');
                 $cell->getRow()->setAttr('title', 'Warning: Supervisor assessment category does not match placement category.');
             }
+            // TODO: add a columns for css reporting showing the values of both company and student assessment values.
         });
 
         /** @var \Ca\Db\Assessment $assessment */

@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 3.2.48 [2022-03-07]:
+-------------------------------
+  - Added auto placement completed for DVM34
+  - Added assessment alert icons to placement manager
+
+
 Ver 3.2.46 [2021-11-05]:
 -------------------------------
 

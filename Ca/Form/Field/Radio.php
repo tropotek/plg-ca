@@ -36,8 +36,8 @@ class Radio extends Field\Radio
     {
         $xhtml = <<<HTML
 <div class="ca-control ca-radio">
-  <div class="col-md-8" var="left-col"></div>
-  <div class="col-md-4">
+  <div class="col-md-6" var="left-col"></div>
+  <div class="col-md-6">
       <div class="radio" repeat="option" var="option">
         <label var="label">
           <input type="radio" var="element" /><br/>

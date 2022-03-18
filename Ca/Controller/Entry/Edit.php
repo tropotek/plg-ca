@@ -282,12 +282,12 @@ class Edit extends AdminEditIface
                 $template->setVisible('available');
             }
         } else {
-            $template->setVisible('edit');
             if ($this->getAuthUser()->isStaff()) {
                 if ($this->getEntry()->getId()) {
                     if ($this->statusTable) {
-                        $template->appendTemplate('statusLog', $this->statusTable->show());
-                        $template->setVisible('statusLog');
+                        $template->setVisible('rightCol');
+                        $template->setAttr('main', 'class', 'col-md-8');
+                        $template->appendTemplate('status-table', $this->statusTable->show());
                     }
                 }
             }
@@ -323,11 +323,20 @@ class Edit extends AdminEditIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="EntryEdit">
-  <div class="tk-panel" data-panel-title="Entry Edit" data-panel-icon="fa fa-question" var="panel">
-      <div class="ca-description" choice="instructions" var="instructions"></div>
-      <hr choice="instructions"/>
+<div class="EntryEdit row ">
+
+  <div class="col-md-12" var="main">
+      <div class="tk-panel" data-panel-title="Entry Edit" data-panel-icon="fa fa-question" var="panel">
+          <div class="ca-description" choice="instructions" var="instructions"></div>
+          <hr choice="instructions"/>
+      </div>
   </div>
+  
+  <div class="col-md-4" var="rightCol" choice="rightCol">
+    <div class="tk-panel" data-panel-title="Status Log" data-panel-icon="fa fa-sitemap" var="status-table"></div>
+<!--    <div class="tk-panel" data-panel-title="Staff Notes" data-panel-icon="fa fa-sticky-note" var="notes-body" choice="notes-panel"></div>-->
+  </div>
+  
 </div>
 HTML;
         return \Dom\Loader::load($xhtml);

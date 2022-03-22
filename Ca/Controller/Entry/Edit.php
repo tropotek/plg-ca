@@ -213,7 +213,7 @@ class Edit extends AdminEditIface
         $this->initForm($request);
         $this->getForm()->execute();
 
-        if ($this->getAuthUser() && $this->getAuthUser()->isStaff() && $this->getEntry()->getId()) {
+        if (!$this->isPublic() && $this->getAuthUser() && $this->getAuthUser()->isStaff() && $this->getEntry()->getId()) {
             $this->statusTable = \Bs\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')->init();
             $filter = array(
                 'model' => $this->getEntry(),
@@ -298,7 +298,10 @@ class Edit extends AdminEditIface
             $title .= ': ' . $this->getEntry()->getPlacement()->getTitle(true);
         }
         if ($this->getEntry()->getId()) {
-            $title = sprintf('[ID: %s] ', $this->getEntry()->getId()) . $title;
+            $str = '';
+            if ($this->getConfig()->isDebug())
+                $str = sprintf('[PID: %s] ', $this->getEntry()->getPlacementId());
+            $title = sprintf($str . '[ID: %s] ', $this->getEntry()->getId()) . $title;
         }
         $template->setAttr('panel', 'data-panel-title', $title);
 

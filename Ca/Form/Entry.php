@@ -159,6 +159,7 @@ JS;
         // Do Custom Validations
         $form->addFieldErrors($this->getEntry()->validate());
         if ($form->hasErrors()) {
+            $form->addError('Some fields are not correctly filled in, please check your submission and submit again.');
             return;
         }
 

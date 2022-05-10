@@ -279,7 +279,7 @@ CSS;
 
             if ($item->getScale()->getType() == Scale::TYPE_CHOICE) {
                 $scaleList = $item->getScale()->getOptions()->toArray('name');
-                
+
                 // Fix array offset for values that start higher than 0
                 $add = 0;
                 $vals = $item->getScale()->getOptions()->toArray('value');

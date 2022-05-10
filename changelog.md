@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.4.10 [2022-05-11]:
+-------------------------------
+  - Fixed assessment animals worked on question in PDF
+
+
 Ver 3.4.8 [2022-03-28]:
 -------------------------------
   - Fixed intermittent server 500 error

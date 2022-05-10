@@ -279,9 +279,19 @@ CSS;
 
             if ($item->getScale()->getType() == Scale::TYPE_CHOICE) {
                 $scaleList = $item->getScale()->getOptions()->toArray('name');
+                
+                // Fix array offset for values that start higher than 0
+                $add = 0;
+                $vals = $item->getScale()->getOptions()->toArray('value');
+                if ($vals[0] > 0) {
+                    $add--;
+                }
+
                 $tot = $item->getScale()->getOptions()->count()-1;
                 $repeat->insertHtml('data', $value . '/' . $tot);       // TODO: see if this is correct.
-                $repeat->insertHtml('tag', $scaleList[$value]);
+
+                $repeat->insertHtml('tag', $scaleList[$value+$add]);
+
             } else if ($item->getScale()->getType() === Scale::TYPE_TEXT) {
                 $cHtml .= sprintf("<br/><p><pre>%s</pre></p>\n", $value);
             } else {

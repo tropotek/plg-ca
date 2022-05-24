@@ -1,5 +1,9 @@
 #CHANGELOG#
 
+Ver 3.4.12 [2022-05-25]:
+-------------------------------
+
+
 Ver 3.4.10 [2022-05-11]:
 -------------------------------
   - Fixed assessment animals worked on question in PDF

@@ -53,8 +53,8 @@ class CourseEditHandler implements Subscriber
     public function onFormInit(\Tk\Event\FormEvent $event)
     {
         if ($event->getForm() instanceof \Uni\Form\Course) {
-            $tab = 'Placement';
-            $f = $event->getForm()->appendField(Checkbox::create('placementCheck')->setCheckboxLabel('Show warnings when placement class does not match Supervisor Assessment.'))->setTabGroup($tab);
+            $tab = 'Placements';
+            $f = $event->getForm()->appendField(Checkbox::create('placementCheck')->setCheckboxLabel('Show warning icons in Dashboard and placement manager when placement category does not match Supervisor Assessment.'))->setTabGroup($tab);
             $courseData = $event->getForm()->getCourse()->getData();
             $f->setValue($courseData->get('placementCheck', ''));
         }

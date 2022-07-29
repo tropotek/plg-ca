@@ -110,7 +110,7 @@ jQuery(function ($) {
     
     $.get(document.location, {change: 'change', active: active, publish: tr.find('input.date').val(), assessmentId: $(this).data('assessmentId')}, 
       function (data) {
-        //console.log(data);
+        
       }
     );
   });

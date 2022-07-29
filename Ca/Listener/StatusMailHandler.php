@@ -79,7 +79,7 @@ class StatusMailHandler implements Subscriber
                         'placementTypeId' => $placement->placementTypeId
                     );
                     $list = \Ca\Db\AssessmentMap::create()->findFiltered($filter);
-                    //vd($filter, $list->count());
+
                     /** @var \Ca\Db\Assessment $assessment */
                     foreach ($list as $assessment) {
                         $key = $assessment->getNameKey();

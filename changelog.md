@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.4.18 [2022-08-04]:
+-------------------------------
+  - removed comments
+
+
 Ver 3.4.16 [2022-06-17]:
 -------------------------------
   - Only show active placementTypes to the UI

@@ -26,13 +26,12 @@ Or add the following to your composer.json file:
 
 ```json
 {
-  "ttek-plg/plg-ca": "~1.0"
+  "ttek-plg/plg-ca": "~3.4"
 }
 ```
 
 If you do not use Composer, you can grab the code from GitHub, and use any
-PSR-0 compatible autoloader (e.g. the [plg-ca](https://github.com/tropotek/plg-ca))
-to load the classes.
+PSR-0 compatible autoloader to load the classes.
 
 ## Introduction
 

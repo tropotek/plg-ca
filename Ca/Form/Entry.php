@@ -63,11 +63,11 @@ class Entry extends \Uni\FormIface
 
         // $this->appendField(new Field\Input('title'));        // HTML from auto gen title
         $this->appendField(new Field\Input('assessorName'))->setFieldset($fieldset)->setRequired();
-        $this->appendField(new Field\Input('assessorEmail'))->setFieldset($fieldset);
+        $this->appendField(new Field\Input('assessorEmail'))->setFieldset($fieldset)->setRequired();
         if ($this->getEntry()->getAssessorId() != $this->getEntry()->getStudentId()) {
             $this->appendField(new Field\Input('absent'))->setFieldset($fieldset)->setNotes('Enter the number of days the student was absent if any.');
         }
-        $this->appendField(new Field\Textarea('notes'))->setLabel('Comments')->setFieldset($fieldset);
+        $this->appendField(new Field\Textarea('notes'))->setLabel('Comments')->setRequired()->setFieldset($fieldset);
 
         $items = \Ca\Db\ItemMap::create()->findFiltered(array('assessmentId' => $this->getEntry()->getAssessmentId()),
             \Tk\Db\Tool::create('order_by'));
@@ -159,6 +159,7 @@ JS;
         // Do Custom Validations
         $form->addFieldErrors($this->getEntry()->validate());
         if ($form->hasErrors()) {
+            $form->addError('Some fields are not correctly filled in, please check your submission and submit again.');
             return;
         }
 

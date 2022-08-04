@@ -63,7 +63,7 @@ class Assessment extends \Uni\FormIface
 //            ->addCss('tk-dual-select')->setTabGroup($tab)
 //            ->setNotes('Select the placement status values when assessments become available and can be submitted by users.');
 
-        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('courseId' => $this->getAssessment()->getCourseId()));
+        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('courseId' => $this->getAssessment()->getCourseId(), 'active' => true));
         $ptiField = $this->appendField(new Field\CheckboxGroup('placementTypeId[]', $list))
             ->addCss('_tk-dual-select')->setTabGroup($tab)
             ->setNotes('Enable this assessment for the selected placement types.');

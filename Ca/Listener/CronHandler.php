@@ -138,7 +138,7 @@ class CronHandler implements Subscriber
                             $e = new \Bs\Event\StatusEvent($status);
                             $this->getConfig()->getEventDispatcher()->dispatch(\Bs\StatusEvents::STATUS_CHANGE, $e);
                             $this->getConfig()->getEventDispatcher()->dispatch(\Bs\StatusEvents::STATUS_SEND_MESSAGES, $e);
-                        //\Tk\Log::warning($placement->getTitle() . ': ' . $placement->getStatus());
+                            //\Tk\Log::warning($placement->getTitle() . ': ' . $placement->getStatus());
                             if ($e->isPropagationStopped()) continue;
 
                             // Mark reminder sent

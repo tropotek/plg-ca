@@ -187,7 +187,8 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 break;
             }
         }
-        if ($selectedOption && (strtolower($rule->getName()) != strtolower($selectedOption->getName()))) {
+
+        if ($rule && $selectedOption && (strtolower($rule->getName()) != strtolower($selectedOption->getName()))) {
             return false;
         }
         return true;

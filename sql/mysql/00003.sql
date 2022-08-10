@@ -1,5 +1,5 @@
 -- ---------------------------------
--- Author: Michael Mifsud <info@tropotek.com>
+-- Author: Michael Mifsud <http://www.tropotek.com/>
 -- ---------------------------------
 -- Adding an entry reminder system to the plugin
 

@@ -64,6 +64,7 @@ class Entry extends \Uni\FormIface
         // $this->appendField(new Field\Input('title'));        // HTML from auto gen title
         $this->appendField(new Field\Input('assessorName'))->setFieldset($fieldset)->setRequired();
         $this->appendField(new Field\Input('assessorEmail'))->setFieldset($fieldset)->setRequired();
+
         if ($this->getEntry()->getAssessorId() != $this->getEntry()->getStudentId()) {
             $this->appendField(new Field\Input('absent'))->setFieldset($fieldset)->setNotes('Enter the number of days the student was absent if any.');
         }

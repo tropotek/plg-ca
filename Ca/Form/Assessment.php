@@ -75,6 +75,12 @@ class Assessment extends \Uni\FormIface
         $list = \Ca\Db\AssessmentMap::create()->findPlacementTypes($this->getAssessment()->getId());
         $ptiField->setValue($list);
 
+        $tab = 'Instructions';
+
+        $this->appendField(new Field\Textarea('description'))->setLabel('Instructions')->setTabGroup($tab)
+            ->setNotes('Enter any student instructions on how to complete placement entries.')
+            ->addCss('mce')->setAttr('data-elfinder-path', $this->getConfig()->getInstitution()->getDataPath().'/media');;
+
         $tab = 'Reminder Notifications';
 
         $this->appendField(new Field\Checkbox('enableReminder'))->setLabel('')->setTabGroup($tab)
@@ -86,12 +92,6 @@ class Assessment extends \Uni\FormIface
             ->setNotes('The number of days to send subsequent reminders after the initial date has passed.');
         $this->appendField(new Field\Input('reminderRepeatCycles'))->setTabGroup($tab)
             ->setNotes('The number of times to send subsequent reminders');
-
-        $tab = 'Instructions';
-
-        $this->appendField(new Field\Textarea('description'))->setLabel('Instructions')->setTabGroup($tab)
-            ->setNotes('Enter any student instructions on how to complete placement entries.')
-            ->addCss('mce')->setAttr('data-elfinder-path', $this->getConfig()->getInstitution()->getDataPath().'/media');;
 
         $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
         $this->appendField(new Event\Submit('save', array($this, 'doSubmit')));

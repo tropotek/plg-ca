@@ -33,7 +33,7 @@ class SetupHandler implements Subscriber
         $config = \Uni\Config::getInstance();
         $dispatcher = $config->getEventDispatcher();
 
-        $dispatcher->addSubscriber(new \Ca\Listener\CronHandler());
+        //$dispatcher->addSubscriber(new \Ca\Listener\CronHandler());       // Deprecated: See placement reminders
         $dispatcher->addSubscriber(new \Ca\Listener\StatusMailHandler());
 
         $this->setup();

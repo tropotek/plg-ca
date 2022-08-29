@@ -554,8 +554,8 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 $mailTemplate->getRecipient() != MailTemplate::RECIPIENT_COMPANY) return;
         }
 
-        $msgSubject = $assessment->getName() . ' Entry ' .
-            ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ';
+        $statusName = preg_replace('/^\[[0-9]+\] /', '', $status->getName());
+        $msgSubject = '[#' . $placement->getId() . '] ' . ucfirst($statusName) . ' for ' . $placement->getTitle(true) . ' ';
         // '[#'.$entry->getId().'] '
 
         $message->setSubject($msgSubject);
@@ -684,6 +684,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 }
                 break;
         }
+        return $message;
     }
 
     /**

@@ -12,7 +12,7 @@ use Tk\Event\Subscriber;
  * @license Copyright 2015 Michael Mifsud
  *
  * @todo See todo.md as this need to be refactored to be a more maintainable codebase
- *
+ * @deprecated See placement reminders
  */
 class CronHandler implements Subscriber
 {
@@ -178,9 +178,10 @@ class CronHandler implements Subscriber
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            \App\AppEvents::CONSOLE_CRON => array('onCron', 0)
-        );
+        return [];
+//        return array(
+//            \App\AppEvents::CONSOLE_CRON => array('onCron', 0)
+//        );
     }
     
 }

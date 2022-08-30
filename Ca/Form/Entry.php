@@ -65,8 +65,11 @@ class Entry extends \Uni\FormIface
         $this->appendField(new Field\Input('assessorName'))->setFieldset($fieldset)->setRequired();
         $this->appendField(new Field\Input('assessorEmail'))->setFieldset($fieldset)->setRequired();
 
-        if ($this->getEntry()->getAssessorId() != $this->getEntry()->getStudentId()) {
-            $this->appendField(new Field\Input('absent'))->setFieldset($fieldset)->setNotes('Enter the number of days the student was absent if any.');
+        $f = $this->appendField(new Field\Input('absent'))->setFieldset($fieldset)->setNotes('Enter the number of days the student was absent if any.');
+        if ($this->getEntry()->getAssessment()->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT) {
+            $f->setNotes('If you were absent during this placement and have not already contacted the EMS team, 
+            please send documentation supporting this absence to <a href="mailto:vet-extramurals@unimelb.edu.au">vet-extramurals@unimelb.edu.au</a>. 
+            For more information on this requirement please see the <a href="/data/institution/1/media/DVM_3_4/2022%20DVM%20Clinical%20EMS%20Studies%20Guide.pdf" target="_blank">DVM Clinical EMS Guide</a>.');
         }
         $this->appendField(new Field\Textarea('notes'))->setLabel('Comments')->setRequired()->setFieldset($fieldset);
 

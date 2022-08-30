@@ -1,5 +1,9 @@
 #CHANGELOG#
 
+Ver 3.4.26 [2022-08-31]:
+-------------------------------
+
+
 Ver 3.4.24 [2022-08-22]:
 -------------------------------
   - Fixed public companyManager orderBy field

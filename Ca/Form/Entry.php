@@ -71,7 +71,7 @@ class Entry extends \Uni\FormIface
             please send documentation supporting this absence to <a href="mailto:vet-extramurals@unimelb.edu.au">vet-extramurals@unimelb.edu.au</a>. 
             For more information on this requirement please see the <a href="/data/institution/1/media/DVM_3_4/2022%20DVM%20Clinical%20EMS%20Studies%20Guide.pdf" target="_blank">DVM Clinical EMS Guide</a>.');
         }
-        $this->appendField(new Field\Textarea('notes'))->setLabel('Comments')->setRequired()->setFieldset($fieldset);
+        $this->appendField(new Field\Textarea('notes'))->setLabel('Comments')->setFieldset($fieldset);
 
         $items = \Ca\Db\ItemMap::create()->findFiltered(array('assessmentId' => $this->getEntry()->getAssessmentId()),
             \Tk\Db\Tool::create('order_by'));

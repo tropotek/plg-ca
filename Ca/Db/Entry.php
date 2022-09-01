@@ -544,8 +544,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         }
 
         $isReminder = false;
-        if ($status->getEvent() == 'message.ca.entry.reminder')
+        if ($status->getEvent() == 'message.ca.entry.reminder') {
             $isReminder = true;
+
+        }
 
         if ($isReminder && $mailTemplate->getRecipient()) {
             if ($assessment->getAssessorGroup() == Assessment::ASSESSOR_GROUP_STUDENT &&
@@ -554,9 +556,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 $mailTemplate->getRecipient() != MailTemplate::RECIPIENT_COMPANY) return;
         }
 
-        $statusName = preg_replace('/^\[[0-9]+\] /', '', $status->getName());
-        $msgSubject = '[#' . $placement->getId() . '] ' . ucfirst($statusName) . ' for ' . $placement->getTitle(true) . ' ';
-        // '[#'.$entry->getId().'] '
+
+        $msgSubject = '[#' . $placement->getId() . '] ' . $assessment->getName() . ' Entry ' . ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ';
+        //$msgSubject = '[#' . $placement->getId() . '] ' . ucfirst($statusName) . ' for ' . $placement->getTitle(true) . ' ';
+
 
         $message->setSubject($msgSubject);
         $message->setFrom(\Tk\Mail\Message::joinEmail(\Uni\Util\Status::getCourse($status)->getEmail(),

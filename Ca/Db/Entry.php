@@ -679,8 +679,12 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 break;
             case Assessment::ASSESSOR_GROUP_COMPANY:
                 $company = $placement->getCompany();
-                // TODO: We could also send one to the placement supervisor directly
-                if ($company && $company->getEmail()) {
+                $supervisor = $placement->getSupervisor();
+                if ($supervisor && $supervisor->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($supervisor->getEmail(), $supervisor->getName()));
+                    $message->set('recipient::email', $supervisor->getEmail());
+                    $message->set('recipient::name', $supervisor->getName());
+                } else if ($company && $company->getEmail()) {
                     $message->addTo(\Tk\Mail\Message::joinEmail($company->getEmail(), $company->getName()));
                     $message->set('recipient::email', $company->getEmail());
                     $message->set('recipient::name', $company->getName());

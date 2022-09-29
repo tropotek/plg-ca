@@ -32,10 +32,13 @@ class Manager extends AdminManagerIface
     public function doDefault(Request $request)
     {
         $this->setTable(\Ca\Table\Entry::create());
-        $this->getTable()->setEditUrl(\Bs\Uri::createHomeUrl('/ca/entryEdit.html'));
+        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/ca/entryEdit.html'));
         $this->getTable()->init();
 
-        $filter = array();
+        $filter = [
+            'assessmentId' => $request->get('assessmentId'),
+            'subjectId' => $this->getSubjectId()
+        ];
         $this->getTable()->setList($this->getTable()->findList($filter));
     }
 

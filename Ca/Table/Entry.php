@@ -32,17 +32,20 @@ class Entry extends \Uni\TableIface
     {
     
         $this->appendCell(new Cell\Checkbox('id'));
-        $this->appendCell(new Cell\Text('assessmentId'));
-        $this->appendCell(new Cell\Text('subjectId'));
+        //$this->appendCell(new Cell\Text('assessmentId'));
+        //$this->appendCell(new Cell\Text('subjectId'));
         $this->appendCell(new Cell\Text('studentId'));
-        $this->appendCell(new Cell\Text('assessorId'));
         $this->appendCell(new Cell\Text('placementId'));
         $this->appendCell(new Cell\Text('title'))->addCss('key')->setUrl($this->getEditUrl());
-        $this->appendCell(new Cell\Text('assessorName'));
-        $this->appendCell(new Cell\Text('assessorEmail'));
-        $this->appendCell(new Cell\Text('absent'));
-        $this->appendCell(new Cell\Text('average'));
         $this->appendCell(new Cell\Text('status'));
+        //$this->appendCell(new Cell\Text('assessorId'));
+        $this->appendCell(new Cell\Text('assessorName'));
+        //$this->appendCell(new Cell\Text('assessorEmail'));
+        $this->appendCell(new Cell\Text('absent'));
+        //$this->appendCell(new Cell\Text('average'));
+        $this->appendCell(new Cell\Summarize('notes'));
+
+
         $this->appendCell(new Cell\Date('modified'));
         $this->appendCell(new Cell\Date('created'));
 

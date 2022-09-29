@@ -13,10 +13,9 @@ if (!$routes) return;
 
 
 // Staff Only
-$routes->add('ca-staff-assessment-manager', Route::create('/staff/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault'));
+//$routes->add('ca-staff-assessment-manager', Route::create('/staff/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault'));
 $routes->add('ca-staff-assessment-edit', Route::create('/staff/ca/assessmentEdit.html', 'Ca\Controller\Assessment\Edit::doDefault'));
 $routes->add('ca-staff-assessment-preview', Route::create('/staff/ca/assessmentPreview.html', 'Ca\Controller\Assessment\Preview::doDefault'));
-$routes->add('ca-staff-assessment-active', Route::create('/staff/{subjectCode}/ca/activeAssessments.html', 'Ca\Controller\Assessment\Active::doDefault'));
 
 $routes->add('ca-staff-domain-manager', Route::create('/staff/ca/domainManager.html', 'Ca\Controller\Domain\Manager::doDefault'));
 $routes->add('ca-staff-domain-edit', Route::create('/staff/ca/domainEdit.html', 'Ca\Controller\Domain\Edit::doDefault'));
@@ -51,6 +50,8 @@ $routes->add('ca-staff-item-edit', Route::create('/staff/ca/itemEdit.html', 'Ca\
 //// Competancy
 //$routes->add('ca-staff-item-manager', Route::create('/staff/{subjectCode}/ca/itemManager.html', 'Ca\Controller\Item\Manager::doDefault'));
 //$routes->add('ca-staff-item-edit', Route::create('/staff/{subjectCode}/ca/itemEdit.html', 'Ca\Controller\Item\Edit::doDefault'));
+
+$routes->add('ca-staff-assessment-active', Route::create('/staff/{subjectCode}/ca/activeAssessments.html', 'Ca\Controller\Assessment\Active::doDefault'));
 
 $routes->add('ca-staff-entry-manager', Route::create('/staff/{subjectCode}/ca/entryManager.html', 'Ca\Controller\Entry\Manager::doDefault'));
 $routes->add('ca-staff-entry-edit', Route::create('/staff/{subjectCode}/ca/entryEdit.html', 'Ca\Controller\Entry\Edit::doDefault'));

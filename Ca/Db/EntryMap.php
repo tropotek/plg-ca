@@ -81,7 +81,8 @@ class EntryMap extends Mapper
      */
     public function findFiltered($filter, $tool = null)
     {
-        return $this->selectFromFilter($this->makeQuery(\Tk\Db\Filter::create($filter)), $tool);
+        $r = $this->selectFromFilter($this->makeQuery(\Tk\Db\Filter::create($filter)), $tool);
+        return $r;
     }
 
     /**
@@ -111,11 +112,12 @@ class EntryMap extends Mapper
             $w = $this->makeMultiQuery($filter['assessmentId'], 'a.assessment_id');
             if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
+        if (!empty($filter['studentId'])) {
+            $w = $this->makeMultiQuery($filter['studentId'], 'a.student_id');
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
+        }
         if (!empty($filter['subjectId'])) {
             $filter->appendWhere('a.subject_id = %s AND ', (int)$filter['subjectId']);
-        }
-        if (!empty($filter['studentId'])) {
-            $filter->appendWhere('a.student_id = %s AND ', (int)$filter['studentId']);
         }
         if (!empty($filter['assessorId'])) {
             $filter->appendWhere('a.assessor_id = %s AND ', (int)$filter['assessorId']);

@@ -1,6 +1,8 @@
 <?php
 namespace Ca\Table;
 
+use App\Db\Permission;
+use App\Db\User;
 use Tk\Form\Field;
 use Tk\Table\Cell;
 
@@ -32,17 +34,19 @@ class Entry extends \Uni\TableIface
     {
     
         $this->appendCell(new Cell\Checkbox('id'));
-        //$this->appendCell(new Cell\Text('assessmentId'));
-        //$this->appendCell(new Cell\Text('subjectId'));
-        $this->appendCell(new Cell\Text('studentId'));
-        $this->appendCell(new Cell\Text('placementId'));
-        $this->appendCell(new Cell\Text('title'))->addCss('key')->setUrl($this->getEditUrl());
+        $this->appendCell(new Cell\Text('studentId'))
+            ->addOnPropertyValue(function (\Tk\Table\Cell\Text $cell, \Ca\Db\Entry $obj, $value) {
+                if ($obj->getStudent()) {
+                    $value = $obj->getStudent()->getName();
+                }
+                return $value;
+            });
+        $this->appendCell(new Cell\Text('title'))->addCss('key')->setUrl($this->getEditUrl(), 'placementId');
         $this->appendCell(new Cell\Text('status'));
-        //$this->appendCell(new Cell\Text('assessorId'));
+        //$this->appendCell(new Cell\Text('assessorId'))->setUrl($this->getEditUrl(), 'placementId');
         $this->appendCell(new Cell\Text('assessorName'));
-        //$this->appendCell(new Cell\Text('assessorEmail'));
+        $this->appendCell(new Cell\Text('assessorEmail'));
         $this->appendCell(new Cell\Text('absent'));
-        //$this->appendCell(new Cell\Text('average'));
         $this->appendCell(new Cell\Summarize('notes'));
 
 
@@ -52,12 +56,19 @@ class Entry extends \Uni\TableIface
         // Filters
         $this->appendFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Search');
 
+
+        $list = $this->getConfig()->getUserMapper()
+            ->findFiltered([
+                'subjectId' => $this->getConfig()->getSubjectId(),
+                'type' => User::TYPE_STUDENT
+            ], \Tk\Db\Tool::create('a.name_first'));
+        $this->appendFilter(new Field\CheckboxSelect('studentId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)));
+
+
         // Actions
-        //$this->appendAction(\Tk\Table\Action\Link::createLink('New Entry', \Bs\Uri::createHomeUrl('/ca/entryEdit.html'), 'fa fa-plus'));
-        //$this->appendAction(\Tk\Table\Action\ColumnSelect::create()->setUnselected(array('modified', 'created')));
-        if ($this->getAuthUser()->isCoordinator()) {
-            $this->appendAction(\Tk\Table\Action\Delete::create());
-        }
+        $cs = $this->appendAction(\Tk\Table\Action\ColumnSelect::create()
+            ->setUnselected(array('studentId', 'assessorId', 'assessorEmail', 'absent', 'modified'))
+            );
         $this->appendAction(\Tk\Table\Action\Csv::create());
 
         // load table

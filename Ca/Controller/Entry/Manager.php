@@ -32,7 +32,7 @@ class Manager extends AdminManagerIface
     public function doDefault(Request $request)
     {
         $this->setTable(\Ca\Table\Entry::create());
-        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/ca/entryEdit.html'));
+        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/placementEdit.html'));
         $this->getTable()->init();
 
         $filter = [

@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.4.34 [2022-09-30]:
+-------------------------------
+  - Added assessment manager
+
+
 Ver 3.4.32 [2022-09-20]:
 -------------------------------
   - Change assessment reminders to use supervisor email

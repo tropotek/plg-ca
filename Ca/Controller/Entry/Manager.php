@@ -61,7 +61,7 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        if ($this->getConfig()->isSubjectUrl() && $this->getConfig()->isDebug()) {
+        if ($this->getConfig()->isSubjectUrl()) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Average Report',
                 Uri::createSubjectUrl('/ca/reportAverage.html')->set('assessmentId', $this->assessment->getId()), $this->assessment->getIcon()));
         }

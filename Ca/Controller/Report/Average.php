@@ -1,5 +1,5 @@
 <?php 
-namespace Ca\Controller\Entry;
+namespace Ca\Controller\Report;
 
 use App\Controller\AdminManagerIface;
 use Ca\Db\Assessment;
@@ -7,18 +7,16 @@ use Ca\Db\AssessmentMap;
 use Dom\Template;
 use Tk\Exception;
 use Tk\Request;
-use Uni\Uri;
+use Tk\Table\Cell\Summarize;
+use Tk\Table\Cell\Text;
 
 /**
- * TODO: Add Route to routes.php:
- *      $routes->add('ca-entry-manager', Route::create('/staff/ca/entryManager.html', 'Ca\Controller\Entry\Manager::doDefault'));
- *
  * @author Mick Mifsud
  * @created 2019-11-06
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
-class Manager extends AdminManagerIface
+class Average extends AdminManagerIface
 {
 
     /**
@@ -31,7 +29,7 @@ class Manager extends AdminManagerIface
      */
     public function __construct()
     {
-        $this->setPageTitle('Entry Manager');
+        $this->setPageTitle('Report Assessment Average');
     }
 
     /**
@@ -45,15 +43,48 @@ class Manager extends AdminManagerIface
             throw new Exception('Invalid assessment ID');
         }
 
-        $this->setTable(\Ca\Table\Entry::create());
-        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/placementEdit.html'));
-        $this->getTable()->init();
+        $table = $this->getConfig()->createTable('averageCalc');
+        $table->setRenderer($this->getConfig()->createTableRenderer($table));
+        $this->setTable($table);
 
-        $filter = [
-            'assessmentId' => $request->get('assessmentId'),
-            'subjectId' => $this->getSubjectId()
-        ];
-        $this->getTable()->setList($this->getTable()->findList($filter));
+        $table->appendCell(Summarize::create('name'))->addCss('key')->setOrderProperty('');
+        $table->appendCell(Text::create('percent'))->setLabel('%')->setOrderProperty('')->addOnPropertyValue(function (\Tk\Table\Cell\Iface $cell, $obj, $value) {
+            $value = 0;
+            if ($obj->max_value > 0) {
+                $value = ($obj->avr / $obj->max_value) * 100;
+            }
+            return sprintf('%.2f', round($value, 2)) . '%';
+        });
+        $table->appendCell(Text::create('avr'))->setOrderProperty('')->addOnPropertyValue(function (\Tk\Table\Cell\Iface $cell, $obj, $value) {
+            //return round($value, 2);
+            return sprintf('%.2f', round($value, 2));
+        });
+        $table->appendCell(Text::create('max_value'))->setLabel('Max')->setOrderProperty('');
+        $table->appendCell(Text::create('cnt'))->setLabel('Count')->setOrderProperty('');
+
+        $this->getTable()->appendAction(\Tk\Table\Action\Csv::create());
+
+        //$this->getTable()->init();
+
+
+
+        $sql = <<<SQL
+SELECT *, AVG(value) as 'avr', count(item_id) as 'cnt'
+FROM v_ca_value
+WHERE
+    assessment_id = {$this->assessment->getId()}
+    AND subject_id = {$this->getSubjectId()}
+    AND `value` != '0'
+GROUP BY item_id
+ORDER BY order_by
+SQL;
+
+        $stmt = $this->getConfig()->getDb()->query($sql);
+
+        $this->getTable()->setList($stmt->fetchAll());
+        $this->getTable()->getRenderer()->enableFooter(false);
+        $this->getTable()->appendAction(\Tk\Table\Action\Csv::create());
+        //$this->getTable()->setList($this->getTable()->findList($filter));
     }
 
     /**
@@ -61,10 +92,7 @@ class Manager extends AdminManagerIface
      */
     public function initActionPanel()
     {
-        if ($this->getConfig()->isSubjectUrl() && $this->getConfig()->isDebug()) {
-            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Average Report',
-                Uri::createSubjectUrl('/ca/reportAverage.html')->set('assessmentId', $this->assessment->getId()), $this->assessment->getIcon()));
-        }
+
     }
 
     /**
@@ -75,7 +103,7 @@ class Manager extends AdminManagerIface
         $this->initActionPanel();
         $template = parent::show();
 
-        $template->appendTemplate('panel', $this->getTable()->show());
+        $template->appendTemplate('panel', $this->getTable()->getRenderer()->show());
         $placementTypes = $this->assessment->getPlacementTypes();
         $str = '';
         foreach ($placementTypes as $placementType) {
@@ -107,5 +135,5 @@ class Manager extends AdminManagerIface
 HTML;
         return \Dom\Loader::load($xhtml);
     }
-    
+
 }

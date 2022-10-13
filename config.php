@@ -13,7 +13,7 @@ if (!$routes) return;
 
 
 // Staff Only
-//$routes->add('ca-staff-assessment-manager', Route::create('/staff/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault'));
+$routes->add('ca-staff-assessment-manager', Route::create('/staff/ca/assessmentManager.html', 'Ca\Controller\Assessment\Manager::doDefault'));
 $routes->add('ca-staff-assessment-edit', Route::create('/staff/ca/assessmentEdit.html', 'Ca\Controller\Assessment\Edit::doDefault'));
 $routes->add('ca-staff-assessment-preview', Route::create('/staff/ca/assessmentPreview.html', 'Ca\Controller\Assessment\Preview::doDefault'));
 
@@ -51,6 +51,7 @@ $routes->add('ca-staff-item-edit', Route::create('/staff/ca/itemEdit.html', 'Ca\
 //$routes->add('ca-staff-item-manager', Route::create('/staff/{subjectCode}/ca/itemManager.html', 'Ca\Controller\Item\Manager::doDefault'));
 //$routes->add('ca-staff-item-edit', Route::create('/staff/{subjectCode}/ca/itemEdit.html', 'Ca\Controller\Item\Edit::doDefault'));
 
+$routes->add('ca-staff-report-average', Route::create('/staff/{subjectCode}/ca/reportAverage.html', 'Ca\Controller\Report\Average::doDefault'));
 $routes->add('ca-staff-assessment-active', Route::create('/staff/{subjectCode}/ca/activeAssessments.html', 'Ca\Controller\Assessment\Active::doDefault'));
 
 $routes->add('ca-staff-entry-manager', Route::create('/staff/{subjectCode}/ca/entryManager.html', 'Ca\Controller\Entry\Manager::doDefault'));

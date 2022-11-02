@@ -66,8 +66,6 @@ class Average extends AdminManagerIface
 
         //$this->getTable()->init();
 
-
-
         $sql = <<<SQL
 SELECT *, AVG(value) as 'avr', count(item_id) as 'cnt'
 FROM v_ca_value

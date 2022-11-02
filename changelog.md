@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.4.42 [2022-11-03]:
+-------------------------------
+  - Fixed absent field from student assesment form
+
+
 Ver 3.4.40 [2022-11-03]:
 -------------------------------
 

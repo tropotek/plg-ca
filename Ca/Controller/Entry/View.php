@@ -85,7 +85,6 @@ class View extends AdminEditIface
             $this->getForm()->removeField('assessorName');
             $this->getForm()->removeField('assessorEmail');
             $this->getForm()->removeField('average');
-            $this->getForm()->removeField('absent');
         }
         $this->getForm()->removeField('save');
         $this->getForm()->removeField('update');

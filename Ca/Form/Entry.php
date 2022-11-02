@@ -65,6 +65,7 @@ class Entry extends \Uni\FormIface
         $this->appendField(new Field\Input('assessorName'))->setFieldset($fieldset)->setRequired();
         $this->appendField(new Field\Input('assessorEmail'))->setFieldset($fieldset)->setRequired();
 
+        vd();
         $f = $this->appendField(new Field\Input('absent'))->setFieldset($fieldset)->setNotes('Enter the number of days the student was absent if any.');
         if ($this->getEntry()->getAssessment()->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT) {
             $f->setNotes('If you were absent during this placement and have not already contacted the EMS team, 

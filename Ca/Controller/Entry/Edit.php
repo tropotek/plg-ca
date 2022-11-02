@@ -208,7 +208,6 @@ class Edit extends AdminEditIface
             $this->getForm()->removeField('assessorName');
             $this->getForm()->removeField('assessorEmail');
             $this->getForm()->removeField('average');
-            $this->getForm()->removeField('absent');
         }
         $this->initForm($request);
         $this->getForm()->execute();

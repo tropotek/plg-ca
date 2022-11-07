@@ -36,6 +36,7 @@ class AssessmentMap extends Mapper
             $this->dbMap->addPropertyMap(new Db\Text('assessorGroup', 'assessor_group'));
             $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
             $this->dbMap->addPropertyMap(new Db\Boolean('enableCheckbox', 'enable_checkbox'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('enableAbsentDoc', 'enable_absent_doc'));
             $this->dbMap->addPropertyMap(new Db\Boolean('enableReminder', 'enable_reminder'));
             $this->dbMap->addPropertyMap(new Db\Integer('reminderInitialDays', 'reminder_initial_days'));
             $this->dbMap->addPropertyMap(new Db\Integer('reminderRepeatDays', 'reminder_repeat_days'));
@@ -65,6 +66,7 @@ class AssessmentMap extends Mapper
             $this->formMap->addPropertyMap(new Form\Text('assessorGroup'));
             $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
             $this->formMap->addPropertyMap(new Form\Boolean('enableCheckbox'));
+            $this->formMap->addPropertyMap(new Form\Boolean('enableAbsentDoc'));
             $this->formMap->addPropertyMap(new Form\Boolean('enableReminder'));
             $this->formMap->addPropertyMap(new Form\Integer('reminderInitialDays'));
             $this->formMap->addPropertyMap(new Form\Integer('reminderRepeatDays'));

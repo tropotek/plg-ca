@@ -52,6 +52,10 @@ class Assessment extends \Uni\FormIface
         $this->appendField(new Field\Checkbox('enableCheckbox'))->setLabel('Subject Assessment Table')->setTabGroup($tab)
             ->setCheckboxLabel('Display a checkbox on the Subject student assessment table when Entry marked approved');
 
+
+        $this->appendField(new Field\Checkbox('enableAbsentDoc'))->setLabel('Enable Absent Upload')->setTabGroup($tab)
+            ->setCheckboxLabel('If a student enters a value for the absent field require an uploaded document.');
+
         // TODO: Hide this when assessor group is 'student'
         //$list = \App\Db\Placement::getStatusList();
         $list = array('Approved' => 'approved', 'Assessing' => 'assessing', 'Evaluating' => 'evaluating');

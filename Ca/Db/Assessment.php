@@ -68,6 +68,11 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var bool
      */
+    public $enableAbsentDoc = false;
+
+    /**
+     * @var bool
+     */
     public $enableReminder = false;
 
     /**
@@ -285,6 +290,24 @@ class Assessment extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     public function setEnableCheckbox($enableCheckbox): Assessment
     {
         $this->enableCheckbox = $enableCheckbox;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnableAbsentDoc(): bool
+    {
+        return $this->enableAbsentDoc;
+    }
+
+    /**
+     * @param bool $enableAbsentDoc
+     * @return Assessment
+     */
+    public function setEnableAbsentDoc($enableAbsentDoc): Assessment
+    {
+        $this->enableAbsentDoc = $enableAbsentDoc;
         return $this;
     }
 

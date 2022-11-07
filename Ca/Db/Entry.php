@@ -270,6 +270,28 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * Get the path for all file associated to this object
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getDataPath()
+    {
+        if ($this->getPlacement())
+            return sprintf('%s/entry/%s', $this->getPlacement()->getDataPath(), $this->getVolatileId());
+        return '';
+    }
+
+    /**
+     * @return File|object|\Tk\Db\Map\Model|null
+     */
+    public function getAbsentDoc()
+    {
+        $filter = ['model' => $this];
+        return \Bs\Db\FileMap::create()->findFiltered($filter)->current();
+    }
+
+    /**
      * @param int $studentId
      * @return Entry
      */

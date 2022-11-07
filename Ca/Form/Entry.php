@@ -35,6 +35,10 @@ class Entry extends \Uni\FormIface
     {
         parent::__construct($formId);
         $this->setPublic($isPublic);
+
+        if ($this->getConfig()->getRequest()->has('del')) {
+            $this->doDelete($this->getConfig()->getRequest());
+        }
     }
 
     /**
@@ -65,12 +69,30 @@ class Entry extends \Uni\FormIface
         $this->appendField(new Field\Input('assessorName'))->setFieldset($fieldset)->setRequired();
         $this->appendField(new Field\Input('assessorEmail'))->setFieldset($fieldset)->setRequired();
 
-        vd();
         $f = $this->appendField(new Field\Input('absent'))->setFieldset($fieldset)->setNotes('Enter the number of days the student was absent if any.');
         if ($this->getEntry()->getAssessment()->getAssessorGroup() == \Ca\Db\Assessment::ASSESSOR_GROUP_STUDENT) {
-            $f->setNotes('If you were absent during this placement and have not already contacted the EMS team, 
-            please send documentation supporting this absence to <a href="mailto:vet-extramurals@unimelb.edu.au">vet-extramurals@unimelb.edu.au</a>. 
-            For more information on this requirement please see the <a href="/data/institution/1/media/DVM_3_4/2022%20DVM%20Clinical%20EMS%20Studies%20Guide.pdf" target="_blank">DVM Clinical EMS Guide</a>.');
+//            $f->setNotes('If you were absent during this placement and have not already contacted the EMS team,
+//            please send documentation supporting this absence to <a href="mailto:vet-extramurals@unimelb.edu.au">vet-extramurals@unimelb.edu.au</a>.
+//            For more information on this requirement please see the <a href="/data/institution/1/media/DVM_3_4/2022%20DVM%20Clinical%20EMS%20Studies%20Guide.pdf" target="_blank">DVM Clinical EMS Guide</a>.');
+            $f->setNotes('If you were absent during this placement, please ensure to upload the relevant
+            documentation supporting this absence. If you have any questions please contact the EMS team via 
+            <a href="mailto:vet-extramurals@unimelb.edu.au">vet-extramurals@unimelb.edu.au</a>. 
+            For more information on this requirement please see the <a href="/data/institution/1/media/DVM_3_4/2022%20DVM%20Clinical%20EMS%20Studies%20Guide.pdf" target="_blank">DVM Clinical EMS Guide</a>');
+
+            if ($this->getEntry()->getAssessment()->isEnableAbsentDoc()) {
+                $file = $this->appendField(new Field\File('absentDoc'))->setLabel('Absent Document')
+                    ->setFieldset($fieldset)
+                    ->setAttr('accept', '.doc,.docx,.pdf')
+                    ->addCss('tk-multiinput')
+                    ->setAttr('data-max-files', '1');
+
+                if ($this->getEntry()->getId()) {
+                    $v = json_encode([$this->getEntry()->getAbsentDoc()]);
+                    $file->setAttr('data-value', $v);
+                    $file->setAttr('data-prop-path', 'path');
+                    $file->setAttr('data-prop-id', 'id');
+                }
+            }
         }
         $this->appendField(new Field\Textarea('notes'))->setLabel('Comments')->setFieldset($fieldset);
 
@@ -125,6 +147,7 @@ jQuery(function ($) {
   if (config.roleType === 'staff') {
     $('.ca-entry-edit .tk-form-events').clone(true).appendTo($('.ca-entry-edit fieldset.EntryDetails'));
   }
+  
 });
 JS;
         if (!$this->isPublic() && $this->getAuthUser() && $this->getAuthUser()->isStaff()) {
@@ -143,6 +166,25 @@ JS;
     }
 
     /**
+     * @param \Tk\Request $request
+     */
+    public function doDelete(\Tk\Request $request)
+    {
+        $fileId = $request->get('del');
+        try {
+            /** @var \Bs\Db\File $file */
+            $file = \Bs\Db\FileMap::create()->find($fileId);
+            vd($fileId, $file);
+            if ($file) $file->delete();
+        } catch (\Exception $e) {
+            \Tk\ResponseJson::createJson(array('status' => 'err', 'msg' => $e->getMessage()), 500)->send();
+            exit();
+        }
+        \Tk\ResponseJson::createJson(array('status' => 'ok'))->send();
+        exit();
+    }
+
+    /**
      * @param Form $form
      * @param Event\Iface $event
      * @throws \Exception
@@ -158,6 +200,14 @@ JS;
             $name = 'item-'.$item->getId();
             if (!\Ca\Form\Field\ItemHelper::isValid($item, $form->getFieldValue($name))) {
                 $form->addFieldError($name, 'Please enter a valid value for this item.');
+            }
+        }
+
+        /** @var \Tk\Form\Field\File $fileField */
+        $absentDoc = $form->getField('absentDoc');
+        if ($absentDoc) {
+            if (!$this->getEntry()->getAbsentDoc() && !$absentDoc->hasFile() && $form->getFieldValue('absent') > 0) {
+                $form->addFieldError('absentDoc', 'Please attach relevant documentation supporting your absence.');
             }
         }
 
@@ -187,6 +237,36 @@ JS;
         foreach ($form->getValues('/^item\-/') as $name => $val) {
             $id = (int)substr($name, strrpos($name, '-') + 1);
             \Ca\Db\EntryMap::create()->saveValue($this->getEntry()->getVolatileId(), $id, $val);
+        }
+
+
+        if ($absentDoc && $absentDoc->hasFile()) {
+            foreach ($absentDoc->getUploadedFiles() as $file) {
+                if (!\App\Config::getInstance()->validateFile($file->getClientOriginalName())) {
+                    \Tk\Alert::addWarning('Illegal file type: ' . $file->getClientOriginalName());
+                    continue;
+                }
+                try {
+                    $filePath = $this->getConfig()->getDataPath() . $this->getEntry()->getDataPath() . '/' . $file->getClientOriginalName();
+                    if (!is_dir(dirname($filePath))) {
+                        mkdir(dirname($filePath), $this->getConfig()->getDirMask(), true);
+                    }
+                    $file->move(dirname($filePath), basename($filePath));
+                    $oFile = \Bs\Db\FileMap::create()->findFiltered([
+                        'model' => $this->getEntry(),
+                        'label' => 'attach',
+                        'path' => $this->getEntry()->getDataPath() . '/' . $file->getClientOriginalName()
+                    ])->current();
+                    if (!$oFile) {
+                        $oFile = \Bs\Db\File::create($this->getEntry(), $this->getEntry()->getDataPath() . '/' . $file->getClientOriginalName(), $this->getConfig()->getDataPath() );
+                        $oFile->setLabel('attach');
+                    }
+                    $oFile->save();
+                } catch (\Exception $e) {
+                    \Tk\Log::error($e->__toString());
+                    \Tk\Alert::addWarning('Error Uploading file: ' . $file->getClientOriginalName());
+                }
+            }
         }
 
         $event->setRedirect($this->getBackUrl());

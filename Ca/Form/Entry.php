@@ -206,7 +206,7 @@ JS;
         /** @var \Tk\Form\Field\File $fileField */
         $absentDoc = $form->getField('absentDoc');
         if ($absentDoc) {
-            if (!$this->getEntry()->getAbsentDoc() && !$absentDoc->hasFile() && $form->getFieldValue('absent') > 0) {
+            if (!$this->getAuthUser()->isStaff() && !$this->getEntry()->getAbsentDoc() && !$absentDoc->hasFile() && $form->getFieldValue('absent') > 0) {
                 $form->addFieldError('absentDoc', 'Please attach relevant documentation supporting your absence.');
             }
         }

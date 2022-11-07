@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.4.44 [2022-11-08]:
+-------------------------------
+  - Added absent upload doc to Assement entries
+
+
 Ver 3.4.42 [2022-11-03]:
 -------------------------------
   - Fixed absent field from student assesment form

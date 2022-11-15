@@ -4,6 +4,8 @@ namespace Ca\Controller\Report;
 use App\Controller\AdminManagerIface;
 use Ca\Db\Assessment;
 use Ca\Db\AssessmentMap;
+use Ca\Db\OptionMap;
+use Ca\Db\ScaleMap;
 use Dom\Template;
 use Tk\Exception;
 use Tk\Request;
@@ -48,41 +50,37 @@ class Average extends AdminManagerIface
         $this->setTable($table);
 
         $table->appendCell(Summarize::create('name'))->addCss('key')->setOrderProperty('');
-        $table->appendCell(Text::create('percent'))->setLabel('%')->setOrderProperty('')->addOnPropertyValue(function (\Tk\Table\Cell\Iface $cell, $obj, $value) {
-            $value = 0;
-            if ($obj->max_value > 0) {
-                $value = ($obj->avr / $obj->max_value) * 100;
-            }
-            return sprintf('%.2f', round($value, 2)) . '%';
-        });
-        $table->appendCell(Text::create('avr'))->setOrderProperty('')->addOnPropertyValue(function (\Tk\Table\Cell\Iface $cell, $obj, $value) {
-            //return round($value, 2);
-            return sprintf('%.2f', round($value, 2));
-        });
-        $table->appendCell(Text::create('max_value'))->setLabel('Max')->setOrderProperty('');
-        $table->appendCell(Text::create('cnt'))->setLabel('Count')->setOrderProperty('');
+        $options = OptionMap::create()->findFiltered(['scaleId' => 4], 'value');
+        foreach ($options as $option) {
+            $table->appendCell(Text::create($option->getId()))->setLabel($option->getName())->setOrderProperty('')->addOnPropertyValue(function (\Tk\Table\Cell\Iface $cell, $obj, $value) {
+                $cell->addCss('text-center');
+                return round($value ?? 0) . '%';
+            });
+        }
 
-        $this->getTable()->appendAction(\Tk\Table\Action\Csv::create());
+        $this->getTable()->appendAction(\Tk\Table\Action\Csv::create('csv', ''));
 
-        //$this->getTable()->init();
 
         $sql = <<<SQL
-SELECT *, AVG(value) as 'avr', count(item_id) as 'cnt'
-FROM v_ca_value
+SELECT *
+FROM v_item_option_avg
 WHERE
     assessment_id = {$this->assessment->getId()}
     AND subject_id = {$this->getSubjectId()}
-    AND `value` != '0'
-GROUP BY item_id
 ORDER BY order_by
 SQL;
 
         $stmt = $this->getConfig()->getDb()->query($sql);
+        $results = [];
+        foreach ($stmt as $row) {
+            $results[$row->item_id]['name'] = $row->name;
+            $results[$row->item_id]['item_id'] = $row->item_id;
+            $results[$row->item_id]['order_by'] = $row->order_by;
+            $results[$row->item_id][$row->option_id] = $row->avg;
+        }
 
-        $this->getTable()->setList($stmt->fetchAll());
+        $this->getTable()->setList($results);
         $this->getTable()->getRenderer()->enableFooter(false);
-        $this->getTable()->appendAction(\Tk\Table\Action\Csv::create());
-        //$this->getTable()->setList($this->getTable()->findList($filter));
     }
 
     /**

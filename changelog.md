@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.4.50 [2023-09-01]:
+-------------------------------
+  - Disable feedback form buttons and pages whn subject inactive
+
+
 Ver 3.4.48 [2022-11-16]:
 -------------------------------
 

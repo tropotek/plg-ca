@@ -3,6 +3,7 @@ namespace Ca\Controller\Entry;
 
 use App\Controller\AdminEditIface;
 use Dom\Template;
+use Tk\Alert;
 use Tk\Crumbs;
 use Tk\Request;
 use Tk\Str;
@@ -152,6 +153,11 @@ class Edit extends AdminEditIface
 
 
         if ($this->isPublic()) {
+            vd($this->getEntry()->getPlacement()->getSubject()->getName());
+            if (!$this->getEntry()->getPlacement()->getSubject()->isActive()) {
+                $this->errors[] = 'This subject is no longer active. Please contact the EMS coordinator.';
+                return;
+            }
             if ($this->getEntry()->hasStatus(array(\Ca\Db\Entry::STATUS_APPROVED, \Ca\Db\Entry::STATUS_NOT_APPROVED))) {
                 $this->errors[] = 'This entry has already been submitted.';
                 return;
@@ -162,6 +168,11 @@ class Edit extends AdminEditIface
             }
         } else {
             if ($this->getAuthUser()->isStudent()) {
+                if (!$this->getSubject()->isActive()) {
+                    Alert::addWarning('This subject is no longer active. Please contact your EMS coordinator.');
+                    \Uni\Uri::createSubjectUrl('/index.html')->redirect();
+                }
+
                 if ($this->getEntry()->getId() && $this->getEntry()->getPlacement()) {
                     if (!$this->getEntry()->getAssessment()->canWriteEntry($this->getEntry()->getPlacement(), $this->getAuthUser())) {
 

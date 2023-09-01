@@ -3,6 +3,7 @@ namespace Ca\Listener;
 
 use Tk\ConfigTrait;
 use Tk\Event\Subscriber;
+use Tk\Uri;
 
 /**
  * @author Michael Mifsud <http://www.tropotek.com/>
@@ -48,26 +49,42 @@ class PlacementViewHandler implements Subscriber
                         'assessmentId' => $assessment->getId(),
                         'placementId' => $placement->getId()
                     ))->current();
+
+vd();
+                    $url = Uri::create('#');
+                    $disable = '';
+                    if (!$placement->getSubject()->isActive()) {
+                        $disable = 'disabled';
+                    }
                     if ($entry) {
                         if (($entry->getStatus() == \Ca\Db\Entry::STATUS_PENDING || $entry->getStatus() == \Ca\Db\Entry::STATUS_AMEND)
                             && ($this->getAuthUser()->isStaff() || $this->getAuthUser()->isLearner())) {
-                            $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
-                                ->set('assessmentId', $assessment->getId())->set('placementId', $placement->getId());
+                            if (!$disable) {
+                                $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
+                                    ->set('assessmentId', $assessment->getId())->set('placementId', $placement->getId());
+                            }
                             $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
                             $btn->setAttr('title', 'Edit ' . $assessment->getName());
                             $btn->addCss('btn-info');
+                            $btn->addCss($disable);
                         } else {
-                            $url = \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $entry->getId());
+                            //if (!$disable) {
+                                $url = \Uni\Uri::createSubjectUrl('/ca/entryView.html')->set('entryId', $entry->getId());
+                            //}
                             $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
                             $btn->setAttr('title', 'View ' . $assessment->getName());
+                            //$btn->addCss($disable);
                         }
                     } else {
                         if ($placement->getReport() && ($this->getAuthUser()->isStaff() || $this->getAuthUser()->isLearner())) {
-                            $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
-                                ->set('assessmentId', $assessment->getId())->set('placementId', $placement->getId());
+                            if (!$disable) {
+                                $url = \Uni\Uri::createSubjectUrl('/ca/entryEdit.html')
+                                    ->set('assessmentId', $assessment->getId())->set('placementId', $placement->getId());
+                            }
                             $btn = \Tk\Ui\Link::createBtn($assessment->getName(), $url, $assessment->getIcon());
                             $btn->setAttr('title', 'Create ' . $assessment->getName());
                             $btn->addCss('btn-success');
+                            $btn->addCss($disable);
                         }
                     }
 

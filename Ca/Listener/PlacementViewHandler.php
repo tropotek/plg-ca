@@ -50,7 +50,6 @@ class PlacementViewHandler implements Subscriber
                         'placementId' => $placement->getId()
                     ))->current();
 
-vd();
                     $url = Uri::create('#');
                     $disable = '';
                     if (!$placement->getSubject()->isActive()) {

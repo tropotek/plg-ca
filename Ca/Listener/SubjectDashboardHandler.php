@@ -1,6 +1,7 @@
 <?php
 namespace Ca\Listener;
 
+use Bs\Uri;
 use Tk\Event\Event;
 use Tk\Event\Subscriber;
 
@@ -66,6 +67,7 @@ class SubjectDashboardHandler implements Subscriber
                             return;
                         }
 
+
                         $entry = $assessment->findEntry($obj);
                         if ($entry) {
                             $btn->setAttr('title', 'View ' . $assessment->getName());
@@ -90,6 +92,12 @@ class SubjectDashboardHandler implements Subscriber
                                 $btn->setVisible(false);
                             }
                         }
+
+                        if (!$obj->getSubject()->isActive()) {
+                            $btn->setUrl(Uri::create('#'));
+                            $btn->addCss('disabled');
+                        }
+
                     });
             }
 

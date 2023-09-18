@@ -561,6 +561,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         }
 
         $placement = $entry->getPlacement();
+        if ($placement && $placement->getSubject() && !$placement->getSubject()->isActive()) return null;
         if (!$placement->getPlacementType()->isNotifications()) {
             \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->getName() . '] Notifications Disabled');
         }

@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.4.54 [2023-09-18]:
+-------------------------------
+  - fix emails being sent for inactive subjects
+
+
 Ver 3.4.52 [2023-09-01]:
 -------------------------------
   - Disable feedback form buttons and pages whn subject inactive
